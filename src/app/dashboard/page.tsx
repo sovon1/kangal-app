@@ -7,6 +7,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { MealToggles } from '@/components/dashboard/meal-toggles';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
+import { SpendingChart } from '@/components/dashboard/spending-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -432,6 +433,11 @@ export default function DashboardPage() {
                 balance={balanceQuery.data?.currentBalance ?? null}
                 loading={statsQuery.isLoading}
             />
+
+            {/* Spending Chart */}
+            {userContext && (
+                <SpendingChart cycleId={userContext.cycleId} messId={userContext.messId} />
+            )}
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
