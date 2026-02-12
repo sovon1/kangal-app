@@ -1,0 +1,127 @@
+﻿
+> kangal-app@0.1.0 build
+> next build
+
+node.exe : ΓÜá Warning: 
+Next.js inferred your 
+workspace root, but it 
+may not be correct.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (Γ  
+  Üá Warning: Ne...not    
+ be correct.:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+ We detected multiple 
+lockfiles and selected 
+the directory of C:\Users\
+sovon\package-lock.json 
+as the root directory.
+ To silence this warning, 
+set `turbopack.root` in 
+your Next.js config, or 
+consider removing one of 
+the lockfiles if it's not 
+needed.
+   See https://nextjs.org/
+docs/app/api-reference/con
+fig/next-config-js/turbopa
+ck#root-directory for 
+more information.
+ Detected additional 
+lockfiles: 
+   * C:\Users\sovon\Deskto
+p\kangal web\kangal-app\pa
+ckage-lock.json
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+
+ΓÜá The "middleware" file 
+convention is deprecated. 
+Please use "proxy" 
+instead. Learn more: https
+://nextjs.org/docs/message
+s/middleware-to-proxy
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 5.0s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/(dashboard)/page
+.tsx:229:73
+Type error: Type 'number 
+| undefined' is not 
+assignable to type 
+'number'.
+  Type 'undefined' is not 
+assignable to type 
+'number'.
+
+[0m [90m 227 |[39m     
+                        ) 
+[33m:[39m balanceQuery[
+33m.[39mdata [33m?[39m 
+(
+ [90m 228 |[39m         
+                        
+[33m<[39m[33mdiv[39m c
+lassName[33m=[39m[32m"s
+pace-y-2.5"[39m[33m>[39
+m
+[31m[1m>[22m[39m[90m 
+229 |[39m                
+                     [33m
+<[39m[33mBalanceRow[39m
+ label[33m=[39m[32m"Ope
+ning Balance"[39m amount
+[33m=[39m{balanceQuery[3
+3m.[39mdata[33m.[39mope
+ningBalance} 
+[33m/[39m[33m>[39m
+ [90m     |[39m         
+                          
+                          
+            
+[31m[1m^[22m[39m
+ [90m 230 |[39m         
+                          
+  [33m<[39m[33mBalanceR
+ow[39m label[33m=[39m[
+32m"Deposits"[39m amount
+[33m=[39m{balanceQuery[3
+3m.[39mdata[33m.[39mtot
+alDeposits} positive 
+[33m/[39m[33m>[39m
+ [90m 231 |[39m         
+                          
+  
+[33m<[39m[33mdiv[39m c
+lassName[33m=[39m[32m"b
+order-t 
+border-border/50"[39m 
+[33m/[39m[33m>[39m
+ [90m 232 |[39m         
+                          
+  [33m<[39m[33mBalanceR
+ow[39m label[33m=[39m{
+[32m`Meals (${balanceQuery
+.data.totalMeals}├ù)`[39m
+} amount[33m=[39m{[33m-
+[39mbalanceQuery[33m.[3
+9mdata[33m.[39mmealCost}
+ 
+[33m/[39m[33m>[39m[0m
+Next.js build worker 
+exited with code: 1 and 
+signal: null

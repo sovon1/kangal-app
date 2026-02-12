@@ -1,0 +1,260 @@
+'use client';
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+interface MemberCostData {
+    memberName: string;
+    totalMeals: number;
+    mealRate: number;
+    mealCost: number;
+    bazaarSpent: number;
+    deposits: number;
+    fixedCostShare: number;
+    individualCosts: number;
+    balance: number;
+}
+
+interface CycleMeta {
+    messName: string;
+    cycleName: string;
+    startDate: string;
+    endDate: string;
+}
+
+// Helper: get last table's final Y position
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getFinalY(doc: any, fallback: number): number {
+    return doc.lastAutoTable?.finalY ?? fallback;
+}
+
+// ============================================================================
+// SINGLE MEMBER REPORT
+// ============================================================================
+
+export function exportSingleMemberPDF(
+    member: MemberCostData,
+    cycle: CycleMeta,
+    deposits: Array<{ date: string; amount: number; method: string }>,
+    bazaarTrips: Array<{ date: string; amount: number; items: string }>,
+    individualCosts: Array<{ description: string; amount: number; status: string }>
+) {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Header
+    doc.setFillColor(30, 30, 30);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('KANGAL', 14, 20);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${cycle.messName} · ${cycle.cycleName}`, 14, 30);
+    doc.text(`${cycle.startDate} — ${cycle.endDate}`, pageWidth - 14, 30, { align: 'right' });
+
+    // Member name
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Member Report: ${member.memberName}`, 14, 55);
+
+    // Summary table
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Summary', 14, 68);
+    autoTable(doc as unknown as jsPDF, {
+        startY: 72,
+        head: [['Item', 'Value']],
+        body: [
+            ['Total Meals', String(member.totalMeals)],
+            ['Meal Rate', `TK ${member.mealRate.toFixed(2)}`],
+            ['Meal Cost', `TK ${member.mealCost.toLocaleString()}`],
+            ['Fixed Cost Share', `TK ${member.fixedCostShare.toLocaleString()}`],
+            ['Individual Costs', `TK ${member.individualCosts.toLocaleString()}`],
+            ['Total Deposits', `TK ${member.deposits.toLocaleString()}`],
+            ['Bazaar Shopping', `TK ${member.bazaarSpent.toLocaleString()}`],
+            ['Balance', `TK ${member.balance.toLocaleString()}`],
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [45, 45, 45] },
+        styles: { fontSize: 10 },
+        columnStyles: { 1: { halign: 'right' } },
+    });
+
+    let y = getFinalY(doc, 130);
+
+    // Deposits table
+    if (deposits.length > 0) {
+        y += 10;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Deposits', 14, y);
+        autoTable(doc as unknown as jsPDF, {
+            startY: y + 4,
+            head: [['Date', 'Amount', 'Method']],
+            body: deposits.map(d => [d.date, `TK ${d.amount.toLocaleString()}`, d.method]),
+            theme: 'striped',
+            headStyles: { fillColor: [45, 45, 45] },
+            styles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+        });
+        y = getFinalY(doc, y + 30);
+    }
+
+    // Bazaar trips
+    if (bazaarTrips.length > 0) {
+        y += 10;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Bazaar Shopping Trips', 14, y);
+        autoTable(doc as unknown as jsPDF, {
+            startY: y + 4,
+            head: [['Date', 'Amount', 'Items']],
+            body: bazaarTrips.map(b => [b.date, `TK ${b.amount.toLocaleString()}`, b.items]),
+            theme: 'striped',
+            headStyles: { fillColor: [45, 45, 45] },
+            styles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+        });
+        y = getFinalY(doc, y + 30);
+    }
+
+    // Individual costs
+    if (individualCosts.length > 0) {
+        y += 10;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Individual Costs', 14, y);
+        autoTable(doc as unknown as jsPDF, {
+            startY: y + 4,
+            head: [['Description', 'Amount', 'Status']],
+            body: individualCosts.map(c => [c.description, `TK ${c.amount.toLocaleString()}`, c.status]),
+            theme: 'striped',
+            headStyles: { fillColor: [45, 45, 45] },
+            styles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+        });
+    }
+
+    // Footer
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(130, 130, 130);
+        doc.text(`Generated by KANGAL · ${new Date().toLocaleDateString()}`, 14, doc.internal.pageSize.getHeight() - 10);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 14, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+    }
+
+    doc.save(`${member.memberName.replace(/\s+/g, '_')}_report_${cycle.cycleName.replace(/\s+/g, '_')}.pdf`);
+}
+
+// ============================================================================
+// ALL MEMBERS REPORT
+// ============================================================================
+
+export function exportAllMembersPDF(
+    members: MemberCostData[],
+    cycle: CycleMeta,
+    fixedCosts: Array<{ type: string; amount: number }>,
+    totalBazaar: number,
+    totalDeposits: number
+) {
+    const doc = new jsPDF({ orientation: 'landscape' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Header
+    doc.setFillColor(30, 30, 30);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('KANGAL', 14, 20);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${cycle.messName} — All Members Report`, 14, 30);
+    doc.text(`${cycle.cycleName} (${cycle.startDate} — ${cycle.endDate})`, pageWidth - 14, 30, { align: 'right' });
+
+    // Summary
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cycle Summary', 14, 52);
+
+    autoTable(doc as unknown as jsPDF, {
+        startY: 56,
+        body: [
+            ['Members', String(members.length)],
+            ['Total Bazaar Expense', `TK ${totalBazaar.toLocaleString()}`],
+            ['Total Deposits', `TK ${totalDeposits.toLocaleString()}`],
+            ['Total Fixed Costs', `TK ${fixedCosts.reduce((s, c) => s + c.amount, 0).toLocaleString()}`],
+        ],
+        theme: 'plain',
+        styles: { fontSize: 10, cellPadding: 3 },
+        columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
+    });
+
+    let y = getFinalY(doc, 85);
+
+    // Fixed costs breakdown
+    if (fixedCosts.length > 0) {
+        y += 6;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Fixed Costs Breakdown', 14, y);
+        autoTable(doc as unknown as jsPDF, {
+            startY: y + 4,
+            head: [['Type', 'Amount']],
+            body: fixedCosts.map(c => [c.type.replace('_', ' '), `TK ${c.amount.toLocaleString()}`]),
+            theme: 'striped',
+            headStyles: { fillColor: [45, 45, 45] },
+            styles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+            tableWidth: 120,
+        });
+        y = getFinalY(doc, y + 30);
+    }
+
+    // All members table
+    y += 10;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Member-wise Breakdown', 14, y);
+
+    autoTable(doc as unknown as jsPDF, {
+        startY: y + 4,
+        head: [['Member', 'Meals', 'Rate', 'Meal Cost', 'Fixed Share', 'Individual', 'Deposits', 'Bazaar', 'Balance']],
+        body: members.map(m => [
+            m.memberName,
+            String(m.totalMeals),
+            `TK ${m.mealRate.toFixed(2)}`,
+            `TK ${m.mealCost.toLocaleString()}`,
+            `TK ${m.fixedCostShare.toLocaleString()}`,
+            `TK ${m.individualCosts.toLocaleString()}`,
+            `TK ${m.deposits.toLocaleString()}`,
+            `TK ${m.bazaarSpent.toLocaleString()}`,
+            `TK ${m.balance.toLocaleString()}`,
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [45, 45, 45], fontSize: 8 },
+        styles: { fontSize: 8 },
+        columnStyles: {
+            0: { cellWidth: 40 },
+            8: { fontStyle: 'bold' },
+        },
+    });
+
+    // Footer
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(130, 130, 130);
+        doc.text(`Generated by KANGAL · ${new Date().toLocaleDateString()}`, 14, doc.internal.pageSize.getHeight() - 10);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 14, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+    }
+
+    doc.save(`All_Members_Report_${cycle.cycleName.replace(/\s+/g, '_')}.pdf`);
+}

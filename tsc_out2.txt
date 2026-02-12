@@ -1,0 +1,10 @@
+﻿src/app/(dashboard)/page.tsx(229,73): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/app/(dashboard)/page.tsx(230,66): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/app/(dashboard)/page.tsx(232,109): error TS18048: 'balanceQuery.data.mealCost' is possibly 'undefined'.
+src/app/(dashboard)/page.tsx(233,78): error TS18048: 'balanceQuery.data.fixedCostShare' is possibly 'undefined'.
+src/app/(dashboard)/page.tsx(234,83): error TS18048: 'balanceQuery.data.individualCostTotal' is possibly 'undefined'.
+src/app/(dashboard)/page.tsx(238,71): error TS18048: 'balanceQuery.data.currentBalance' is possibly 'undefined'.
+src/app/(dashboard)/page.tsx(239,47): error TS18048: 'balanceQuery.data.currentBalance' is possibly 'undefined'.
+src/components/dashboard/stats-cards.tsx(83,109): error TS2339: Property 'dynamic' does not exist on type '{ readonly key: "mealRate"; readonly label: "Meal Rate"; readonly icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 4 more ...; readonly borderColor: "border-violet-500/20"; } | { ...; } | { ...; } | { ...; }'.
