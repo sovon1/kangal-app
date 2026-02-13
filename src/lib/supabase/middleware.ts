@@ -29,9 +29,14 @@ export async function updateSession(request: NextRequest) {
         }
     );
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    let user = null;
+    try {
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
+    } catch (error) {
+        // Supabase might be down - treat as logged out
+        console.error('Middleware auth check failed:', error);
+    }
 
     // Protected routes — redirect to login if not authenticated
     const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
@@ -39,8 +44,9 @@ export async function updateSession(request: NextRequest) {
         request.nextUrl.pathname.startsWith('/forgot-password') ||
         request.nextUrl.pathname.startsWith('/reset-password');
     const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback');
+    const isLandingPage = request.nextUrl.pathname === '/';
 
-    if (!user && !isAuthPage && !isAuthCallback) {
+    if (!user && !isAuthPage && !isAuthCallback && !isLandingPage) {
         const url = request.nextUrl.clone();
         url.pathname = '/login';
         return NextResponse.redirect(url);
