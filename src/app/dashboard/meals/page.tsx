@@ -8,9 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays, ChevronLeft, ChevronRight, Sun, Cloud, Moon, Lock, Users, Plus, Minus, Settings } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Sun, Cloud, Moon, Lock, Users, Plus, Minus, Settings, UtensilsCrossed } from 'lucide-react';
 import { toast } from 'sonner';
-import { toggleMeal, updateGuestMeal } from '@/lib/actions/meals';
+import { toggleMeal, updateGuestMeal, getAllMealsForMonth } from '@/lib/actions/meals';
 import Link from 'next/link';
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner'] as const;
@@ -202,6 +202,127 @@ export default function MealsPage() {
                     })}
                 </div>
             )}
+
+            {/* Inline Meal Chart */}
+            {ctx && (
+                <InlineMealChart messId={ctx.messId} cycleId={ctx.cycleId} />
+            )}
+        </div>
+    );
+}
+
+// ============================================================================
+// INLINE MEAL CHART (embedded below the calendar)
+// ============================================================================
+
+function InlineMealChart({ messId, cycleId }: { messId: string; cycleId: string }) {
+    const chartQuery = useQuery({
+        queryKey: ['meal-chart-month', messId, cycleId],
+        queryFn: async () => {
+            const result = await getAllMealsForMonth(messId, cycleId);
+            if ('error' in result) return null;
+            return result.data;
+        },
+        enabled: !!messId && !!cycleId,
+    });
+
+    const data = chartQuery.data;
+    const members = data?.members || [];
+    const dates = data?.dates || [];
+    const mealsMap = data?.meals || {};
+
+    const getMeal = (date: string, memberId: string) => {
+        return mealsMap[date]?.[memberId] || { breakfast: 0, lunch: 0, dinner: 0, guestBreakfast: 0, guestLunch: 0, guestDinner: 0 };
+    };
+
+    const formatDate = (dateStr: string) => {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+    };
+
+    const isToday = (dateStr: string) => dateStr === new Date().toISOString().split('T')[0];
+
+    if (chartQuery.isLoading) {
+        return (
+            <div className="space-y-3">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                    <UtensilsCrossed className="h-5 w-5" /> Meal Chart
+                </h2>
+                <div className="space-y-2">
+                    {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-14 rounded-lg" />)}
+                </div>
+            </div>
+        );
+    }
+
+    if (!members.length) return null;
+
+    return (
+        <div className="space-y-3">
+            <h2 className="text-lg font-bold flex items-center gap-2">
+                <UtensilsCrossed className="h-5 w-5 text-primary" /> Meal Chart
+            </h2>
+            <p className="text-xs text-muted-foreground -mt-1">All members’ daily meals for this cycle</p>
+
+            <div className="border border-border/50 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse" style={{ minWidth: `${90 + members.length * 140}px` }}>
+                        <thead>
+                            <tr className="bg-muted/50 border-b border-border/50">
+                                <th className="text-left px-4 py-3 font-semibold text-muted-foreground sticky left-0 bg-muted/50 z-10 min-w-[80px]">
+                                    Date
+                                </th>
+                                {members.map((m) => (
+                                    <th key={m.id} className="text-left px-3 py-3 font-bold text-foreground min-w-[130px]">
+                                        {m.name}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {dates.map((date, idx) => {
+                                const today = isToday(date);
+                                return (
+                                    <tr
+                                        key={date}
+                                        className={`border-b border-border/20 transition-colors ${today ? 'bg-primary/5' : idx % 2 === 0 ? 'bg-background' : 'bg-muted/10'
+                                            } hover:bg-muted/30`}
+                                    >
+                                        <td className={`px-4 py-3 font-medium sticky left-0 z-10 ${today ? 'bg-primary/5 text-primary font-bold' : idx % 2 === 0 ? 'bg-background' : 'bg-muted/10'
+                                            }`}>
+                                            {formatDate(date)}
+                                            {today && <span className="ml-1 text-[9px] text-primary">(Today)</span>}
+                                        </td>
+                                        {members.map((m) => {
+                                            const meal = getMeal(date, m.id);
+                                            const b = meal.breakfast + meal.guestBreakfast;
+                                            const l = meal.lunch + meal.guestLunch;
+                                            const d = meal.dinner + meal.guestDinner;
+                                            const total = b + l + d;
+                                            return (
+                                                <td key={m.id} className="px-3 py-2.5">
+                                                    {total === 0 ? (
+                                                        <span className="text-muted-foreground/30 text-[10px]">No meal</span>
+                                                    ) : (
+                                                        <div className="space-y-0.5 text-[11px] text-muted-foreground">
+                                                            <div>Breakfast: <span className="text-foreground font-medium">{b.toFixed(2)}</span></div>
+                                                            <div>Lunch: <span className="text-foreground font-medium">{l.toFixed(2)}</span></div>
+                                                            <div>Dinner: <span className="text-foreground font-medium">{d.toFixed(2)}</span></div>
+                                                            <div className="pt-0.5 border-t border-border/20 font-semibold text-foreground">
+                                                                Total: {total.toFixed(2)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 }

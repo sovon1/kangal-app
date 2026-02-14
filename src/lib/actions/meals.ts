@@ -251,6 +251,77 @@ export async function getAllMealsForDate(messId: string, cycleId: string, mealDa
 }
 
 // ============================================================================
+// GET ALL MEMBERS' MEALS FOR FULL MONTH/CYCLE (for chart view)
+// ============================================================================
+
+export async function getAllMealsForMonth(messId: string, cycleId: string) {
+    const supabase = await getSupabaseServerClient();
+
+    // Get cycle dates
+    const { data: cycle } = await supabase
+        .from('mess_cycles')
+        .select('start_date, end_date')
+        .eq('id', cycleId)
+        .single();
+
+    if (!cycle) return { error: 'Cycle not found' };
+
+    // Fetch all active members
+    const { data: members, error: membersError } = await supabase
+        .from('mess_members')
+        .select('id, role, profile:profiles(full_name)')
+        .eq('mess_id', messId)
+        .eq('status', 'active')
+        .order('role', { ascending: true });
+
+    if (membersError) return { error: membersError.message };
+    if (!members) return { data: { members: [], dates: [], meals: {} } };
+
+    // Fetch ALL meals for this cycle
+    const { data: meals } = await supabase
+        .from('daily_meals')
+        .select('member_id, meal_date, breakfast, lunch, dinner, guest_breakfast, guest_lunch, guest_dinner')
+        .eq('cycle_id', cycleId)
+        .order('meal_date', { ascending: true });
+
+    // Build date list from cycle start to today (or end_date, whichever is earlier)
+    const startDate = new Date(cycle.start_date);
+    const endDate = new Date(Math.min(new Date(cycle.end_date).getTime(), new Date().getTime()));
+    const dates: string[] = [];
+    const d = new Date(startDate);
+    while (d <= endDate) {
+        dates.push(d.toISOString().split('T')[0]);
+        d.setDate(d.getDate() + 1);
+    }
+
+    // Build a map: date -> memberId -> meal data
+    const mealsMap: Record<string, Record<string, { breakfast: number; lunch: number; dinner: number; guestBreakfast: number; guestLunch: number; guestDinner: number }>> = {};
+    for (const meal of (meals || [])) {
+        const date = meal.meal_date as string;
+        const memberId = meal.member_id as string;
+        if (!mealsMap[date]) mealsMap[date] = {};
+        mealsMap[date][memberId] = {
+            breakfast: meal.breakfast ? 1 : 0,
+            lunch: meal.lunch ? 1 : 0,
+            dinner: meal.dinner ? 1 : 0,
+            guestBreakfast: (meal.guest_breakfast as number) || 0,
+            guestLunch: (meal.guest_lunch as number) || 0,
+            guestDinner: (meal.guest_dinner as number) || 0,
+        };
+    }
+
+    const memberList = members.map((m) => {
+        const profile = m.profile as unknown as { full_name: string };
+        return {
+            id: m.id,
+            name: profile?.full_name || 'Unknown',
+        };
+    });
+
+    return { data: { members: memberList, dates: dates.reverse(), meals: mealsMap } };
+}
+
+// ============================================================================
 // MANAGER BULK UPDATE MEALS (bypasses cutoff checks)
 // ============================================================================
 
