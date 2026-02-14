@@ -172,50 +172,14 @@ export async function transferManager(input: {
         return { error: 'Only the current manager can transfer the role.' };
     }
 
-    // 2. Verify target member exists and is active
-    const { data: targetMember } = await supabase
-        .from('mess_members')
-        .select('id, role')
-        .eq('id', input.newManagerMemberId)
-        .eq('mess_id', input.messId)
-        .eq('status', 'active')
-        .single();
-
-    if (!targetMember) {
-        return { error: 'Target member not found or inactive.' };
-    }
-
-    if (targetMember.id === currentMember.id) {
-        return { error: 'You are already the manager.' };
-    }
-
-    // 3. Demote current manager → member
-    const { error: demoteError } = await supabase
-        .from('mess_members')
-        .update({ role: 'member' })
-        .eq('id', currentMember.id);
-
-    if (demoteError) return { error: demoteError.message };
-
-    // 4. Promote target → manager
-    const { error: promoteError } = await supabase
-        .from('mess_members')
-        .update({ role: 'manager' })
-        .eq('id', targetMember.id);
-
-    if (promoteError) {
-        // Rollback: re-promote current user
-        await supabase.from('mess_members').update({ role: 'manager' }).eq('id', currentMember.id);
-        return { error: promoteError.message };
-    }
-
-    // 5. Log activity
-    await supabase.from('activity_log').insert({
-        mess_id: input.messId,
-        actor_id: user.id,
-        action: 'manager_transferred',
-        details: { new_manager_member_id: input.newManagerMemberId },
+    // 3. Call Atomic RPC (Fixes Manager Transfer Risk)
+    const { error: rpcError } = await supabase.rpc('transfer_mess_manager', {
+        p_mess_id: input.messId,
+        p_current_manager_id: user.id,
+        p_new_manager_member_id: input.newManagerMemberId
     });
+
+    if (rpcError) return { error: rpcError.message };
 
     return { success: true };
 }

@@ -33,59 +33,37 @@ export async function addBazaarExpense(input: unknown) {
     // Calculate total amount from items
     const totalAmount = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
 
-    // 1. Create the expense header
-    const { data: expense, error: expenseError } = await supabase
-        .from('bazaar_expenses')
-        .insert({
-            mess_id: messId,
-            cycle_id: cycleId,
-            shopper_id: shopperId,
-            expense_date: expenseDate,
-            notes: notes || null,
-            total_amount: totalAmount,
-            approval_status: isManager ? 'approved' : 'pending',
-            approved_by: isManager ? user.id : null,
-            created_by: user.id,
-        })
-        .select('id')
-        .single();
+    // Prepare data for RPC
+    const expenseData = {
+        mess_id: messId,
+        cycle_id: cycleId,
+        shopper_id: shopperId,
+        expense_date: expenseDate,
+        notes: notes || null,
+        total_amount: totalAmount,
+        approval_status: isManager ? 'approved' : 'pending',
+        approved_by: isManager ? user.id : null,
+        created_by: user.id,
+    };
 
-    if (expenseError || !expense) {
-        return { error: expenseError?.message || 'Failed to create expense' };
-    }
-
-    // 2. Insert all line items (this triggers inventory deduction)
-    const bazaarItems = items.map((item) => ({
-        expense_id: expense.id,
+    const itemsData = items.map(item => ({
         item_name: item.itemName,
         quantity: item.quantity,
         unit: item.unit,
-        unit_price: item.unitPrice,
+        unit_price: item.unitPrice
     }));
 
-    const { error: itemsError } = await supabase
-        .from('bazaar_items')
-        .insert(bazaarItems);
-
-    if (itemsError) {
-        // Rollback: delete the expense header
-        await supabase.from('bazaar_expenses').delete().eq('id', expense.id);
-        return { error: itemsError.message };
-    }
-
-    // 3. Log the activity
-    await supabase.from('activity_log').insert({
-        mess_id: messId,
-        actor_id: user.id,
-        action: 'bazaar_added',
-        details: {
-            expense_id: expense.id,
-            item_count: items.length,
-            total: items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0),
-        },
+    // Call Atomic RPC (Fixes Orphan Bazaar Expenses)
+    const { data: expenseId, error: rpcError } = await supabase.rpc('add_bazaar_expense_transaction', {
+        p_expense_data: expenseData,
+        p_items_data: itemsData
     });
 
-    return { success: true, expenseId: expense.id };
+    if (rpcError) {
+        return { error: rpcError.message };
+    }
+
+    return { success: true, expenseId };
 }
 
 // ============================================================================

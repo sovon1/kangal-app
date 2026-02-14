@@ -30,6 +30,7 @@ import {
     Settings,
     BarChart3,
     X,
+    SlidersHorizontal,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -42,6 +43,7 @@ const navItems = [
     { href: '/dashboard/meals', label: 'Meals', icon: CalendarDays },
     { href: '/dashboard/bazaar', label: 'Bazaar', icon: ShoppingCart },
     { href: '/dashboard/deposits', label: 'Deposits', icon: Wallet },
+    { href: '/dashboard/options', label: 'Options', icon: SlidersHorizontal },
 ];
 
 const adminItems = [

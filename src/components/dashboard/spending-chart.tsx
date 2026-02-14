@@ -2,68 +2,95 @@
 
 import { useEffect, useState } from 'react';
 import {
-    AreaChart,
-    Area,
+    BarChart,
+    Bar,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
+    Cell,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
-interface DailySpending {
-    date: string;
-    label: string;
-    amount: number;
+interface MemberMealData {
+    name: string;
+    meals: number;
 }
 
-interface SpendingChartProps {
+interface MealComparisonProps {
     cycleId: string;
     messId: string;
 }
 
-export function SpendingChart({ cycleId, messId }: SpendingChartProps) {
+const BAR_COLORS = [
+    'hsl(142, 76%, 36%)',
+    'hsl(199, 89%, 48%)',
+    'hsl(262, 83%, 58%)',
+    'hsl(24, 95%, 53%)',
+    'hsl(340, 82%, 52%)',
+    'hsl(47, 96%, 53%)',
+    'hsl(173, 80%, 40%)',
+    'hsl(291, 64%, 42%)',
+];
+
+export function MealComparison({ cycleId, messId }: MealComparisonProps) {
     const supabase = getSupabaseBrowserClient();
-    const [data, setData] = useState<DailySpending[]>([]);
+    const [data, setData] = useState<MemberMealData[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
             setLoading(true);
 
-            // Fetch bazaar expenses for this cycle, grouped by date
-            const { data: expenses } = await supabase
-                .from('bazaar_expenses')
-                .select('expense_date, total_cost')
-                .eq('cycle_id', cycleId)
-                .order('expense_date', { ascending: true });
+            // Get all active members with profiles
+            const { data: members } = await supabase
+                .from('mess_members')
+                .select('id, profile:profiles(full_name)')
+                .eq('mess_id', messId)
+                .eq('status', 'active');
 
-            if (!expenses || expenses.length === 0) {
+            if (!members || members.length === 0) {
                 setData([]);
                 setLoading(false);
                 return;
             }
 
-            // Group by date and sum total_cost
-            const grouped: Record<string, number> = {};
-            expenses.forEach((exp) => {
-                const date = exp.expense_date;
-                grouped[date] = (grouped[date] || 0) + (exp.total_cost || 0);
+            // Get all meals for this cycle
+            const { data: meals } = await supabase
+                .from('daily_meals')
+                .select('member_id, breakfast, lunch, dinner, guest_breakfast, guest_lunch, guest_dinner')
+                .eq('cycle_id', cycleId);
+
+            // Count meals per member
+            const memberMeals: Record<string, number> = {};
+            (meals || []).forEach((m) => {
+                const id = m.member_id as string;
+                const count =
+                    (m.breakfast ? 1 : 0) +
+                    (m.lunch ? 1 : 0) +
+                    (m.dinner ? 1 : 0) +
+                    ((m.guest_breakfast as number) || 0) +
+                    ((m.guest_lunch as number) || 0) +
+                    ((m.guest_dinner as number) || 0);
+                memberMeals[id] = (memberMeals[id] || 0) + count;
             });
 
-            // Convert to chart data with short date labels
-            const chartData: DailySpending[] = Object.entries(grouped).map(([date, amount]) => {
-                const d = new Date(date + 'T00:00:00');
+            // Map to chart data
+            const chartData: MemberMealData[] = members.map((member) => {
+                const profile = member.profile as unknown as { full_name: string } | null;
+                const firstName = (profile?.full_name || 'Unknown').split(' ')[0];
                 return {
-                    date,
-                    label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    amount: Math.round(amount),
+                    name: firstName,
+                    meals: memberMeals[member.id] || 0,
                 };
             });
+
+            // Sort by meal count descending
+            chartData.sort((a, b) => b.meals - a.meals);
 
             setData(chartData);
             setLoading(false);
@@ -79,8 +106,8 @@ export function SpendingChart({ cycleId, messId }: SpendingChartProps) {
             <Card className="border-border/50">
                 <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary" />
-                        Bazaar Spending Trend
+                        <Users className="h-5 w-5 text-primary" />
+                        Member Meal Comparison
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -95,62 +122,64 @@ export function SpendingChart({ cycleId, messId }: SpendingChartProps) {
             <Card className="border-border/50">
                 <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary" />
-                        Bazaar Spending Trend
+                        <Users className="h-5 w-5 text-primary" />
+                        Member Meal Comparison
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
-                        No bazaar expenses recorded yet this cycle.
+                        No meal data recorded yet this cycle.
                     </div>
                 </CardContent>
             </Card>
         );
     }
 
-    const totalSpent = data.reduce((sum, d) => sum + d.amount, 0);
-    const avgDaily = Math.round(totalSpent / data.length);
+    const maxMeals = Math.max(...data.map((d) => d.meals));
+    const totalMeals = data.reduce((s, d) => s + d.meals, 0);
 
     return (
         <Card className="border-border/50">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary" />
-                        Bazaar Spending Trend
+                        <Users className="h-5 w-5 text-primary" />
+                        Member Meal Comparison
                     </CardTitle>
                     <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Avg/day</p>
-                        <p className="text-sm font-semibold">৳{avgDaily.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Total meals</p>
+                        <p className="text-sm font-semibold">{totalMeals}</p>
                     </div>
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="h-[220px] w-full">
+                <div style={{ height: Math.max(200, data.length * 44) }} className="w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                            <defs>
-                                <linearGradient id="colorSpending" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
+                        <BarChart
+                            data={data}
+                            layout="vertical"
+                            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+                        >
                             <CartesianGrid
                                 strokeDasharray="3 3"
                                 stroke="hsl(var(--border))"
                                 opacity={0.3}
+                                horizontal={false}
                             />
                             <XAxis
-                                dataKey="label"
+                                type="number"
                                 tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                                 tickLine={false}
                                 axisLine={false}
+                                domain={[0, maxMeals + 2]}
                             />
                             <YAxis
-                                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                                type="category"
+                                dataKey="name"
+                                tick={{ fontSize: 12, fill: 'hsl(var(--foreground))', fontWeight: 500 }}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(v) => `৳${v}`}
+                                width={70}
                             />
                             <Tooltip
                                 contentStyle={{
@@ -161,19 +190,22 @@ export function SpendingChart({ cycleId, messId }: SpendingChartProps) {
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                                 }}
                                 labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
-                                formatter={(value: number | undefined) => [`৳${(value ?? 0).toLocaleString()}`, 'Spent']}
+                                formatter={(value: number | undefined) => [`${value ?? 0} meals`, 'Total']}
                             />
-                            <Area
-                                type="monotone"
-                                dataKey="amount"
-                                stroke="hsl(142, 76%, 36%)"
-                                strokeWidth={2.5}
-                                fillOpacity={1}
-                                fill="url(#colorSpending)"
-                                dot={{ r: 3, fill: 'hsl(142, 76%, 36%)', strokeWidth: 0 }}
-                                activeDot={{ r: 5, fill: 'hsl(142, 76%, 36%)', stroke: '#fff', strokeWidth: 2 }}
-                            />
-                        </AreaChart>
+                            <Bar
+                                dataKey="meals"
+                                radius={[0, 6, 6, 0]}
+                                barSize={24}
+                            >
+                                {data.map((_entry, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={BAR_COLORS[index % BAR_COLORS.length]}
+                                        opacity={0.85}
+                                    />
+                                ))}
+                            </Bar>
+                        </BarChart>
                     </ResponsiveContainer>
                 </div>
             </CardContent>
