@@ -101,7 +101,16 @@ export function MessOverview({ data, loading }: MessOverviewProps) {
                     <div className="flex items-center gap-2.5 text-sm pt-1 border-t border-border/30">
                         <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                         <span className="text-muted-foreground">This Month Full Details:</span>
-                        <span className="ml-auto text-primary text-xs cursor-pointer hover:underline">📄🔍</span>
+                        <a
+                            href="#all-member-info"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                document.getElementById('all-member-info')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="ml-auto text-primary text-xs cursor-pointer hover:underline flex items-center gap-1"
+                        >
+                            📄 View
+                        </a>
                     </div>
                 </div>
             </CardContent>

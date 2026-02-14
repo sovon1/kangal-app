@@ -44,7 +44,7 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
     if (!members?.length) return null;
 
     return (
-        <div className="space-y-4">
+        <div id="all-member-info" className="space-y-4">
             {/* Header */}
             <div className="text-center">
                 <h2 className="text-lg font-bold flex items-center justify-center gap-2 text-primary">
