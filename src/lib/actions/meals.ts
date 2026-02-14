@@ -204,3 +204,133 @@ export async function getTodayMeals(memberId: string, messId: string) {
         dinnerLocked: isMealLocked('dinner', today, cutoffConfig),
     };
 }
+
+// ============================================================================
+// GET ALL MEMBERS' MEALS FOR A DATE (Manager only)
+// ============================================================================
+
+export async function getAllMealsForDate(messId: string, cycleId: string, mealDate: string) {
+    const supabase = await getSupabaseServerClient();
+
+    // Fetch all active members
+    const { data: members, error: membersError } = await supabase
+        .from('mess_members')
+        .select('id, role, profile:profiles(full_name, avatar_url)')
+        .eq('mess_id', messId)
+        .eq('status', 'active')
+        .order('role', { ascending: true });
+
+    if (membersError) return { error: membersError.message };
+    if (!members) return { data: [] };
+
+    // Fetch meals for all members on this date
+    const { data: meals } = await supabase
+        .from('daily_meals')
+        .select('*')
+        .eq('mess_id', messId)
+        .eq('meal_date', mealDate);
+
+    // Merge member info with meal data
+    const result = members.map((member) => {
+        const meal = (meals || []).find((m: Record<string, unknown>) => m.member_id === member.id);
+        const profile = member.profile as unknown as { full_name: string; avatar_url: string | null };
+        return {
+            memberId: member.id,
+            name: profile?.full_name || 'Unknown',
+            avatarUrl: profile?.avatar_url || null,
+            breakfast: meal?.breakfast ? 1 : 0,
+            lunch: meal?.lunch ? 1 : 0,
+            dinner: meal?.dinner ? 1 : 0,
+            guestBreakfast: meal?.guest_breakfast || 0,
+            guestLunch: meal?.guest_lunch || 0,
+            guestDinner: meal?.guest_dinner || 0,
+        };
+    });
+
+    return { data: result };
+}
+
+// ============================================================================
+// MANAGER BULK UPDATE MEALS (bypasses cutoff checks)
+// ============================================================================
+
+interface MemberMealUpdate {
+    memberId: string;
+    breakfast: number;
+    lunch: number;
+    dinner: number;
+}
+
+export async function managerBulkUpdateMeals(
+    messId: string,
+    cycleId: string,
+    mealDate: string,
+    updates: MemberMealUpdate[]
+) {
+    const supabase = await getSupabaseServerClient();
+
+    // Verify the user is a manager
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { data: member } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    if (member?.role !== 'manager') return { error: 'Only managers can bulk edit meals' };
+
+    // Process each member update
+    const errors: string[] = [];
+    for (const update of updates) {
+        // Check if record exists
+        const { data: existing } = await supabase
+            .from('daily_meals')
+            .select('id')
+            .eq('member_id', update.memberId)
+            .eq('meal_date', mealDate)
+            .single();
+
+        if (existing) {
+            const { error } = await supabase
+                .from('daily_meals')
+                .update({
+                    breakfast: update.breakfast > 0,
+                    lunch: update.lunch > 0,
+                    dinner: update.dinner > 0,
+                    guest_breakfast: Math.max(0, update.breakfast - 1),
+                    guest_lunch: Math.max(0, update.lunch - 1),
+                    guest_dinner: Math.max(0, update.dinner - 1),
+                })
+                .eq('id', existing.id);
+
+            if (error) errors.push(`${update.memberId}: ${error.message}`);
+        } else {
+            // Only insert if there's at least one meal
+            if (update.breakfast > 0 || update.lunch > 0 || update.dinner > 0) {
+                const { error } = await supabase
+                    .from('daily_meals')
+                    .insert({
+                        mess_id: messId,
+                        cycle_id: cycleId,
+                        member_id: update.memberId,
+                        meal_date: mealDate,
+                        breakfast: update.breakfast > 0,
+                        lunch: update.lunch > 0,
+                        dinner: update.dinner > 0,
+                        guest_breakfast: Math.max(0, update.breakfast - 1),
+                        guest_lunch: Math.max(0, update.lunch - 1),
+                        guest_dinner: Math.max(0, update.dinner - 1),
+                    });
+
+                if (error) errors.push(`${update.memberId}: ${error.message}`);
+            }
+        }
+    }
+
+    if (errors.length > 0) return { error: `Some updates failed: ${errors.join(', ')}` };
+
+    return { success: true };
+}

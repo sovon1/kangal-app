@@ -1,13 +1,20 @@
 'use client';
 
-import { TrendingUp, TrendingDown, Users, UtensilsCrossed, Wallet, ShoppingCart } from 'lucide-react';
+import { TrendingUp, TrendingDown, UtensilsCrossed, Wallet, ShoppingCart, Scale } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { DashboardStats } from '@/types';
+
+interface MemberBalance {
+    totalMeals: number;
+    totalDeposits: number;
+    mealCost: number;
+    fixedCostShare: number;
+    individualCostTotal: number;
+    currentBalance: number;
+}
 
 interface StatsCardsProps {
-    stats: DashboardStats | null;
-    balance: number | null;
+    balance: MemberBalance | null;
     loading?: boolean;
 }
 
@@ -15,72 +22,15 @@ function formatCurrency(amount: number): string {
     return `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
 
-interface StatCardConfig {
-    key: string;
-    label: string;
-    icon: React.ComponentType<{ className?: string }>;
-    getValue: (stats: DashboardStats, balance: number | null) => string;
-    subtitle: (stats: DashboardStats) => string;
-    gradient: string;
-    iconColor: string;
-    borderColor: string;
-    dynamic?: boolean;
-}
-
-const statCards: StatCardConfig[] = [
-    {
-        key: 'mealRate',
-        label: 'Meal Rate',
-        icon: UtensilsCrossed,
-        getValue: (stats) => formatCurrency(stats.currentMealRate),
-        subtitle: (stats) => `${stats.daysRemaining}d remaining`,
-        gradient: 'from-violet-500/10 to-purple-500/10',
-        iconColor: 'text-violet-500',
-        borderColor: 'border-violet-500/20',
-    },
-    {
-        key: 'balance',
-        label: 'Your Balance',
-        icon: Wallet,
-        getValue: (_stats, balance) => formatCurrency(balance ?? 0),
-        subtitle: () => 'Current cycle',
-        gradient: 'from-emerald-500/10 to-green-500/10',
-        iconColor: 'text-emerald-500',
-        borderColor: 'border-emerald-500/20',
-        dynamic: true,
-    },
-    {
-        key: 'members',
-        label: 'Active Members',
-        icon: Users,
-        getValue: (stats) => `${stats.activeMembers}`,
-        subtitle: (stats) => `of ${stats.totalMembers} total`,
-        gradient: 'from-blue-500/10 to-cyan-500/10',
-        iconColor: 'text-blue-500',
-        borderColor: 'border-blue-500/20',
-    },
-    {
-        key: 'bazaar',
-        label: 'Bazaar Spent',
-        icon: ShoppingCart,
-        getValue: (stats) => formatCurrency(stats.totalBazaarExpense),
-        subtitle: (stats) => `${stats.cycleProgress}% cycle progress`,
-        gradient: 'from-amber-500/10 to-orange-500/10',
-        iconColor: 'text-amber-500',
-        borderColor: 'border-amber-500/20',
-    },
-];
-
-export function StatsCards({ stats, balance, loading }: StatsCardsProps) {
+export function StatsCards({ balance, loading }: StatsCardsProps) {
     if (loading) {
         return (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[...Array(4)].map((_, i) => (
                     <Card key={i} className="overflow-hidden">
                         <CardContent className="p-4">
-                            <Skeleton className="h-4 w-20 mb-3" />
-                            <Skeleton className="h-7 w-24 mb-1" />
-                            <Skeleton className="h-3 w-16" />
+                            <Skeleton className="h-8 w-20 mb-2" />
+                            <Skeleton className="h-4 w-24" />
                         </CardContent>
                     </Card>
                 ))}
@@ -88,45 +38,83 @@ export function StatsCards({ stats, balance, loading }: StatsCardsProps) {
         );
     }
 
-    if (!stats) return null;
+    if (!balance) return null;
+
+    const totalCost = balance.mealCost + balance.fixedCostShare + balance.individualCostTotal;
+    const isNegativeBalance = balance.currentBalance < 0;
+    const isNegativeDeposit = balance.totalDeposits < 0;
+
+    const cards = [
+        {
+            label: 'My Total Meals',
+            value: balance.totalMeals.toString(),
+            icon: UtensilsCrossed,
+            bgClass: 'bg-gradient-to-br from-emerald-500/15 to-green-500/10 border-emerald-500/20',
+            iconBg: 'bg-emerald-500/10',
+            iconColor: 'text-emerald-500',
+            valueColor: '',
+        },
+        {
+            label: 'My Deposit',
+            value: `${balance.totalDeposits < 0 ? '-' : ''}${formatCurrency(Math.abs(balance.totalDeposits))}`,
+            icon: Wallet,
+            bgClass: 'bg-gradient-to-br from-blue-500/15 to-cyan-500/10 border-blue-500/20',
+            iconBg: 'bg-blue-500/10',
+            iconColor: 'text-blue-500',
+            valueColor: isNegativeDeposit ? 'text-destructive' : '',
+        },
+        {
+            label: 'My Cost',
+            value: formatCurrency(totalCost),
+            icon: ShoppingCart,
+            bgClass: 'bg-gradient-to-br from-amber-500/15 to-orange-500/10 border-amber-500/20',
+            iconBg: 'bg-amber-500/10',
+            iconColor: 'text-amber-500',
+            valueColor: '',
+        },
+        {
+            label: 'My Balance',
+            value: `${balance.currentBalance < 0 ? '-' : ''}${formatCurrency(Math.abs(balance.currentBalance))}`,
+            icon: Scale,
+            bgClass: isNegativeBalance
+                ? 'bg-gradient-to-br from-red-500/15 to-rose-500/10 border-red-500/20'
+                : 'bg-gradient-to-br from-emerald-500/15 to-teal-500/10 border-emerald-500/20',
+            iconBg: isNegativeBalance ? 'bg-red-500/10' : 'bg-emerald-500/10',
+            iconColor: isNegativeBalance ? 'text-red-500' : 'text-emerald-500',
+            valueColor: isNegativeBalance ? 'text-destructive' : 'text-emerald-600 dark:text-emerald-400',
+            trending: true,
+        },
+    ];
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {statCards.map(({ key, label, icon: Icon, getValue, subtitle, gradient, iconColor, borderColor, dynamic }) => {
-                const value = getValue(stats, balance);
-                const isNegative = dynamic && (balance ?? 0) < 0;
-
-                return (
-                    <Card
-                        key={key}
-                        className={`overflow-hidden border ${borderColor} bg-gradient-to-br ${gradient} transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
-                    >
-                        <CardContent className="p-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                    {label}
-                                </span>
-                                <div className={`p-1.5 rounded-lg bg-background/50 ${iconColor}`}>
-                                    <Icon className="h-3.5 w-3.5" />
-                                </div>
+            {cards.map(({ label, value, icon: Icon, bgClass, iconBg, iconColor, valueColor, trending }) => (
+                <Card
+                    key={label}
+                    className={`overflow-hidden border ${bgClass} transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
+                >
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                {label}
+                            </span>
+                            <div className={`p-1.5 rounded-lg ${iconBg} ${iconColor}`}>
+                                <Icon className="h-3.5 w-3.5" />
                             </div>
-                            <div className="flex items-baseline gap-1.5">
-                                <span className={`text-xl font-bold tracking-tight ${isNegative ? 'text-destructive' : ''}`}>
-                                    {value}
-                                </span>
-                                {dynamic && (
-                                    (balance ?? 0) >= 0
-                                        ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
-                                        : <TrendingDown className="h-3.5 w-3.5 text-destructive" />
-                                )}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                                {subtitle(stats)}
-                            </p>
-                        </CardContent>
-                    </Card>
-                );
-            })}
+                        </div>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className={`text-xl font-bold tracking-tight ${valueColor}`}>
+                                {value}
+                            </span>
+                            {trending && (
+                                isNegativeBalance
+                                    ? <TrendingDown className="h-3.5 w-3.5 text-destructive" />
+                                    : <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
         </div>
     );
 }

@@ -19,6 +19,16 @@ export async function addDeposit(input: unknown) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Not authenticated' };
 
+    // Check if current user is manager (auto-approve)
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    const isManager = currentMember?.role === 'manager';
+
     const { error } = await supabase
         .from('transactions')
         .insert({
@@ -29,6 +39,8 @@ export async function addDeposit(input: unknown) {
             payment_method: paymentMethod,
             reference_no: referenceNo || null,
             notes: notes || null,
+            approval_status: isManager ? 'approved' : 'pending',
+            approved_by: isManager ? user.id : null,
             created_by: user.id,
         });
 
@@ -39,8 +51,34 @@ export async function addDeposit(input: unknown) {
         mess_id: messId,
         actor_id: user.id,
         action: 'deposit_added',
-        details: { member_id: memberId, amount, payment_method: paymentMethod },
+        details: { member_id: memberId, amount, payment_method: paymentMethod, status: isManager ? 'approved' : 'pending' },
     });
+
+    return { success: true };
+}
+
+// ============================================================================
+// APPROVE / REJECT DEPOSIT
+// ============================================================================
+
+export async function approveDeposit(
+    depositId: string,
+    action: 'approved' | 'rejected'
+) {
+    const supabase = await getSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { error } = await supabase
+        .from('transactions')
+        .update({
+            approval_status: action,
+            approved_by: user.id,
+        })
+        .eq('id', depositId);
+
+    if (error) return { error: error.message };
 
     return { success: true };
 }
@@ -216,11 +254,12 @@ export async function getDashboardStats(messId: string, cycleId: string) {
             .select('total_amount')
             .eq('cycle_id', cycleId),
 
-        // Total deposits for cycle
+        // Total deposits for cycle (approved only)
         supabase
             .from('transactions')
             .select('amount')
-            .eq('cycle_id', cycleId),
+            .eq('cycle_id', cycleId)
+            .eq('approval_status', 'approved'),
 
         // Cycle dates for progress
         supabase
@@ -264,6 +303,88 @@ export async function getDashboardStats(messId: string, cycleId: string) {
 }
 
 // ============================================================================
+// GET MESS OVERVIEW (Whole mess aggregate stats)
+// ============================================================================
+
+export async function getMessOverview(messId: string, cycleId: string) {
+    const supabase = await getSupabaseServerClient();
+
+    const [
+        messResult,
+        cycleResult,
+        depositsResult,
+        mealsResult,
+        mealRateResult,
+        bazaarResult,
+        individualResult,
+        fixedResult,
+    ] = await Promise.all([
+        // Mess name
+        supabase.from('messes').select('name').eq('id', messId).single(),
+
+        // Cycle info
+        supabase.from('mess_cycles').select('start_date, end_date, status, name').eq('id', cycleId).single(),
+
+        // Total deposits across all members (approved only)
+        supabase.from('transactions').select('amount').eq('cycle_id', cycleId).eq('approval_status', 'approved'),
+
+        // Total meals across all members
+        supabase
+            .from('daily_meals')
+            .select('breakfast, lunch, dinner, guest_breakfast, guest_lunch, guest_dinner')
+            .eq('cycle_id', cycleId),
+
+        // Meal rate
+        supabase.rpc('calculate_meal_rate', { p_cycle_id: cycleId }),
+
+        // Total bazaar (shared) expense
+        supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', cycleId).eq('approval_status', 'approved'),
+
+        // Total individual costs
+        supabase.from('individual_costs').select('amount').eq('cycle_id', cycleId).eq('approval_status', 'approved'),
+
+        // Total fixed costs
+        supabase.from('fixed_costs').select('amount').eq('cycle_id', cycleId),
+    ]);
+
+    const totalDeposits = (depositsResult.data || []).reduce((s, d) => s + Number(d.amount), 0);
+
+    const totalMeals = (mealsResult.data || []).reduce((sum, m) => {
+        return sum +
+            (m.breakfast ? 1 : 0) + (m.lunch ? 1 : 0) + (m.dinner ? 1 : 0) +
+            (m.guest_breakfast || 0) + (m.guest_lunch || 0) + (m.guest_dinner || 0);
+    }, 0);
+
+    const mealRate = Number(mealRateResult.data) || 0;
+    const totalMealCost = totalMeals * mealRate;
+    const totalSharedCost = (bazaarResult.data || []).reduce((s, e) => s + Number(e.total_amount), 0);
+    const totalFixedCost = (fixedResult.data || []).reduce((s, e) => s + Number(e.amount), 0);
+    const totalIndividualCost = (individualResult.data || []).reduce((s, e) => s + Number(e.amount), 0);
+    const messBalance = totalDeposits - (totalMealCost + totalSharedCost + totalFixedCost + totalIndividualCost);
+
+    // Format month name from cycle
+    let monthLabel = '';
+    if (cycleResult.data?.start_date) {
+        const d = new Date(cycleResult.data.start_date);
+        monthLabel = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    return {
+        messName: messResult.data?.name || 'Mess',
+        cycleName: cycleResult.data?.name || '',
+        cycleStatus: cycleResult.data?.status || 'open',
+        monthLabel,
+        messBalance,
+        totalDeposits,
+        totalMeals,
+        totalMealCost,
+        mealRate,
+        totalIndividualCost,
+        totalSharedCost: totalSharedCost + totalFixedCost,
+    };
+}
+
+// ============================================================================
 // GET MEMBER BALANCE (Calls the stored procedure)
 // ============================================================================
 
@@ -289,6 +410,52 @@ export async function getMemberBalance(memberId: string, cycleId: string) {
         individualCostTotal: Number(row?.individual_cost_total) || 0,
         currentBalance: Number(row?.current_balance) || 0,
     };
+}
+
+// ============================================================================
+// GET ALL MEMBER BALANCES (for All Member Info section)
+// ============================================================================
+
+export async function getAllMemberBalances(messId: string, cycleId: string) {
+    const supabase = await getSupabaseServerClient();
+
+    // Fetch all active members
+    const { data: members, error: membersError } = await supabase
+        .from('mess_members')
+        .select('id, role, profile:profiles(full_name)')
+        .eq('mess_id', messId)
+        .eq('status', 'active')
+        .order('role', { ascending: true });
+
+    if (membersError) return { error: membersError.message };
+    if (!members?.length) return { data: [] };
+
+    // Calculate balance for each member
+    const results = await Promise.all(
+        members.map(async (member) => {
+            const { data, error } = await supabase.rpc('calculate_member_balance', {
+                p_member_id: member.id,
+                p_cycle_id: cycleId,
+            });
+
+            if (error) return null;
+            const row = Array.isArray(data) ? data[0] : data;
+
+            return {
+                memberId: member.id,
+                name: (member.profile as unknown as { full_name: string })?.full_name || 'Unknown',
+                role: member.role,
+                totalMeals: Number(row?.total_meals) || 0,
+                totalDeposits: Number(row?.total_deposits) || 0,
+                mealCost: Number(row?.meal_cost) || 0,
+                fixedCostShare: Number(row?.fixed_cost_share) || 0,
+                individualCostTotal: Number(row?.individual_cost_total) || 0,
+                currentBalance: Number(row?.current_balance) || 0,
+            };
+        })
+    );
+
+    return { data: results.filter(Boolean) };
 }
 
 // ============================================================================

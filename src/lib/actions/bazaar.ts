@@ -20,6 +20,16 @@ export async function addBazaarExpense(input: unknown) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Not authenticated' };
 
+    // Check if current user is manager (auto-approve)
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    const isManager = currentMember?.role === 'manager';
+
     // 1. Create the expense header
     const { data: expense, error: expenseError } = await supabase
         .from('bazaar_expenses')
@@ -30,6 +40,8 @@ export async function addBazaarExpense(input: unknown) {
             expense_date: expenseDate,
             notes: notes || null,
             total_amount: 0, // Will be auto-updated by trigger
+            approval_status: isManager ? 'approved' : 'pending',
+            approved_by: isManager ? user.id : null,
             created_by: user.id,
         })
         .select('id')
@@ -71,6 +83,32 @@ export async function addBazaarExpense(input: unknown) {
     });
 
     return { success: true, expenseId: expense.id };
+}
+
+// ============================================================================
+// APPROVE / REJECT BAZAAR EXPENSE
+// ============================================================================
+
+export async function approveBazaarExpense(
+    expenseId: string,
+    action: 'approved' | 'rejected'
+) {
+    const supabase = await getSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { error } = await supabase
+        .from('bazaar_expenses')
+        .update({
+            approval_status: action,
+            approved_by: user.id,
+        })
+        .eq('id', expenseId);
+
+    if (error) return { error: error.message };
+
+    return { success: true };
 }
 
 // ============================================================================

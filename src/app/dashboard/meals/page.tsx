@@ -8,9 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays, ChevronLeft, ChevronRight, Sun, Cloud, Moon, Lock, Users, Plus, Minus } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Sun, Cloud, Moon, Lock, Users, Plus, Minus, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal } from '@/lib/actions/meals';
+import Link from 'next/link';
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner'] as const;
 const MEAL_ICONS = { breakfast: Sun, lunch: Cloud, dinner: Moon };
@@ -23,18 +24,18 @@ const MEAL_COLORS = {
 export default function MealsPage() {
     const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
-    const [ctx, setCtx] = useState<{ userId: string; memberId: string; messId: string; cycleId: string } | null>(null);
+    const [ctx, setCtx] = useState<{ userId: string; memberId: string; messId: string; cycleId: string; role: string } | null>(null);
     const [weekOffset, setWeekOffset] = useState(0);
 
     useEffect(() => {
         async function load() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id').eq('user_id', user.id).eq('status', 'active').limit(1).single();
+            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
             if (!m) return;
             const { data: c } = await supabase.from('mess_cycles').select('id').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
             if (!c) return;
-            setCtx({ userId: user.id, memberId: m.id, messId: m.mess_id, cycleId: c.id });
+            setCtx({ userId: user.id, memberId: m.id, messId: m.mess_id, cycleId: c.id, role: m.role });
         }
         load();
     }, [supabase]);
@@ -120,6 +121,13 @@ export default function MealsPage() {
                     <CalendarDays className="h-3 w-3" />
                     {totalMeals} meals this week
                 </Badge>
+                {ctx?.role === 'manager' && (
+                    <Link href="/dashboard/meals/manage">
+                        <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                            <Settings className="h-3.5 w-3.5" /> Manage
+                        </Button>
+                    </Link>
+                )}
             </div>
 
             {/* Week Navigation */}

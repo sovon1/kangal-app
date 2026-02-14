@@ -102,6 +102,8 @@ CREATE TABLE transactions (
     payment_method payment_method NOT NULL DEFAULT 'cash',
     reference_no TEXT,
     notes TEXT,
+    approval_status approval_status NOT NULL DEFAULT 'pending',
+    approved_by UUID REFERENCES profiles(id),
     created_by UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -115,6 +117,8 @@ CREATE TABLE bazaar_expenses (
     expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
     total_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
     notes TEXT,
+    approval_status approval_status NOT NULL DEFAULT 'pending',
+    approved_by UUID REFERENCES profiles(id),
     created_by UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -764,7 +768,8 @@ CREATE POLICY daily_meals_update ON daily_meals FOR UPDATE USING (
 
 -- Transactions: Members see their own, managers see all
 CREATE POLICY transactions_select ON transactions FOR SELECT USING (is_mess_member(mess_id));
-CREATE POLICY transactions_insert ON transactions FOR INSERT WITH CHECK (is_mess_manager(mess_id));
+CREATE POLICY transactions_insert ON transactions FOR INSERT WITH CHECK (is_mess_member(mess_id));
+CREATE POLICY transactions_update ON transactions FOR UPDATE USING (is_mess_manager(mess_id));
 
 -- Bazaar Expenses: Members see all, managers insert
 CREATE POLICY bazaar_expenses_select ON bazaar_expenses FOR SELECT USING (is_mess_member(mess_id));

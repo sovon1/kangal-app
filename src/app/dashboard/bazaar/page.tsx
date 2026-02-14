@@ -2,42 +2,40 @@
 
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { bazaarExpenseSchema, type BazaarExpenseInput } from '@/lib/validations';
-import { addBazaarExpense, getBazaarExpenses } from '@/lib/actions/bazaar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { addBazaarExpense, getBazaarExpenses, approveBazaarExpense } from '@/lib/actions/bazaar';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShoppingCart, Plus, Trash2, Loader2, Calendar } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatDistanceToNow } from 'date-fns';
 
 export default function BazaarPage() {
     const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
-    const [ctx, setCtx] = useState<{ memberId: string; messId: string; cycleId: string } | null>(null);
+    const [ctx, setCtx] = useState<{ memberId: string; messId: string; cycleId: string; role: string } | null>(null);
     const [addOpen, setAddOpen] = useState(false);
     const [items, setItems] = useState([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
     const [submitting, setSubmitting] = useState(false);
+    const [approvingId, setApprovingId] = useState<string | null>(null);
 
     useEffect(() => {
         async function load() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id').eq('user_id', user.id).eq('status', 'active').limit(1).single();
+            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
             if (!m) return;
             const { data: c } = await supabase.from('mess_cycles').select('id').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
             if (!c) return;
-            setCtx({ memberId: m.id, messId: m.mess_id, cycleId: c.id });
+            setCtx({ memberId: m.id, messId: m.mess_id, cycleId: c.id, role: m.role });
         }
         load();
     }, [supabase]);
+
+    const isManager = ctx?.role === 'manager';
 
     const expensesQuery = useQuery({
         queryKey: ['bazaar-expenses', ctx?.cycleId],
@@ -72,13 +70,33 @@ export default function BazaarPage() {
         setSubmitting(false);
 
         if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
-        toast.success('Bazaar expense added!');
+        toast.success(isManager ? 'Bazaar expense approved & saved!' : 'Bazaar expense submitted for approval!');
         setAddOpen(false);
         setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
         queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
     };
 
-    const totalSpent = (expensesQuery.data || []).reduce((s: number, e: Record<string, unknown>) => s + Number(e.total_amount || 0), 0);
+    const handleApproval = async (expenseId: string, action: 'approved' | 'rejected') => {
+        setApprovingId(expenseId);
+        const result = await approveBazaarExpense(expenseId, action);
+        setApprovingId(null);
+        if (result.error) { toast.error(result.error); return; }
+        toast.success(action === 'approved' ? 'Bazaar expense approved!' : 'Bazaar expense rejected!');
+        queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
+        queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+    };
+
+    const approvedExpenses = (expensesQuery.data || []).filter((e: Record<string, unknown>) => e.approval_status === 'approved');
+    const totalSpent = approvedExpenses.reduce((s: number, e: Record<string, unknown>) => s + Number(e.total_amount || 0), 0);
+
+    const statusBadge = (status: string) => {
+        switch (status) {
+            case 'approved': return <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 text-[10px] gap-1"><CheckCircle2 className="h-3 w-3" />Approved</Badge>;
+            case 'rejected': return <Badge variant="secondary" className="bg-red-500/10 text-red-600 text-[10px] gap-1"><XCircle className="h-3 w-3" />Rejected</Badge>;
+            default: return <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 text-[10px] gap-1"><Clock className="h-3 w-3" />Pending</Badge>;
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -96,7 +114,7 @@ export default function BazaarPage() {
             <div className="grid grid-cols-2 gap-3">
                 <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
                     <CardContent className="p-4">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Spent</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Approved</p>
                         <p className="text-2xl font-bold mt-1">৳{totalSpent.toLocaleString()}</p>
                     </CardContent>
                 </Card>
@@ -120,22 +138,52 @@ export default function BazaarPage() {
             ) : (
                 <div className="space-y-3">
                     {expensesQuery.data.map((expense: Record<string, unknown>) => (
-                        <Card key={expense.id as string} className="hover:shadow-md transition-shadow">
+                        <Card key={expense.id as string} className={`hover:shadow-md transition-shadow ${expense.approval_status === 'rejected' ? 'opacity-50' : ''}`}>
                             <CardContent className="p-4">
                                 <div className="flex items-start justify-between mb-2">
                                     <div className="flex items-center gap-2">
                                         <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500"><ShoppingCart className="h-4 w-4" /></div>
                                         <div>
-                                            <p className="font-semibold">৳{Number(expense.total_amount).toLocaleString()}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-semibold">৳{Number(expense.total_amount).toLocaleString()}</p>
+                                                {statusBadge(expense.approval_status as string)}
+                                            </div>
                                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                                                 <Calendar className="h-3 w-3" />
                                                 {new Date(expense.expense_date as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                {' · '}
+                                                {((expense.shopper as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string || 'Shopper'}
                                             </p>
                                         </div>
                                     </div>
-                                    <Badge variant="outline" className="text-xs">
-                                        {((expense.items as unknown[]) || []).length} items
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="outline" className="text-xs">
+                                            {((expense.items as unknown[]) || []).length} items
+                                        </Badge>
+                                        {/* Manager approve/reject buttons for pending expenses */}
+                                        {isManager && expense.approval_status === 'pending' && (
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
+                                                    onClick={() => handleApproval(expense.id as string, 'approved')}
+                                                    disabled={approvingId === expense.id}
+                                                >
+                                                    {approvingId === expense.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                                                    onClick={() => handleApproval(expense.id as string, 'rejected')}
+                                                    disabled={approvingId === expense.id}
+                                                >
+                                                    <XCircle className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5 mt-2">
                                     {((expense.items as Record<string, unknown>[]) || []).map((item, i) => (
@@ -155,6 +203,9 @@ export default function BazaarPage() {
                 <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Add Bazaar Expense</DialogTitle>
+                        {!isManager && (
+                            <p className="text-xs text-amber-600 mt-1">Your expense will be submitted for manager approval.</p>
+                        )}
                     </DialogHeader>
                     <div className="space-y-4">
                         {items.map((item, i) => (
@@ -184,7 +235,7 @@ export default function BazaarPage() {
                         <div className="border-t pt-3 flex items-center justify-between">
                             <span className="font-semibold">Total: ৳{items.reduce((s, i) => s + i.quantity * i.unitPrice, 0).toLocaleString()}</span>
                             <Button onClick={handleSubmit} disabled={submitting}>
-                                {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : 'Save Expense'}
+                                {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : isManager ? 'Approve & Save' : 'Submit for Approval'}
                             </Button>
                         </div>
                     </div>

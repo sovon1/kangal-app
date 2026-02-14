@@ -5,6 +5,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { StatsCards } from '@/components/dashboard/stats-cards';
+import { AllMemberInfo } from '@/components/dashboard/all-member-info';
+import { MessOverview } from '@/components/dashboard/mess-overview';
 import { MealToggles } from '@/components/dashboard/meal-toggles';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { SpendingChart } from '@/components/dashboard/spending-chart';
@@ -24,7 +26,7 @@ import {
 import { Plus, ArrowRight, TrendingUp, CalendarDays, Loader2, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals';
-import { getDashboardStats, getMemberBalance, getRecentActivity } from '@/lib/actions/finance';
+import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
 import { createMess, joinMess } from '@/lib/actions/mess';
 import type { DashboardStats, MealToggleState } from '@/types';
 
@@ -429,10 +431,51 @@ export default function DashboardPage() {
 
             {/* Stats Cards */}
             <StatsCards
-                stats={statsQuery.data ?? null}
-                balance={balanceQuery.data?.currentBalance ?? null}
-                loading={statsQuery.isLoading}
+                balance={balanceQuery.data ?? null}
+                loading={balanceQuery.isLoading}
             />
+
+            {/* Mess Overview + Balance Breakdown (Two Column) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left: Mess Details */}
+                {userContext && (
+                    <MessOverviewSection messId={userContext.messId} cycleId={userContext.cycleId} />
+                )}
+
+                {/* Right: My Balance Breakdown */}
+                <Card className="border-border/50 h-full">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-lg">My Balance Breakdown</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {balanceQuery.isLoading ? (
+                            <div className="space-y-3">
+                                {[...Array(5)].map((_, i) => (
+                                    <Skeleton key={i} className="h-4 w-full" />
+                                ))}
+                            </div>
+                        ) : balanceQuery.data ? (
+                            <div className="space-y-2.5">
+                                <BalanceRow label="Opening Balance" amount={balanceQuery.data.openingBalance} />
+                                <BalanceRow label="Deposits" amount={balanceQuery.data.totalDeposits} positive />
+                                <div className="border-t border-border/50" />
+                                <BalanceRow label={`Meals (${balanceQuery.data.totalMeals}×)`} amount={-balanceQuery.data.mealCost} />
+                                <BalanceRow label="Fixed Costs" amount={-balanceQuery.data.fixedCostShare} />
+                                <BalanceRow label="Individual Costs" amount={-balanceQuery.data.individualCostTotal} />
+                                <div className="border-t border-border/50 pt-1" />
+                                <div className="flex items-center justify-between font-bold">
+                                    <span className="text-sm">Current Balance</span>
+                                    <span className={`text-base ${balanceQuery.data.currentBalance >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
+                                        ৳{balanceQuery.data.currentBalance.toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground text-center py-4">No data available</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
 
             {/* Spending Chart */}
             {userContext && (
@@ -454,49 +497,19 @@ export default function DashboardPage() {
                     />
                 </div>
 
-                {/* Right Column: Balance Summary + Activity */}
+                {/* Right Column: Recent Activity */}
                 <div className="space-y-6">
-                    {/* Balance Breakdown */}
-                    <Card className="border-border/50">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Balance Breakdown</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {balanceQuery.isLoading ? (
-                                <div className="space-y-3">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Skeleton key={i} className="h-4 w-full" />
-                                    ))}
-                                </div>
-                            ) : balanceQuery.data ? (
-                                <div className="space-y-2.5">
-                                    <BalanceRow label="Opening Balance" amount={balanceQuery.data.openingBalance} />
-                                    <BalanceRow label="Deposits" amount={balanceQuery.data.totalDeposits} positive />
-                                    <div className="border-t border-border/50" />
-                                    <BalanceRow label={`Meals (${balanceQuery.data.totalMeals}×)`} amount={-balanceQuery.data.mealCost} />
-                                    <BalanceRow label="Fixed Costs" amount={-balanceQuery.data.fixedCostShare} />
-                                    <BalanceRow label="Individual Costs" amount={-balanceQuery.data.individualCostTotal} />
-                                    <div className="border-t border-border/50 pt-1" />
-                                    <div className="flex items-center justify-between font-bold">
-                                        <span className="text-sm">Current Balance</span>
-                                        <span className={`text-base ${balanceQuery.data.currentBalance >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
-                                            ৳{balanceQuery.data.currentBalance.toLocaleString()}
-                                        </span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground text-center py-4">No data available</p>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Recent Activity */}
                     <RecentActivity
                         activities={activityQuery.data ?? null}
                         loading={activityQuery.isLoading}
                     />
                 </div>
             </div>
+
+            {/* All Member Info */}
+            {userContext && (
+                <AllMemberInfoSection messId={userContext.messId} cycleId={userContext.cycleId} />
+            )}
         </div>
     );
 }
@@ -511,5 +524,45 @@ function BalanceRow({ label, amount, positive }: { label: string; amount: number
                 {isNeg ? '-' : positive ? '+' : ''}৳{Math.abs(amount).toLocaleString()}
             </span>
         </div>
+    );
+}
+
+// All Member Info section with its own query
+function AllMemberInfoSection({ messId, cycleId }: { messId: string; cycleId: string }) {
+    const allBalancesQuery = useQuery({
+        queryKey: ['all-member-balances', messId, cycleId],
+        queryFn: async () => {
+            const result = await getAllMemberBalances(messId, cycleId);
+            if ('error' in result) return null;
+            return result.data;
+        },
+        enabled: !!messId && !!cycleId,
+    });
+
+    const members = allBalancesQuery.data
+        ? (allBalancesQuery.data.filter((m): m is NonNullable<typeof m> => m !== null))
+        : null;
+
+    return (
+        <AllMemberInfo
+            members={members}
+            loading={allBalancesQuery.isLoading}
+        />
+    );
+}
+
+// Mess Overview section with its own query
+function MessOverviewSection({ messId, cycleId }: { messId: string; cycleId: string }) {
+    const overviewQuery = useQuery({
+        queryKey: ['mess-overview', messId, cycleId],
+        queryFn: () => getMessOverview(messId, cycleId),
+        enabled: !!messId && !!cycleId,
+    });
+
+    return (
+        <MessOverview
+            data={overviewQuery.data ?? null}
+            loading={overviewQuery.isLoading}
+        />
     );
 }
