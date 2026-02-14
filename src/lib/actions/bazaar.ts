@@ -30,6 +30,9 @@ export async function addBazaarExpense(input: unknown) {
 
     const isManager = currentMember?.role === 'manager';
 
+    // Calculate total amount from items
+    const totalAmount = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
+
     // 1. Create the expense header
     const { data: expense, error: expenseError } = await supabase
         .from('bazaar_expenses')
@@ -39,7 +42,7 @@ export async function addBazaarExpense(input: unknown) {
             shopper_id: shopperId,
             expense_date: expenseDate,
             notes: notes || null,
-            total_amount: 0, // Will be auto-updated by trigger
+            total_amount: totalAmount,
             approval_status: isManager ? 'approved' : 'pending',
             approved_by: isManager ? user.id : null,
             created_by: user.id,

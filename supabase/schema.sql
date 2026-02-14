@@ -102,8 +102,6 @@ CREATE TABLE transactions (
     payment_method payment_method NOT NULL DEFAULT 'cash',
     reference_no TEXT,
     notes TEXT,
-    approval_status approval_status NOT NULL DEFAULT 'pending',
-    approved_by UUID REFERENCES profiles(id),
     created_by UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -117,8 +115,6 @@ CREATE TABLE bazaar_expenses (
     expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
     total_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
     notes TEXT,
-    approval_status approval_status NOT NULL DEFAULT 'pending',
-    approved_by UUID REFERENCES profiles(id),
     created_by UUID NOT NULL REFERENCES profiles(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -643,7 +639,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER trg_deduct_inventory
     AFTER INSERT ON bazaar_items
@@ -741,20 +737,20 @@ CREATE POLICY profiles_update ON profiles FOR UPDATE USING (id = auth.uid());
 CREATE POLICY profiles_insert ON profiles FOR INSERT WITH CHECK (id = auth.uid());
 
 -- Messes: Members can view their messes, anyone can create
-CREATE POLICY messes_select ON messes FOR SELECT USING (auth.uid() IS NOT NULL);
-CREATE POLICY messes_insert ON messes FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY messes_select ON messes FOR SELECT USING (is_mess_member(id));
+CREATE POLICY messes_insert ON messes FOR INSERT WITH CHECK (created_by = auth.uid());
 CREATE POLICY messes_update ON messes FOR UPDATE USING (is_mess_manager(id));
 
 -- Mess Members: Members see their mess mates
 CREATE POLICY mess_members_select ON mess_members FOR SELECT USING (is_mess_member(mess_id));
 CREATE POLICY mess_members_insert ON mess_members FOR INSERT WITH CHECK (
-    auth.uid() IS NOT NULL
+    user_id = auth.uid() OR is_mess_manager(mess_id)
 );
 CREATE POLICY mess_members_update ON mess_members FOR UPDATE USING (is_mess_manager(mess_id));
 
 -- Mess Cycles: Members see their cycles
 CREATE POLICY mess_cycles_select ON mess_cycles FOR SELECT USING (is_mess_member(mess_id));
-CREATE POLICY mess_cycles_insert ON mess_cycles FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY mess_cycles_insert ON mess_cycles FOR INSERT WITH CHECK (is_mess_manager(mess_id));
 CREATE POLICY mess_cycles_update ON mess_cycles FOR UPDATE USING (is_mess_manager(mess_id));
 
 -- Daily Meals: Members see their own meals, managers see all
@@ -768,8 +764,7 @@ CREATE POLICY daily_meals_update ON daily_meals FOR UPDATE USING (
 
 -- Transactions: Members see their own, managers see all
 CREATE POLICY transactions_select ON transactions FOR SELECT USING (is_mess_member(mess_id));
-CREATE POLICY transactions_insert ON transactions FOR INSERT WITH CHECK (is_mess_member(mess_id));
-CREATE POLICY transactions_update ON transactions FOR UPDATE USING (is_mess_manager(mess_id));
+CREATE POLICY transactions_insert ON transactions FOR INSERT WITH CHECK (is_mess_manager(mess_id));
 
 -- Bazaar Expenses: Members see all, managers insert
 CREATE POLICY bazaar_expenses_select ON bazaar_expenses FOR SELECT USING (is_mess_member(mess_id));
@@ -802,7 +797,7 @@ CREATE POLICY inventory_update ON inventory FOR UPDATE USING (is_mess_manager(me
 
 -- Meal Cutoff Config: Members see, managers manage
 CREATE POLICY meal_cutoff_select ON meal_cutoff_config FOR SELECT USING (is_mess_member(mess_id));
-CREATE POLICY meal_cutoff_insert ON meal_cutoff_config FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY meal_cutoff_insert ON meal_cutoff_config FOR INSERT WITH CHECK (is_mess_manager(mess_id));
 CREATE POLICY meal_cutoff_update ON meal_cutoff_config FOR UPDATE USING (is_mess_manager(mess_id));
 
 -- Month Snapshots: Members see their own
@@ -828,6 +823,24 @@ CREATE POLICY announcements_delete ON announcements FOR DELETE USING (is_mess_ma
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO profiles (id, full_name, email)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+        NEW.email
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_new_user();
+-- Fix: Recreate the trigger function with proper SECURITY DEFINER
+CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER
 SECURITY DEFINER
 SET search_path = public
@@ -843,8 +856,112 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Ensure the trigger exists
 CREATE OR REPLACE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
     EXECUTE FUNCTION handle_new_user();
 
+
+
+    -- Fix RLS policies for mess creation flow
+DROP POLICY IF EXISTS messes_select ON messes;
+DROP POLICY IF EXISTS messes_insert ON messes;
+CREATE POLICY messes_select ON messes FOR SELECT USING (
+    is_mess_member(id) OR created_by = auth.uid()
+);
+CREATE POLICY messes_insert ON messes FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS mess_members_insert ON mess_members;
+CREATE POLICY mess_members_insert ON mess_members FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS mess_cycles_insert ON mess_cycles;
+CREATE POLICY mess_cycles_insert ON mess_cycles FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS meal_cutoff_insert ON meal_cutoff_config;
+CREATE POLICY meal_cutoff_insert ON meal_cutoff_config FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+
+-- Allow any authenticated user to see messes (needed for invite code lookup)
+DROP POLICY IF EXISTS messes_select ON messes;
+CREATE POLICY messes_select ON messes FOR SELECT USING (auth.uid() IS NOT NULL);
+
+
+-- Fix: Handle NULL from empty SELECT INTO results
+CREATE OR REPLACE FUNCTION calculate_member_balance(
+    p_member_id UUID,
+    p_cycle_id UUID
+)
+RETURNS TABLE (
+    opening_balance NUMERIC,
+    total_deposits NUMERIC,
+    total_meals INT,
+    meal_rate NUMERIC,
+    meal_cost NUMERIC,
+    fixed_cost_share NUMERIC,
+    individual_cost_total NUMERIC,
+    current_balance NUMERIC
+) AS $$
+DECLARE
+    v_opening NUMERIC(12, 2) := 0;
+    v_deposits NUMERIC(12, 2) := 0;
+    v_meals INT := 0;
+    v_rate NUMERIC(10, 4) := 0;
+    v_meal_cost NUMERIC(12, 2) := 0;
+    v_fixed NUMERIC(12, 2) := 0;
+    v_individual NUMERIC(12, 2) := 0;
+    v_balance NUMERIC(12, 2) := 0;
+BEGIN
+    SELECT COALESCE(ms.closing_balance, 0)
+    INTO v_opening
+    FROM month_snapshots ms
+    JOIN mess_cycles mc ON mc.id = ms.cycle_id
+    WHERE ms.member_id = p_member_id
+      AND mc.end_date < (SELECT start_date FROM mess_cycles WHERE id = p_cycle_id)
+    ORDER BY mc.end_date DESC
+    LIMIT 1;
+
+    -- Fix: PostgreSQL sets variable to NULL when SELECT INTO returns no rows
+    v_opening := COALESCE(v_opening, 0);
+
+    SELECT COALESCE(SUM(amount), 0)
+    INTO v_deposits
+    FROM transactions
+    WHERE member_id = p_member_id AND cycle_id = p_cycle_id AND approval_status = 'approved';
+
+    SELECT COALESCE(
+        SUM(
+            CASE WHEN breakfast THEN 1 ELSE 0 END +
+            CASE WHEN lunch THEN 1 ELSE 0 END +
+            CASE WHEN dinner THEN 1 ELSE 0 END +
+            guest_breakfast + guest_lunch + guest_dinner
+        ), 0
+    )
+    INTO v_meals
+    FROM daily_meals
+    WHERE member_id = p_member_id AND cycle_id = p_cycle_id;
+
+    v_rate := COALESCE(calculate_meal_rate(p_cycle_id), 0);
+    v_meal_cost := ROUND(v_meals * v_rate, 2);
+    v_fixed := COALESCE(prorate_fixed_costs(p_member_id, p_cycle_id), 0);
+
+    SELECT COALESCE(SUM(amount), 0)
+    INTO v_individual
+    FROM individual_costs
+    WHERE member_id = p_member_id
+      AND cycle_id = p_cycle_id
+      AND approval_status = 'approved';
+
+    v_balance := (v_opening + v_deposits) - (v_meal_cost + v_fixed + v_individual);
+
+    RETURN QUERY SELECT
+        v_opening,
+        v_deposits,
+        v_meals,
+        v_rate,
+        v_meal_cost,
+        v_fixed,
+        v_individual,
+        v_balance;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
