@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { getAllMealsForDate, managerBulkUpdateMeals } from '@/lib/actions/meals';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, CalendarDays, Loader2, Save, Users, User, UtensilsCrossed } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useMessContext } from '@/components/mess-context';
 
 interface MemberMeal {
     memberId: string;
@@ -27,26 +27,13 @@ interface MemberMeal {
 }
 
 export default function ManageMealsPage() {
-    const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
-    const [ctx, setCtx] = useState<{ messId: string; cycleId: string; role: string } | null>(null);
+    const messCtx = useMessContext();
+    const ctx = messCtx ? { messId: messCtx.messId, cycleId: messCtx.cycleId, role: messCtx.role } : null;
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [mealData, setMealData] = useState<Record<string, { breakfast: number; lunch: number; dinner: number }>>({});
     const [submitting, setSubmitting] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
-
-    useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) return;
-            const { data: c } = await supabase.from('mess_cycles').select('id').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
-            if (!c) return;
-            setCtx({ messId: m.mess_id, cycleId: c.id, role: m.role });
-        }
-        load();
-    }, [supabase]);
 
     const isManager = ctx?.role === 'manager';
 

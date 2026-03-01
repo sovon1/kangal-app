@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
@@ -28,19 +28,16 @@ import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals';
 import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
 import { createMess, joinMess } from '@/lib/actions/mess';
+import { useMessContext } from '@/components/mess-context';
 import type { DashboardStats, MealToggleState } from '@/types';
 
 export default function DashboardPage() {
     const supabase = getSupabaseBrowserClient();
     const router = useRouter();
     const queryClient = useQueryClient();
-    const [userContext, setUserContext] = useState<{
-        userId: string;
-        memberId: string;
-        messId: string;
-        cycleId: string;
-    } | null>(null);
-    const [contextLoading, setContextLoading] = useState(true);
+    const messCtx = useMessContext();
+    const userContext = messCtx;
+    const contextLoading = false; // Context is provided instantly by layout
 
     // Dialog states
     const [createOpen, setCreateOpen] = useState(false);
@@ -52,55 +49,10 @@ export default function DashboardPage() {
     const [createdInviteCode, setCreatedInviteCode] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
 
-    // Load user context (mess membership + current cycle)
+    // Reload context by refreshing the page (layout re-fetches)
     const loadContext = useCallback(async () => {
-        setContextLoading(true);
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            setContextLoading(false);
-            return;
-        }
-
-        // Get active membership
-        const { data: membership } = await supabase
-            .from('mess_members')
-            .select('id, mess_id')
-            .eq('user_id', user.id)
-            .eq('status', 'active')
-            .limit(1)
-            .single();
-
-        if (!membership) {
-            setContextLoading(false);
-            return;
-        }
-
-        // Get current open cycle
-        const { data: cycle } = await supabase
-            .from('mess_cycles')
-            .select('id')
-            .eq('mess_id', membership.mess_id)
-            .eq('status', 'open')
-            .limit(1)
-            .single();
-
-        if (!cycle) {
-            setContextLoading(false);
-            return;
-        }
-
-        setUserContext({
-            userId: user.id,
-            memberId: membership.id,
-            messId: membership.mess_id,
-            cycleId: cycle.id,
-        });
-        setContextLoading(false);
-    }, [supabase]);
-
-    useEffect(() => {
-        loadContext();
-    }, [loadContext]);
+        router.refresh();
+    }, [router]);
 
     // ============ CREATE MESS HANDLER ============
     const handleCreateMess = async () => {
@@ -477,11 +429,6 @@ export default function DashboardPage() {
                 </Card>
             </div>
 
-            {/* Member Meal Comparison */}
-            {userContext && (
-                <MealComparison cycleId={userContext.cycleId} messId={userContext.messId} />
-            )}
-
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Meal Toggles — Takes 2 columns on desktop */}
@@ -509,6 +456,11 @@ export default function DashboardPage() {
             {/* All Member Info */}
             {userContext && (
                 <AllMemberInfoSection messId={userContext.messId} cycleId={userContext.cycleId} />
+            )}
+
+            {/* Member Meal Comparison — at the bottom */}
+            {userContext && (
+                <MealComparison cycleId={userContext.cycleId} messId={userContext.messId} />
             )}
         </div>
     );

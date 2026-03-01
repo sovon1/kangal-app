@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { getAllMealsForMonth } from '@/lib/actions/meals';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Settings, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
+import { useMessContext } from '@/components/mess-context';
 
 interface MealCell {
     breakfast: number;
@@ -20,21 +19,8 @@ interface MealCell {
 }
 
 export default function MealChartPage() {
-    const supabase = getSupabaseBrowserClient();
-    const [ctx, setCtx] = useState<{ messId: string; cycleId: string; role: string } | null>(null);
-
-    useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) return;
-            const { data: c } = await supabase.from('mess_cycles').select('id').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
-            if (!c) return;
-            setCtx({ messId: m.mess_id, cycleId: c.id, role: m.role });
-        }
-        load();
-    }, [supabase]);
+    const messCtx = useMessContext();
+    const ctx = messCtx ? { messId: messCtx.messId, cycleId: messCtx.cycleId, role: messCtx.role } : null;
 
     const isManager = ctx?.role === 'manager';
 
@@ -150,11 +136,11 @@ export default function MealChartPage() {
                                                             <span className="text-muted-foreground/30 text-[10px]">No meal</span>
                                                         ) : (
                                                             <div className="space-y-0.5 text-[11px] text-muted-foreground">
-                                                                <div>Breakfast: <span className="text-foreground font-medium">{b.toFixed(2)}</span></div>
-                                                                <div>Lunch: <span className="text-foreground font-medium">{l.toFixed(2)}</span></div>
-                                                                <div>Dinner: <span className="text-foreground font-medium">{d.toFixed(2)}</span></div>
+                                                                <div>Breakfast: <span className="text-foreground font-medium">{b}</span></div>
+                                                                <div>Lunch: <span className="text-foreground font-medium">{l}</span></div>
+                                                                <div>Dinner: <span className="text-foreground font-medium">{d}</span></div>
                                                                 <div className="pt-0.5 border-t border-border/20 font-semibold text-foreground">
-                                                                    Total: {total.toFixed(2)}
+                                                                    Total: {total}
                                                                 </div>
                                                             </div>
                                                         )}
