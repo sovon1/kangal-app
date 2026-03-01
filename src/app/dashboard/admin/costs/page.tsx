@@ -141,7 +141,7 @@ export default function CostsPage() {
                             .from('bazaar_expenses')
                             .select('total_amount')
                             .eq('cycle_id', ctx.cycleId)
-                            .eq('shopper_member_id', m.id as string);
+                            .eq('shopper_id', m.id as string);
 
                         const bazaarSpent = (bazaarData || []).reduce((s, e) => s + Number(e.total_amount), 0);
 
@@ -204,7 +204,7 @@ export default function CostsPage() {
                     .from('bazaar_expenses')
                     .select('*')
                     .eq('cycle_id', ctx.cycleId)
-                    .eq('shopper_member_id', exportMember)
+                    .eq('shopper_id', exportMember)
                     .order('expense_date', { ascending: false });
 
                 const bazaarTrips = (bazaarData || []).map((b: Record<string, unknown>) => ({
@@ -354,7 +354,10 @@ export default function CostsPage() {
             {/* Add Fixed Cost Dialog */}
             <Dialog open={fixedOpen} onOpenChange={setFixedOpen}>
                 <DialogContent className="sm:max-w-md">
-                    <DialogHeader><DialogTitle>Add Fixed Cost</DialogTitle></DialogHeader>
+                    <DialogHeader>
+                        <DialogTitle>Add Fixed Cost</DialogTitle>
+                        <DialogDescription>Add a shared cost that will be split equally among all members.</DialogDescription>
+                    </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label>Cost Type</Label>
@@ -383,7 +386,10 @@ export default function CostsPage() {
             {/* Add Individual Cost Dialog */}
             <Dialog open={indOpen} onOpenChange={setIndOpen}>
                 <DialogContent className="sm:max-w-md">
-                    <DialogHeader><DialogTitle>Add Individual Cost</DialogTitle></DialogHeader>
+                    <DialogHeader>
+                        <DialogTitle>Add Individual Cost</DialogTitle>
+                        <DialogDescription>Add a cost charged to a specific member.</DialogDescription>
+                    </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label>Member</Label>

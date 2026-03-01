@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
@@ -203,6 +203,7 @@ export default function BazaarPage() {
                 <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Add Bazaar Expense</DialogTitle>
+                        <DialogDescription>Add items purchased during a shopping trip.</DialogDescription>
                         {!isManager && (
                             <p className="text-xs text-amber-600 mt-1">Your expense will be submitted for manager approval.</p>
                         )}

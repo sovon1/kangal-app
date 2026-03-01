@@ -29,14 +29,14 @@ export default function OptionsPage() {
     const router = useRouter();
 
     // User Context
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<{ id: string } | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [messId, setMessId] = useState<string | null>(null);
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     // Data State
-    const [months, setMonths] = useState<any[]>([]);
+    const [months, setMonths] = useState<{ id: string; name: string; status: string }[]>([]);
 
     // Form States
     const [newMonthName, setNewMonthName] = useState('');
@@ -68,7 +68,9 @@ export default function OptionsPage() {
             if (member) {
                 setMessId(member.mess_id);
                 setRole(member.role);
-                setMessName((member.mess as any)?.name || '');
+                const messData = member.mess as unknown as { name: string } | { name: string }[] | null;
+                const messNameValue = Array.isArray(messData) ? messData[0]?.name : messData?.name;
+                setMessName(messNameValue || '');
 
                 // Get active cycle
                 const { data: cycle } = await supabase

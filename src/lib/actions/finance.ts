@@ -357,10 +357,10 @@ export async function getMessOverview(messId: string, cycleId: string) {
 
     const mealRate = Number(mealRateResult.data) || 0;
     const totalMealCost = totalMeals * mealRate;
-    const totalSharedCost = (bazaarResult.data || []).reduce((s, e) => s + Number(e.total_amount), 0);
+    const totalBazaarCost = (bazaarResult.data || []).reduce((s, e) => s + Number(e.total_amount), 0);
     const totalFixedCost = (fixedResult.data || []).reduce((s, e) => s + Number(e.amount), 0);
     const totalIndividualCost = (individualResult.data || []).reduce((s, e) => s + Number(e.amount), 0);
-    const messBalance = totalDeposits - (totalMealCost + totalSharedCost + totalFixedCost + totalIndividualCost);
+    const messBalance = totalDeposits - (totalMealCost + totalBazaarCost + totalFixedCost + totalIndividualCost);
 
     // Format month name from cycle
     let monthLabel = '';
@@ -380,7 +380,7 @@ export async function getMessOverview(messId: string, cycleId: string) {
         totalMealCost,
         mealRate,
         totalIndividualCost,
-        totalSharedCost: totalSharedCost + totalFixedCost,
+        totalSharedCost: totalBazaarCost + totalFixedCost,
     };
 }
 

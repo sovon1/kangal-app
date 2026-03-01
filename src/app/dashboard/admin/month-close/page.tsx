@@ -35,8 +35,8 @@ export default function MonthClosePage() {
             const [membersRes, mealsRes, bazaarRes, depositsRes] = await Promise.all([
                 supabase.from('mess_members').select('id', { count: 'exact' }).eq('mess_id', m.mess_id).eq('status', 'active'),
                 supabase.from('daily_meals').select('id', { count: 'exact' }).eq('cycle_id', c.id),
-                supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', c.id),
-                supabase.from('transactions').select('amount').eq('cycle_id', c.id),
+                supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', c.id).eq('approval_status', 'approved'),
+                supabase.from('transactions').select('amount').eq('cycle_id', c.id).eq('approval_status', 'approved'),
             ]);
 
             setStats({

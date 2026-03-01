@@ -30,7 +30,7 @@ export async function startNewMonth(messId: string, currentCycleId: string, newM
         // If we want a custom name, we might need to update the new cycle after creation.
 
         // Let's call the existing logic
-        const { error } = await supabase.rpc('close_month_and_create_next', {
+        const { error } = await supabase.rpc('close_mess_month', {
             p_cycle_id: currentCycleId
         });
 

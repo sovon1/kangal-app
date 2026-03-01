@@ -63,24 +63,13 @@ export default function LoginPage() {
         if (error) {
             setError(error.message);
         } else {
-            router.push('/');
+            router.push('/dashboard');
             router.refresh();
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
-            {/* Doodle background image */}
-            <div
-                className="absolute inset-0 z-0"
-                style={{
-                    backgroundImage: 'url(/auth-bg.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    opacity: 0.1,
-                }}
-            />
 
             <Card className="w-full max-w-md mx-4 relative z-10 border-border/50 bg-card/80 backdrop-blur-xl shadow-2xl">
                 <CardHeader className="text-center space-y-4">

@@ -14,32 +14,37 @@ interface CutoffConfig {
     dinner_cutoff: string;
 }
 
-function isMealLocked(mealType: MealType, mealDate: string, config: CutoffConfig): boolean {
+function getBDTime(): Date {
+    // Get current time in Bangladesh (UTC+6) regardless of server timezone
     const now = new Date();
-    const date = new Date(mealDate);
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcMs + 6 * 3600000); // UTC+6
+}
+
+function isMealLocked(mealType: MealType, mealDate: string, config: CutoffConfig): boolean {
+    const now = getBDTime();
+    // Parse mealDate as a local date (no timezone shift)
+    const [year, month, day] = mealDate.split('-').map(Number);
 
     let cutoffTime: string;
-    let cutoffDate: Date;
+    let cutoffDay: number = day;
 
     switch (mealType) {
         case 'breakfast':
             // Breakfast locks at cutoff time on the PREVIOUS day
             cutoffTime = config.breakfast_cutoff;
-            cutoffDate = new Date(date);
-            cutoffDate.setDate(cutoffDate.getDate() - 1);
+            cutoffDay = day - 1;
             break;
         case 'lunch':
             cutoffTime = config.lunch_cutoff;
-            cutoffDate = new Date(date);
             break;
         case 'dinner':
             cutoffTime = config.dinner_cutoff;
-            cutoffDate = new Date(date);
             break;
     }
 
     const [hours, minutes] = cutoffTime.split(':').map(Number);
-    cutoffDate.setHours(hours, minutes, 0, 0);
+    const cutoffDate = new Date(year, month - 1, cutoffDay, hours, minutes, 0, 0);
 
     return now > cutoffDate;
 }

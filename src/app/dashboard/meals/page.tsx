@@ -113,14 +113,16 @@ export default function MealsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Meal Calendar</h1>
-                    <p className="text-muted-foreground text-sm mt-0.5">Toggle your meals for the week</p>
+                <div className="flex items-center gap-3">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Meal Calendar</h1>
+                        <p className="text-muted-foreground text-sm mt-0.5">Toggle your meals for the week</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs gap-1">
+                        <CalendarDays className="h-3 w-3" />
+                        {totalMeals} meals this week
+                    </Badge>
                 </div>
-                <Badge variant="outline" className="text-xs gap-1">
-                    <CalendarDays className="h-3 w-3" />
-                    {totalMeals} meals this week
-                </Badge>
                 {ctx?.role === 'manager' && (
                     <Link href="/dashboard/meals/manage">
                         <Button variant="outline" size="sm" className="gap-1.5 text-xs">
@@ -305,11 +307,11 @@ function InlineMealChart({ messId, cycleId }: { messId: string; cycleId: string 
                                                         <span className="text-muted-foreground/30 text-[10px]">No meal</span>
                                                     ) : (
                                                         <div className="space-y-0.5 text-[11px] text-muted-foreground">
-                                                            <div>Breakfast: <span className="text-foreground font-medium">{b.toFixed(2)}</span></div>
-                                                            <div>Lunch: <span className="text-foreground font-medium">{l.toFixed(2)}</span></div>
-                                                            <div>Dinner: <span className="text-foreground font-medium">{d.toFixed(2)}</span></div>
+                                                            <div>Breakfast: <span className="text-foreground font-medium">{b}</span></div>
+                                                            <div>Lunch: <span className="text-foreground font-medium">{l}</span></div>
+                                                            <div>Dinner: <span className="text-foreground font-medium">{d}</span></div>
                                                             <div className="pt-0.5 border-t border-border/20 font-semibold text-foreground">
-                                                                Total: {total.toFixed(2)}
+                                                                Total: {total}
                                                             </div>
                                                         </div>
                                                     )}
