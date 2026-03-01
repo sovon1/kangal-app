@@ -62,6 +62,19 @@ export async function toggleMeal(input: unknown) {
     const { memberId, cycleId, messId, mealDate, mealType, value } = parsed.data;
     const supabase = await getSupabaseServerClient();
 
+    // Get current user to check if they're a manager
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    const isManager = currentMember?.role === 'manager';
+
     // 1. Get cutoff config
     const { data: config } = await supabase
         .from('meal_cutoff_config')
@@ -75,8 +88,8 @@ export async function toggleMeal(input: unknown) {
         dinner_cutoff: '15:00',
     };
 
-    // 2. Server-side cutoff check
-    if (isMealLocked(mealType, mealDate, cutoffConfig)) {
+    // 2. Server-side cutoff check (managers bypass this)
+    if (!isManager && isMealLocked(mealType, mealDate, cutoffConfig)) {
         return {
             error: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} for ${mealDate} is locked. The cutoff time has passed.`,
         };
