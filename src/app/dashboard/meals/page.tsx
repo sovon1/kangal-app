@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Sun, Cloud, Moon, Lock, Users,
 import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal, getAllMealsForMonth } from '@/lib/actions/meals';
 import Link from 'next/link';
+import { useMessContext } from '@/components/mess-context';
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner'] as const;
 const MEAL_ICONS = { breakfast: Sun, lunch: Cloud, dinner: Moon };
@@ -24,21 +25,8 @@ const MEAL_COLORS = {
 export default function MealsPage() {
     const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
-    const [ctx, setCtx] = useState<{ userId: string; memberId: string; messId: string; cycleId: string; role: string } | null>(null);
+    const ctx = useMessContext();
     const [weekOffset, setWeekOffset] = useState(0);
-
-    useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) return;
-            const { data: c } = await supabase.from('mess_cycles').select('id').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
-            if (!c) return;
-            setCtx({ userId: user.id, memberId: m.id, messId: m.mess_id, cycleId: c.id, role: m.role });
-        }
-        load();
-    }, [supabase]);
 
     // Get week dates
     const getWeekDates = useCallback(() => {

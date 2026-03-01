@@ -98,7 +98,7 @@ BEGIN
         (p_expense_data->>'expense_date')::DATE,
         NULLIF(p_expense_data->>'notes', ''),
         (p_expense_data->>'total_amount')::NUMERIC,
-        (p_expense_data->>'approval_status')::expense_approval_status,
+        (p_expense_data->>'approval_status')::approval_status,
         (p_expense_data->>'approved_by')::UUID,
         (p_expense_data->>'created_by')::UUID
     )

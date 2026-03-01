@@ -11,32 +11,33 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BarChart3, AlertTriangle, Lock, Loader2, CheckCircle2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useMessContext } from '@/components/mess-context';
 
 export default function MonthClosePage() {
     const supabase = getSupabaseBrowserClient();
     const router = useRouter();
-    const [ctx, setCtx] = useState<{ cycleId: string; cycleName: string; messId: string } | null>(null);
+    const messCtx = useMessContext();
+    const [cycleName, setCycleName] = useState('');
     const [stats, setStats] = useState<{ members: number; meals: number; bazaar: number; deposits: number } | null>(null);
     const [closing, setClosing] = useState(false);
     const [closed, setClosed] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    const ctx = messCtx ? { cycleId: messCtx.cycleId, cycleName, messId: messCtx.messId } : null;
+
     useEffect(() => {
+        if (!messCtx) { setLoading(false); return; }
         async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { setLoading(false); return; }
-            const { data: m } = await supabase.from('mess_members').select('mess_id').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) { setLoading(false); return; }
-            const { data: c } = await supabase.from('mess_cycles').select('id, name').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
-            if (!c) { setLoading(false); return; }
-            setCtx({ cycleId: c.id, cycleName: c.name, messId: m.mess_id });
+            // Only fetch cycle name + stats (context provides messId/cycleId)
+            const { data: c } = await supabase.from('mess_cycles').select('name').eq('id', messCtx!.cycleId).single();
+            if (c) setCycleName(c.name);
 
             // Get summary stats
             const [membersRes, mealsRes, bazaarRes, depositsRes] = await Promise.all([
-                supabase.from('mess_members').select('id', { count: 'exact' }).eq('mess_id', m.mess_id).eq('status', 'active'),
-                supabase.from('daily_meals').select('id', { count: 'exact' }).eq('cycle_id', c.id),
-                supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', c.id).eq('approval_status', 'approved'),
-                supabase.from('transactions').select('amount').eq('cycle_id', c.id).eq('approval_status', 'approved'),
+                supabase.from('mess_members').select('id', { count: 'exact' }).eq('mess_id', messCtx!.messId).eq('status', 'active'),
+                supabase.from('daily_meals').select('id', { count: 'exact' }).eq('cycle_id', messCtx!.cycleId),
+                supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', messCtx!.cycleId).eq('approval_status', 'approved'),
+                supabase.from('transactions').select('amount').eq('cycle_id', messCtx!.cycleId).eq('approval_status', 'approved'),
             ]);
 
             setStats({

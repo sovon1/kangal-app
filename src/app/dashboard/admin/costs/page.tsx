@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Skeleton } from '@/components/ui/skeleton';
 import { DollarSign, Plus, Loader2, Zap, Wifi, Flame, Droplets, Home, Wrench, ChefHat, Layers, FileDown, Users } from 'lucide-react';
 import { toast } from 'sonner';
+import { useMessContext } from '@/components/mess-context';
 
 const COST_ICONS: Record<string, typeof DollarSign> = {
     cook_salary: ChefHat, wifi: Wifi, gas: Flame, electricity: Zap,
@@ -28,7 +29,8 @@ const COST_TYPES = ['cook_salary', 'wifi', 'gas', 'electricity', 'water', 'rent'
 export default function CostsPage() {
     const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
-    const [ctx, setCtx] = useState<{ memberId: string; messId: string; cycleId: string } | null>(null);
+    const messCtx = useMessContext();
+    const ctx = messCtx ? { memberId: messCtx.memberId, messId: messCtx.messId, cycleId: messCtx.cycleId } : null;
     const [cycleMeta, setCycleMeta] = useState<{ messName: string; cycleName: string; startDate: string; endDate: string } | null>(null);
     const [fixedOpen, setFixedOpen] = useState(false);
     const [indOpen, setIndOpen] = useState(false);
@@ -43,25 +45,23 @@ export default function CostsPage() {
     const [indMember, setIndMember] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
+    // Only fetch extra cycle metadata (name, dates) that the context doesn't provide
     useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) return;
-            const { data: c } = await supabase.from('mess_cycles').select('id, name, start_date, end_date').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
-            if (!c) return;
-            const { data: mess } = await supabase.from('messes').select('name').eq('id', m.mess_id).single();
-            setCtx({ memberId: m.id, messId: m.mess_id, cycleId: c.id });
+        if (!ctx) return;
+        async function loadMeta() {
+            const [cycleRes, messRes] = await Promise.all([
+                supabase.from('mess_cycles').select('name, start_date, end_date').eq('id', ctx!.cycleId).single(),
+                supabase.from('messes').select('name').eq('id', ctx!.messId).single(),
+            ]);
             setCycleMeta({
-                messName: mess?.name || 'Mess',
-                cycleName: c.name || 'Current Cycle',
-                startDate: new Date(c.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                endDate: new Date(c.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                messName: messRes.data?.name || 'Mess',
+                cycleName: cycleRes.data?.name || 'Current Cycle',
+                startDate: new Date(cycleRes.data?.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                endDate: new Date(cycleRes.data?.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             });
         }
-        load();
-    }, [supabase]);
+        loadMeta();
+    }, [ctx?.cycleId, ctx?.messId, supabase]);
 
     const fixedQuery = useQuery({
         queryKey: ['fixed-costs', ctx?.cycleId],

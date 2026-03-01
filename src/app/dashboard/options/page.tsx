@@ -23,17 +23,19 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useMessContext } from '@/components/mess-context';
 
 export default function OptionsPage() {
     const supabase = getSupabaseBrowserClient();
     const router = useRouter();
+    const messCtx = useMessContext();
 
-    // User Context
-    const [user, setUser] = useState<{ id: string } | null>(null);
-    const [role, setRole] = useState<string | null>(null);
-    const [messId, setMessId] = useState<string | null>(null);
-    const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Derived from context
+    const user = messCtx ? { id: messCtx.userId } : null;
+    const role = messCtx?.role || null;
+    const messId = messCtx?.messId || null;
+    const activeCycleId = messCtx?.cycleId || null;
+    const [loading, setLoading] = useState(!messCtx);
 
     // Data State
     const [months, setMonths] = useState<{ id: string; name: string; status: string }[]>([]);
@@ -53,42 +55,18 @@ export default function OptionsPage() {
     const [refreshingMonths, setRefreshingMonths] = useState(false);
 
     useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            setUser(user);
+        if (!messCtx) return;
+        async function loadExtra() {
+            // Fetch mess name for delete confirmation
+            const { data: mess } = await supabase.from('messes').select('name').eq('id', messCtx!.messId).single();
+            if (mess) setMessName(mess.name || '');
 
-            const { data: member } = await supabase
-                .from('mess_members')
-                .select('mess_id, role, mess:messes(name)')
-                .eq('user_id', user.id)
-                .eq('status', 'active')
-                .single();
-
-            if (member) {
-                setMessId(member.mess_id);
-                setRole(member.role);
-                const messData = member.mess as unknown as { name: string } | { name: string }[] | null;
-                const messNameValue = Array.isArray(messData) ? messData[0]?.name : messData?.name;
-                setMessName(messNameValue || '');
-
-                // Get active cycle
-                const { data: cycle } = await supabase
-                    .from('mess_cycles')
-                    .select('id')
-                    .eq('mess_id', member.mess_id)
-                    .eq('status', 'open')
-                    .single();
-
-                if (cycle) setActiveCycleId(cycle.id);
-
-                // Load months
-                loadMonths(member.mess_id);
-            }
+            // Load months
+            loadMonths(messCtx!.messId);
             setLoading(false);
         }
-        load();
-    }, [supabase]);
+        loadExtra();
+    }, [messCtx?.messId, supabase]);
 
     async function loadMonths(mId: string) {
         setRefreshingMonths(true);

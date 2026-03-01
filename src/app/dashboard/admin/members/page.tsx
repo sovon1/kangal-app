@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Users, Crown, ChefHat, User, Copy, Check, UserPlus, Loader2, ArrowRightLeft, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useMessContext } from '@/components/mess-context';
 
 const ROLE_ICONS = { manager: Crown, cook: ChefHat, member: User };
 const ROLE_COLORS = { manager: 'text-amber-500 bg-amber-500/10', cook: 'text-blue-500 bg-blue-500/10', member: 'text-slate-500 bg-slate-500/10' };
@@ -23,24 +24,25 @@ export default function MembersPage() {
     const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
     const router = useRouter();
-    const [ctx, setCtx] = useState<{ messId: string; inviteCode: string; memberId: string; role: string } | null>(null);
+    const messCtx = useMessContext();
+    const [inviteCode, setInviteCode] = useState('');
     const [copied, setCopied] = useState(false);
     const [transferOpen, setTransferOpen] = useState(false);
     const [selectedNewManager, setSelectedNewManager] = useState('');
     const [transferring, setTransferring] = useState(false);
 
+    // Build ctx from MessContext + fetched invite code
+    const ctx = messCtx ? { messId: messCtx.messId, inviteCode, memberId: messCtx.memberId, role: messCtx.role } : null;
+
+    // Only fetch invite code (extra data not in context)
     useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) return;
-            const { data: mess } = await supabase.from('messes').select('id, invite_code').eq('id', m.mess_id).single();
-            if (!mess) return;
-            setCtx({ messId: mess.id, inviteCode: mess.invite_code || '', memberId: m.id, role: m.role });
+        if (!messCtx) return;
+        async function loadInviteCode() {
+            const { data: mess } = await supabase.from('messes').select('invite_code').eq('id', messCtx!.messId).single();
+            if (mess?.invite_code) setInviteCode(mess.invite_code);
         }
-        load();
-    }, [supabase]);
+        loadInviteCode();
+    }, [messCtx?.messId, supabase]);
 
     const isManager = ctx?.role === 'manager';
 

@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { addBazaarExpense, getBazaarExpenses, approveBazaarExpense } from '@/lib/actions/bazaar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,28 +11,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { useMessContext } from '@/components/mess-context';
 
 export default function BazaarPage() {
-    const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
-    const [ctx, setCtx] = useState<{ memberId: string; messId: string; cycleId: string; role: string } | null>(null);
+    const ctx = useMessContext();
     const [addOpen, setAddOpen] = useState(false);
     const [items, setItems] = useState([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
     const [submitting, setSubmitting] = useState(false);
     const [approvingId, setApprovingId] = useState<string | null>(null);
-
-    useEffect(() => {
-        async function load() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            const { data: m } = await supabase.from('mess_members').select('id, mess_id, role').eq('user_id', user.id).eq('status', 'active').limit(1).single();
-            if (!m) return;
-            const { data: c } = await supabase.from('mess_cycles').select('id').eq('mess_id', m.mess_id).eq('status', 'open').limit(1).single();
-            if (!c) return;
-            setCtx({ memberId: m.id, messId: m.mess_id, cycleId: c.id, role: m.role });
-        }
-        load();
-    }, [supabase]);
 
     const isManager = ctx?.role === 'manager';
 
