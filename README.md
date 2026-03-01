@@ -3,10 +3,9 @@
 <!-- Animated Header -->
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:FF6B6B,50:FFA94D,100:FFD43B&height=220&section=header&text=🍛%20KANGAL&fontSize=80&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=মেস%20ম্যানেজমেন্ট,%20কিন্তু%20ঝামেলা%20ছাড়া।&descSize=18&descAlignY=55" width="100%" />
 
-<!-- Typing SVG -->
-<a href="https://kangal.software">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=FF6B6B&center=true&vCenter=true&multiline=true&repeat=true&random=false&width=600&height=80&lines=Meal+tracking+with+one+tap+🍽️;Auto-calculated+meal+rates+📊;Zero+more+%22manager+tumi+taka+marcho%22+🤫" alt="Typing SVG" />
-</a>
+**One-tap meals · Auto meal rates · Transparent finances · PDF reports**
+
+*No more paper khatas. No more accusations. Just math.* ✨
 
 <br/>
 
@@ -32,21 +31,22 @@
 
 ## 💡 The Problem
 
-> Every university mess in Bangladesh runs on **WhatsApp groups**, **paper khatas**, and **mental math**. Managers get accused of stealing money, members forget which meals they ate, and month-end calculations take hours with a calculator.
+> Every university mess in Bangladesh runs on **WhatsApp groups**, **paper khatas**, and **mental math**.
+> Managers get accused of stealing money, members forget which meals they ate, and month-end calculations take hours.
 
 <div align="center">
 
-```
-     📱 WhatsApp Groups          📓 Paper Khatas           🧮 Mental Math
-     ─────────────────          ──────────────           ──────────────
-     "ভাই আজকে খাবো না"        *হারিয়ে গেছে*            "মনে নাই ভাই"
-     "কে বাজার করবে?"           *ভুল হিসাব*              "তোমার ৫০ টাকা বাকি"
-     "ম্যানেজার টাকা মারছে!"    *ছেঁড়া পেজ*             "আমি ২ বেলাই খাইনি!"
-```
+| | 📱 WhatsApp Groups | 📓 Paper Khatas | 🧮 Mental Math |
+|:---:|:---:|:---:|:---:|
+| 😩 | *"ভাই আজকে খাবো না"* | *হারিয়ে গেছে* | *"মনে নাই ভাই"* |
+| 😤 | *"কে বাজার করবে?"* | *ভুল হিসাব* | *"তোমার ৫০ টাকা বাকি"* |
+| 🤬 | *"ম্যানেজার টাকা মারছে!"* | *ছেঁড়া পেজ* | *"আমি ২ বেলাই খাইনি!"* |
+
+⬇️
+
+### ✅ KANGAL fixes **all of this**. Permanently. No more drama.
 
 </div>
-
-### ✅ KANGAL fixes all of this. Permanently.
 
 ---
 
