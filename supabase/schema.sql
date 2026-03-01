@@ -566,6 +566,11 @@ DECLARE
     v_cutoff_time TIME;
     v_cutoff_timestamp TIMESTAMPTZ;
 BEGIN
+    -- Managers bypass all cutoff checks
+    IF is_mess_manager(NEW.mess_id) THEN
+        RETURN NEW;
+    END IF;
+
     v_meal_date := NEW.meal_date;
 
     -- Get cutoff config for this mess
