@@ -66,7 +66,8 @@ export default function OptionsPage() {
             setLoading(false);
         }
         loadExtra();
-    }, [messCtx?.messId, supabase]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messCtx?.messId, messCtx?.cycleId]);
 
     async function loadMonths(mId: string) {
         setRefreshingMonths(true);
@@ -98,11 +99,10 @@ export default function OptionsPage() {
         } else {
             toast.success(result.message);
             setNewMonthName('');
-            loadMonths(messId);
-            if (role === 'manager') {
-                // If manager, we might want to reload to reflect the new cycle state globally
-                router.refresh();
-            }
+            // Always refresh to pick up the new cycle in layout context
+            router.refresh();
+            // Reload months list after a short delay to allow revalidation
+            setTimeout(() => loadMonths(messId), 500);
         }
     }
 

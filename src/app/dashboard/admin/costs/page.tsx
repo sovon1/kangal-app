@@ -71,6 +71,7 @@ export default function CostsPage() {
             return data || [];
         },
         enabled: !!ctx,
+        staleTime: 30000,
     });
 
     const indQuery = useQuery({
@@ -81,6 +82,7 @@ export default function CostsPage() {
             return data || [];
         },
         enabled: !!ctx,
+        staleTime: 30000,
     });
 
     const membersQuery = useQuery({
@@ -91,6 +93,7 @@ export default function CostsPage() {
             return data || [];
         },
         enabled: !!ctx,
+        staleTime: 60000,
     });
 
     const handleAddFixed = async () => {

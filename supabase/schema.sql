@@ -2,11 +2,10 @@
 -- KANGAL: University Mess Management System — Complete Database Schema
 -- PostgreSQL (Supabase) | 3NF Normalized | Academic-Grade SQL
 -- ============================================================================
-
--- ============================================================================
+ -- kangal.software-- ============================================================================
 -- 1. CUSTOM ENUM TYPES
 -- ============================================================================
-
+ -- UUID stands for Universally Unique Identifier
 CREATE TYPE user_role AS ENUM ('manager', 'member', 'cook');
 CREATE TYPE user_status AS ENUM ('active', 'inactive', 'on_leave');
 CREATE TYPE payment_method AS ENUM ('cash', 'bkash', 'nagad', 'bank_transfer', 'other');
@@ -45,6 +44,7 @@ CREATE TABLE messes (
 );
 
 -- 2.3 Mess Members (join table with RBAC + temporal tracking)
+-- RBAC stands for Role-Based Access Control
 CREATE TABLE mess_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     mess_id UUID NOT NULL REFERENCES messes(id) ON DELETE CASCADE,
@@ -133,6 +133,7 @@ CREATE TABLE bazaar_items (
 );
 
 -- 2.9 Fixed Costs (shared costs per cycle)
+--  UUID stands for Universally Unique Identifier
 CREATE TABLE fixed_costs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     mess_id UUID NOT NULL REFERENCES messes(id) ON DELETE CASCADE,
@@ -162,6 +163,7 @@ CREATE TABLE individual_costs (
 );
 
 -- 2.11 Inventory (stock tracking)
+
 CREATE TABLE inventory (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     mess_id UUID NOT NULL REFERENCES messes(id) ON DELETE CASCADE,
@@ -228,6 +230,10 @@ CREATE TABLE announcements (
 -- ============================================================================
 -- 3. INDEXES (Performance)
 -- ============================================================================
+-- database search ingine optimization 
+-- Primary(index table is created using primary keys), 
+--Secondary(index table is created using candidate keys), 
+--and Clustered(index table is created using non-key values).
 
 CREATE INDEX idx_mess_members_mess ON mess_members(mess_id);
 CREATE INDEX idx_mess_members_user ON mess_members(user_id);
@@ -258,7 +264,7 @@ CREATE INDEX idx_announcements_mess ON announcements(mess_id);
 -- 4.1 Calculate Meal Rate (handles division by zero)
 -- Meal Rate = Total Bazaar Cost / Total Active Meals
 CREATE OR REPLACE FUNCTION calculate_meal_rate(p_cycle_id UUID)
-RETURNS NUMERIC AS $$
+RETURNS NUMERIC AS $$ 
 DECLARE
     v_total_bazaar NUMERIC(12, 2);
     v_total_meals INT;

@@ -56,7 +56,8 @@ export async function startNewMonth(messId: string, currentCycleId: string, newM
             }
         }
 
-        revalidatePath('/dashboard');
+        revalidatePath('/dashboard', 'layout');
+        revalidatePath('/dashboard/options');
         return { success: true, message: 'New month started successfully' };
 
     } else {

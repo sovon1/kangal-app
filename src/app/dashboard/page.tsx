@@ -129,6 +129,7 @@ export default function DashboardPage() {
             return await getDashboardStats(userContext.messId, userContext.cycleId);
         },
         enabled: !!userContext,
+        staleTime: 30000,
         refetchInterval: 30000,
     });
 
@@ -142,6 +143,7 @@ export default function DashboardPage() {
             return result;
         },
         enabled: !!userContext,
+        staleTime: 30000,
         refetchInterval: 30000,
     });
 
@@ -153,6 +155,7 @@ export default function DashboardPage() {
             return await getTodayMeals(userContext.memberId, userContext.messId);
         },
         enabled: !!userContext,
+        staleTime: 15000,
     });
 
     // Recent Activity Query
@@ -165,6 +168,7 @@ export default function DashboardPage() {
             return result.data || null;
         },
         enabled: !!userContext,
+        staleTime: 30000,
     });
 
     // Meal toggle handlers
@@ -489,6 +493,7 @@ function AllMemberInfoSection({ messId, cycleId }: { messId: string; cycleId: st
             return result.data;
         },
         enabled: !!messId && !!cycleId,
+        staleTime: 30000,
     });
 
     const members = allBalancesQuery.data
@@ -509,6 +514,7 @@ function MessOverviewSection({ messId, cycleId }: { messId: string; cycleId: str
         queryKey: ['mess-overview', messId, cycleId],
         queryFn: () => getMessOverview(messId, cycleId),
         enabled: !!messId && !!cycleId,
+        staleTime: 30000,
     });
 
     return (

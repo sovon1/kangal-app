@@ -49,7 +49,7 @@ export default function MonthClosePage() {
             setLoading(false);
         }
         load();
-    }, [supabase]);
+    }, [supabase, messCtx?.cycleId, messCtx?.messId]);
 
     const handleClose = async () => {
         if (!ctx) return;
@@ -69,6 +69,7 @@ export default function MonthClosePage() {
 
         setClosed(true);
         toast.success('Month closed successfully!');
+        router.refresh(); // Force layout to re-fetch with new open cycle
     };
 
     if (loading) {
