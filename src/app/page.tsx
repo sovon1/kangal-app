@@ -48,7 +48,7 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-40 lg:pt-48 lg:pb-64 overflow-hidden">
+      <section className="relative pt-24 pb-86 lg:pt-28 lg:pb-110 overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0 opacity-[0.08]">
           <div
@@ -110,7 +110,7 @@ export default async function LandingPage() {
           src="https://cdn.prod.website-files.com/6784bb6fe62260fc0039c353/6784cbaaca128d91b017a5c4_Hero.avif"
           alt=""
           aria-hidden="true"
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl z-[15] pointer-events-none select-none object-contain"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-8xl z-[15] pointer-events-none select-none object-contain"
         />
       </section>
 
