@@ -302,14 +302,33 @@ export async function getAllMealsForMonth(messId: string, cycleId: string) {
         .eq('cycle_id', cycleId)
         .order('meal_date', { ascending: true });
 
-    // Build date list from cycle start to today (or end_date, whichever is earlier)
-    const startDate = new Date(cycle.start_date);
-    const endDate = new Date(Math.min(new Date(cycle.end_date).getTime(), new Date().getTime()));
+    // Use BD timezone (UTC+6) for consistent date handling
+    const getBDDateStr = (d: Date): string => {
+        const bd = new Date(d.getTime() + 6 * 60 * 60 * 1000);
+        return bd.toISOString().split('T')[0];
+    };
+    const todayStr = getBDDateStr(new Date());
+
+    // Build date list from cycle start to min(end_date, today)
+    // Use date-only strings to avoid timezone issues
+    const startStr = cycle.start_date as string; // "YYYY-MM-DD"
+    const endStr = cycle.end_date as string;
+    const limitStr = todayStr < endStr ? todayStr : endStr;
+
     const dates: string[] = [];
-    const d = new Date(startDate);
-    while (d <= endDate) {
-        dates.push(d.toISOString().split('T')[0]);
-        d.setDate(d.getDate() + 1);
+    // Parse as local date parts to avoid UTC vs local issues
+    const [sy, sm, sd] = startStr.split('-').map(Number);
+    const [ly, lm, ld] = limitStr.split('-').map(Number);
+    const startD = new Date(sy, sm - 1, sd);
+    const limitD = new Date(ly, lm - 1, ld);
+
+    const cursor = new Date(startD);
+    while (cursor <= limitD) {
+        const yyyy = cursor.getFullYear();
+        const mm = String(cursor.getMonth() + 1).padStart(2, '0');
+        const dd = String(cursor.getDate()).padStart(2, '0');
+        dates.push(`${yyyy}-${mm}-${dd}`);
+        cursor.setDate(cursor.getDate() + 1);
     }
 
     // Build a map: date -> memberId -> meal data
