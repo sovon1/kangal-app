@@ -48,7 +48,7 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+      <section className="relative pt-32 pb-40 lg:pt-48 lg:pb-64 overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0 opacity-[0.08]">
           <div
@@ -79,7 +79,7 @@ export default async function LandingPage() {
             Say goodbye to spreadsheets and confusion.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 lg:mb-16">
             {user ? (
               <Link href="/dashboard" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full h-12 px-8 text-lg gap-2">
@@ -103,6 +103,15 @@ export default async function LandingPage() {
             )}
           </div>
         </div>
+
+        {/* Decorative Hero Image (Cabbage & Goat) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://cdn.prod.website-files.com/6784bb6fe62260fc0039c353/6784cbaaca128d91b017a5c4_Hero.avif"
+          alt=""
+          aria-hidden="true"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl z-[15] pointer-events-none select-none object-contain"
+        />
       </section>
 
       {/* Features Grid */}
