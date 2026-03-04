@@ -54,6 +54,7 @@ export default function MembersPage() {
                 .from('mess_members')
                 .select('id, role, status, join_date, profile:profiles(full_name, email)')
                 .eq('mess_id', ctx.messId)
+                .eq('status', 'active')
                 .order('role', { ascending: true });
             return data || [];
         },

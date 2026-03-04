@@ -282,5 +282,6 @@ export async function leaveMess(messId: string) {
     });
 
     revalidatePath('/', 'layout');
+    revalidatePath('/dashboard', 'layout');
     return { success: true, message: 'You have left the mess successfully.' };
 }

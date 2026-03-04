@@ -2,6 +2,7 @@
 
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { createMessSchema, joinMessSchema } from '@/lib/validations';
+import { revalidatePath } from 'next/cache';
 
 // ============================================================================
 // CREATE MESS
@@ -109,13 +110,29 @@ export async function joinMess(input: unknown) {
     // 2. Check if already a member
     const { data: existing } = await supabase
         .from('mess_members')
-        .select('id')
+        .select('id, status')
         .eq('mess_id', mess.id)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
     if (existing) {
-        return { error: 'You are already a member of this mess.' };
+        if (existing.status === 'active') {
+            return { error: 'You are already a member of this mess.' };
+        }
+
+        // Reactivate the member
+        const { error: reactivateError } = await supabase
+            .from('mess_members')
+            .update({
+                status: 'active',
+                join_date: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+
+        if (reactivateError) return { error: reactivateError.message };
+
+        revalidatePath('/dashboard', 'layout');
+        return { success: true, messId: mess.id, messName: mess.name };
     }
 
     // 3. Check member limit
@@ -125,7 +142,7 @@ export async function joinMess(input: unknown) {
         .eq('mess_id', mess.id)
         .eq('status', 'active');
 
-    if (count && mess.max_members && count >= mess.max_members) {
+    if (count !== null && mess.max_members && count >= mess.max_members) {
         return { error: 'This mess has reached its maximum member capacity.' };
     }
 
@@ -143,6 +160,7 @@ export async function joinMess(input: unknown) {
         return { error: joinError.message };
     }
 
+    revalidatePath('/dashboard', 'layout');
     return { success: true, messId: mess.id, messName: mess.name };
 }
 

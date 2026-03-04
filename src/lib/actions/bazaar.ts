@@ -26,6 +26,7 @@ export async function addBazaarExpense(input: unknown) {
         .select('role')
         .eq('mess_id', messId)
         .eq('user_id', user.id)
+        .eq('status', 'active')
         .single();
 
     const isManager = currentMember?.role === 'manager';
