@@ -252,7 +252,8 @@ export async function getDashboardStats(messId: string, cycleId: string) {
         supabase
             .from('bazaar_expenses')
             .select('total_amount')
-            .eq('cycle_id', cycleId),
+            .eq('cycle_id', cycleId)
+            .eq('approval_status', 'approved'),
 
         // Total deposits for cycle (approved only)
         supabase
