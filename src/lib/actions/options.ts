@@ -207,18 +207,6 @@ export async function resetMess(messId: string) {
         return { error: 'Only managers can reset the mess' };
     }
 
-    // 1. Just to be absolutely safe, delete all data across all cycles
-    await Promise.all([
-        supabase.from('daily_meals').delete().eq('mess_id', messId),
-        supabase.from('transactions').delete().eq('mess_id', messId),
-        supabase.from('bazaar_expenses').delete().eq('mess_id', messId),
-        supabase.from('fixed_costs').delete().eq('mess_id', messId),
-        supabase.from('individual_costs').delete().eq('mess_id', messId),
-    ]);
-
-    // 2. Instead of deleting the cycles (which might fail silently due to RLS),
-    //    we just find the current open cycle and update it to a fresh configuration.
-    //    Older closed cycles will just remain as empty historical artifacts.
     const monthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const todayStr = new Date().toISOString().split('T')[0];
 
@@ -227,41 +215,15 @@ export async function resetMess(messId: string) {
     endDate.setDate(endDate.getDate() + 30);
     const endDateStr = endDate.toISOString().split('T')[0];
 
-    const { data: openCycle } = await supabase
-        .from('mess_cycles')
-        .select('id')
-        .eq('mess_id', messId)
-        .eq('status', 'open')
-        .order('start_date', { ascending: false })
-        .limit(1)
-        .single();
+    // Call the SECURITY DEFINER Postgres function to bypass RLS and delete all old cycle/financial data
+    const { error: rpcError } = await supabase.rpc('reset_mess_data', {
+        p_mess_id: messId,
+        p_new_cycle_name: monthName,
+        p_start_date: todayStr,
+        p_end_date: endDateStr
+    });
 
-    if (openCycle) {
-        // Update the active cycle rather than inserting a new one 
-        const { error: updateError } = await supabase
-            .from('mess_cycles')
-            .update({
-                name: monthName,
-                start_date: todayStr,
-                end_date: endDateStr
-            })
-            .eq('id', openCycle.id);
-
-        if (updateError) return { error: updateError.message };
-    } else {
-        // Fallback: If no open cycle exists, try to insert one (might still hit constraint if closed cycle has same start_date)
-        const { error: insertError } = await supabase
-            .from('mess_cycles')
-            .insert({
-                mess_id: messId,
-                name: monthName,
-                start_date: todayStr,
-                end_date: endDateStr,
-                status: 'open'
-            });
-
-        if (insertError) return { error: insertError.message };
-    }
+    if (rpcError) return { error: rpcError.message };
 
     // Log the reset action
     await supabase.from('activity_log').insert({
@@ -273,5 +235,5 @@ export async function resetMess(messId: string) {
 
     revalidatePath('/dashboard', 'layout');
     revalidatePath('/dashboard/options');
-    return { success: true, message: 'Mess has been reset successfully' };
+    return { success: true, message: 'Mess has been permanently reset globally.' };
 }
