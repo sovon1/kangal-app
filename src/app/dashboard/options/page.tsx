@@ -1,8 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { getAllMonths, renameCycle, deleteMess, resetMess, leaveMess } from '@/lib/actions/options';
+import {
+    getSupabaseBrowserClient
+} from '@/lib/supabase/client';
+import { KangalLoader } from '@/components/kangal-loader';
+import {
+    getAllMonths, renameCycle, deleteMess, resetMess, leaveMess
+} from '@/lib/actions/options';
 import { closeMonth, getMemberBalance } from '@/lib/actions/finance';
 import { exportAllMembersPDF, downloadFullMessReport } from '@/lib/pdf-export';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -265,9 +270,16 @@ export default function OptionsPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto pb-10">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">Options</h1>
+        <div className="space-y-6">
+            {exporting && (
+                <KangalLoader
+                    fullScreen
+                    text="Generating PDF Report"
+                    subtext="Hold on! Your PDF is being cooked..."
+                />
+            )}
+            <div className="mb-2">
+                <h1 className="text-2xl font-bold tracking-tight">Mess Options</h1>
                 <p className="text-muted-foreground text-sm">Manage mess cycles and settings</p>
             </div>
 

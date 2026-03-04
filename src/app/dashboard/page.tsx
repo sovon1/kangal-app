@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals';
 import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
 import { downloadFullMessReport } from '@/lib/pdf-export';
+import { KangalLoader } from '@/components/kangal-loader';
 import { createMess, joinMess } from '@/lib/actions/mess';
 import { useMessContext } from '@/components/mess-context';
 import type { DashboardStats, MealToggleState } from '@/types';
@@ -537,11 +538,22 @@ function MessOverviewSection({ messId, cycleId }: { messId: string; cycleId: str
     };
 
     return (
-        <MessOverview
-            data={overviewQuery.data ?? null}
-            loading={overviewQuery.isLoading}
-            onExport={handleExportPDF}
-            exporting={exporting}
-        />
+        <>
+            {exporting && (
+                <KangalLoader
+                    fullScreen
+                    text="Cooking your PDF report"
+                    subtext="Preparing the delicious data for you"
+                />
+            )}
+            <div className="space-y-4">
+                <MessOverview
+                    data={overviewQuery.data || null}
+                    loading={overviewQuery.isLoading}
+                    onExport={handleExportPDF}
+                    exporting={exporting}
+                />
+            </div>
+        </>
     );
 }

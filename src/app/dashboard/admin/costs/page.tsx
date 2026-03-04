@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { KangalLoader } from '@/components/kangal-loader';
 import { addFixedCost, addIndividualCost, getMemberBalance } from '@/lib/actions/finance';
 import { exportSingleMemberPDF, exportAllMembersPDF, downloadFullMessReport } from '@/lib/pdf-export';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -218,7 +219,14 @@ export default function CostsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            {exporting && (
+                <KangalLoader
+                    fullScreen
+                    text="Preparing Monthly Ledger"
+                    subtext="Cooking the costs... your PDF is almost ready! 👨‍🍳"
+                />
+            )}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Cost Management</h1>
                     <p className="text-muted-foreground text-sm mt-0.5">Manage fixed and individual costs</p>
@@ -427,6 +435,6 @@ export default function CostsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     );
 }

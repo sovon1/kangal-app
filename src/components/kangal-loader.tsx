@@ -4,7 +4,15 @@ import { useEffect, useState } from 'react';
 
 const FOOD_ICONS = ['🍚', '🥘', '🍛', '🥗', '🍲', '🥩', '🧅', '🥕', '🫑', '🍳'];
 
-export function KangalLoader({ text = 'Loading your mess...' }: { text?: string }) {
+export function KangalLoader({
+    text = 'Loading your mess...',
+    subtext = 'Preparing your dashboard',
+    fullScreen = false
+}: {
+    text?: string;
+    subtext?: string;
+    fullScreen?: boolean;
+}) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [dots, setDots] = useState('');
 
@@ -23,8 +31,8 @@ export function KangalLoader({ text = 'Loading your mess...' }: { text?: string 
         };
     }, []);
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+    const content = (
+        <div className={`flex flex-col items-center justify-center gap-6 ${fullScreen ? '' : 'min-h-[60vh]'}`}>
             {/* Animated Food Circle */}
             <div className="relative w-28 h-28">
                 {/* Outer spinning ring */}
@@ -65,7 +73,7 @@ export function KangalLoader({ text = 'Loading your mess...' }: { text?: string 
                     {text}{dots}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                    Preparing your dashboard
+                    {subtext}
                 </p>
             </div>
 
@@ -88,4 +96,14 @@ export function KangalLoader({ text = 'Loading your mess...' }: { text?: string 
             `}</style>
         </div>
     );
+
+    if (fullScreen) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-md transition-all duration-300 animate-in fade-in">
+                {content}
+            </div>
+        );
+    }
+
+    return content;
 }
