@@ -26,6 +26,7 @@ interface MessOverviewData {
     mealRate: number;
     totalIndividualCost: number;
     totalSharedCost: number;
+    inviteCode?: string;
 }
 
 interface MessOverviewProps {
@@ -76,11 +77,18 @@ export function MessOverview({ data, loading, onExport, exporting }: MessOvervie
             <CardContent className="p-5">
                 {/* Header */}
                 <div className="mb-4">
-                    <h3 className="font-bold text-base text-foreground">
+                    <h3 className="font-bold text-base text-foreground flex items-center flex-wrap gap-2">
                         {data.messName}, {data.monthLabel}
-                        <Badge variant="outline" className="ml-2 text-[10px] font-normal">
-                            {statusText}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[10px] font-normal">
+                                {statusText}
+                            </Badge>
+                            {data.inviteCode && (
+                                <Badge variant="secondary" className="text-[10px] font-mono bg-primary/5 text-primary border-primary/20">
+                                    Code: {data.inviteCode}
+                                </Badge>
+                            )}
+                        </div>
                     </h3>
                 </div>
 

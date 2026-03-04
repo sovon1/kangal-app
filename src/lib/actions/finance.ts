@@ -320,8 +320,8 @@ export async function getMessOverview(messId: string, cycleId: string) {
         individualResult,
         fixedResult,
     ] = await Promise.all([
-        // Mess name
-        supabase.from('messes').select('name').eq('id', messId).single(),
+        // Mess name & code
+        supabase.from('messes').select('name, invite_code').eq('id', messId).single(),
 
         // Cycle info
         supabase.from('mess_cycles').select('start_date, end_date, status, name').eq('id', cycleId).single(),
@@ -376,6 +376,7 @@ export async function getMessOverview(messId: string, cycleId: string) {
 
     return {
         messName: messResult.data?.name || 'Mess',
+        inviteCode: messResult.data?.invite_code || '',
         cycleName: cycleResult.data?.name || '',
         cycleStatus: cycleResult.data?.status || 'open',
         monthLabel,
