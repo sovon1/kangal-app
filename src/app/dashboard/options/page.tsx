@@ -248,7 +248,8 @@ export default function OptionsPage() {
             toast.error(result.error);
         } else {
             toast.success("Successfully left the mess.");
-            router.push('/');
+            // Force a full page reload to clear all client-side context and caches
+            window.location.href = '/';
         }
     }
 

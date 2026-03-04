@@ -281,7 +281,10 @@ export async function leaveMess(messId: string) {
         details: { status: 'inactive' }
     });
 
-    revalidatePath('/', 'layout');
+    // Aggressive revalidation to clear layout and data caches
     revalidatePath('/dashboard', 'layout');
+    revalidatePath('/dashboard/options');
+    revalidatePath('/');
+
     return { success: true, message: 'You have left the mess successfully.' };
 }
