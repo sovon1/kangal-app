@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { addFixedCost, addIndividualCost, getMemberBalance } from '@/lib/actions/finance';
-import { exportSingleMemberPDF, exportAllMembersPDF } from '@/lib/pdf-export';
+import { exportSingleMemberPDF, exportAllMembersPDF, downloadFullMessReport } from '@/lib/pdf-export';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -134,51 +134,7 @@ export default function CostsPage() {
 
             if (exportMember === 'all') {
                 // All members report
-                const memberData = await Promise.all(
-                    members.map(async (m: Record<string, unknown>) => {
-                        const balance = await getMemberBalance(m.id as string, ctx.cycleId);
-                        const profile = m.profile as Record<string, unknown>;
-
-                        // Get bazaar for this member
-                        const { data: bazaarData } = await supabase
-                            .from('bazaar_expenses')
-                            .select('total_amount')
-                            .eq('cycle_id', ctx.cycleId)
-                            .eq('shopper_id', m.id as string);
-
-                        const bazaarSpent = (bazaarData || []).reduce((s, e) => s + Number(e.total_amount), 0);
-
-                        const bal = balance as Record<string, unknown>;
-                        return {
-                            memberName: (profile?.full_name as string) || 'Unknown',
-                            totalMeals: Number(bal.totalMeals) || 0,
-                            mealRate: Number(bal.mealRate) || 0,
-                            mealCost: Number(bal.mealCost) || 0,
-                            bazaarSpent,
-                            deposits: Number(bal.totalDeposits) || 0,
-                            fixedCostShare: Number(bal.fixedCostShare) || 0,
-                            individualCosts: Number(bal.individualCostTotal) || 0,
-                            balance: Number(bal.currentBalance) || 0,
-                        };
-                    })
-                );
-
-                const fixedCostsData = (fixedQuery.data || []).map((c: Record<string, unknown>) => ({
-                    type: (c.cost_type as string) || 'other',
-                    amount: Number(c.amount),
-                }));
-
-                const { data: allDeposits } = await supabase.from('transactions').select('amount').eq('cycle_id', ctx.cycleId);
-                const { data: allBazaar } = await supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', ctx.cycleId);
-
-                exportAllMembersPDF(
-                    memberData,
-                    cycleMeta,
-                    fixedCostsData,
-                    (allBazaar || []).reduce((s, e) => s + Number(e.total_amount), 0),
-                    (allDeposits || []).reduce((s, d) => s + Number(d.amount), 0)
-                );
-
+                await downloadFullMessReport(ctx.messId, ctx.cycleId, supabase);
                 toast.success('All members report downloaded!');
             } else {
                 // Single member report

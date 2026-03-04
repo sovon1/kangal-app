@@ -2,6 +2,80 @@
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getMemberBalance } from './actions/finance';
+
+/**
+ * Centrialized helper to fetch all data and trigger a full mess PDF report.
+ * Reusable across Dashboard, Admin, and Options pages.
+ */
+export async function downloadFullMessReport(
+    messId: string,
+    cycleId: string,
+    supabase: any
+) {
+    // 1. Fetch Basic Info
+    const [membersRes, cycleRes, messRes, fixedRes] = await Promise.all([
+        supabase.from('mess_members').select('id, role, profile:profiles(full_name)').eq('mess_id', messId).eq('status', 'active'),
+        supabase.from('mess_cycles').select('name, start_date, end_date').eq('id', cycleId).single(),
+        supabase.from('messes').select('name').eq('id', messId).single(),
+        supabase.from('fixed_costs').select('*').eq('cycle_id', cycleId),
+    ]);
+
+    const members = membersRes.data || [];
+    const cycleMeta = {
+        messName: messRes.data?.name || 'Mess',
+        cycleName: cycleRes.data?.name || 'Cycle',
+        startDate: new Date(cycleRes.data?.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        endDate: new Date(cycleRes.data?.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    };
+
+    // 2. Fetch Detailed Member Data (Balances & Bazaar)
+    const memberData = await Promise.all(
+        members.map(async (m: any) => {
+            const balance = await getMemberBalance(m.id, cycleId);
+            const profile = m.profile as any;
+
+            const { data: bazaarData } = await supabase
+                .from('bazaar_expenses')
+                .select('total_amount')
+                .eq('cycle_id', cycleId)
+                .eq('shopper_id', m.id);
+
+            const bazaarSpent = (bazaarData || []).reduce((s: number, e: any) => s + Number(e.total_amount), 0);
+            const bal = balance as any;
+
+            return {
+                memberName: profile?.full_name || 'Unknown',
+                totalMeals: Number(bal.totalMeals) || 0,
+                mealRate: Number(bal.mealRate) || 0,
+                mealCost: Number(bal.mealCost) || 0,
+                bazaarSpent,
+                deposits: Number(bal.totalDeposits) || 0,
+                fixedCostShare: Number(bal.fixedCostShare) || 0,
+                individualCosts: Number(bal.individualCostTotal) || 0,
+                balance: Number(bal.currentBalance) || 0,
+            } as MemberCostData;
+        })
+    );
+
+    // 3. Totals for Metadata
+    const fixedCostsData = (fixedRes.data || []).map((c: any) => ({
+        type: (c.cost_type as string) || 'other',
+        amount: Number(c.amount),
+    }));
+
+    const { data: allDeposits } = await supabase.from('transactions').select('amount').eq('cycle_id', cycleId).eq('approval_status', 'approved');
+    const { data: allBazaar } = await supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', cycleId).eq('approval_status', 'approved');
+
+    // 4. Generate PDF
+    exportAllMembersPDF(
+        memberData,
+        cycleMeta,
+        fixedCostsData,
+        (allBazaar || []).reduce((s: number, e: any) => s + Number(e.total_amount), 0),
+        (allDeposits || []).reduce((s: number, d: any) => s + Number(d.amount), 0)
+    );
+}
 
 interface MemberCostData {
     memberName: string;

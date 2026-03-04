@@ -31,6 +31,8 @@ interface MessOverviewData {
 interface MessOverviewProps {
     data: MessOverviewData | null;
     loading?: boolean;
+    onExport?: () => void;
+    exporting?: boolean;
 }
 
 function formatCurrency(amount: number): string {
@@ -39,7 +41,7 @@ function formatCurrency(amount: number): string {
     return `${prefix}৳${Math.abs(amount).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-export function MessOverview({ data, loading }: MessOverviewProps) {
+export function MessOverview({ data, loading, onExport, exporting }: MessOverviewProps) {
     if (loading) {
         return (
             <Card className="border-border/50">
@@ -101,16 +103,25 @@ export function MessOverview({ data, loading }: MessOverviewProps) {
                     <div className="flex items-center gap-2.5 text-sm pt-1 border-t border-border/30">
                         <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                         <span className="text-muted-foreground">This Month Full Details:</span>
-                        <a
-                            href="#all-member-info"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                document.getElementById('all-member-info')?.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            className="ml-auto text-primary text-xs cursor-pointer hover:underline flex items-center gap-1"
-                        >
-                            📄 View
-                        </a>
+                        <div className="ml-auto flex items-center gap-3">
+                            <button
+                                onClick={onExport}
+                                disabled={exporting}
+                                className="text-primary text-xs cursor-pointer hover:underline flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {exporting ? '...' : 'PDF'}
+                            </button>
+                            <a
+                                href="#all-member-info"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    document.getElementById('all-member-info')?.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="text-primary text-xs cursor-pointer hover:underline flex items-center gap-1"
+                            >
+                                View
+                            </a>
+                        </div>
                     </div>
                 </div>
             </CardContent>

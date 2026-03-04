@@ -27,6 +27,7 @@ import { Plus, ArrowRight, TrendingUp, CalendarDays, Loader2, Copy, Check } from
 import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals';
 import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
+import { downloadFullMessReport } from '@/lib/pdf-export';
 import { createMess, joinMess } from '@/lib/actions/mess';
 import { useMessContext } from '@/components/mess-context';
 import type { DashboardStats, MealToggleState } from '@/types';
@@ -508,8 +509,12 @@ function AllMemberInfoSection({ messId, cycleId }: { messId: string; cycleId: st
     );
 }
 
+
 // Mess Overview section with its own query
 function MessOverviewSection({ messId, cycleId }: { messId: string; cycleId: string }) {
+    const supabase = getSupabaseBrowserClient();
+    const [exporting, setExporting] = useState(false);
+
     const overviewQuery = useQuery({
         queryKey: ['mess-overview', messId, cycleId],
         queryFn: () => getMessOverview(messId, cycleId),
@@ -517,10 +522,26 @@ function MessOverviewSection({ messId, cycleId }: { messId: string; cycleId: str
         staleTime: 30000,
     });
 
+    const handleExportPDF = async () => {
+        if (!messId || !cycleId) return;
+        setExporting(true);
+        try {
+            await downloadFullMessReport(messId, cycleId, supabase);
+            toast.success('PDF report downloaded!');
+        } catch (err) {
+            console.error('Export error:', err);
+            toast.error('Failed to generate PDF');
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <MessOverview
             data={overviewQuery.data ?? null}
             loading={overviewQuery.isLoading}
+            onExport={handleExportPDF}
+            exporting={exporting}
         />
     );
 }

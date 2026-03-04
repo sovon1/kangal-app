@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { getAllMonths, renameCycle, deleteMess, resetMess, leaveMess } from '@/lib/actions/options';
 import { closeMonth, getMemberBalance } from '@/lib/actions/finance';
-import { exportAllMembersPDF } from '@/lib/pdf-export';
+import { exportAllMembersPDF, downloadFullMessReport } from '@/lib/pdf-export';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -135,67 +135,7 @@ export default function OptionsPage() {
         if (!messId || !activeCycleId) return;
         setExporting(true);
         try {
-            // Fetch all data needed for PDF
-            const [membersRes, cycleRes, messRes, fixedRes] = await Promise.all([
-                supabase.from('mess_members').select('id, role, profile:profiles(full_name)').eq('mess_id', messId).eq('status', 'active'),
-                supabase.from('mess_cycles').select('name, start_date, end_date').eq('id', activeCycleId).single(),
-                supabase.from('messes').select('name').eq('id', messId).single(),
-                supabase.from('fixed_costs').select('*').eq('cycle_id', activeCycleId),
-            ]);
-
-            const members = membersRes.data || [];
-            const cycleMeta = {
-                messName: messRes.data?.name || 'Mess',
-                cycleName: cycleRes.data?.name || 'Cycle',
-                startDate: new Date(cycleRes.data?.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                endDate: new Date(cycleRes.data?.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            };
-
-            // Get balances for all members
-            const memberData = await Promise.all(
-                members.map(async (m) => {
-                    const balance = await getMemberBalance(m.id, activeCycleId);
-                    const profile = m.profile as unknown as { full_name: string };
-
-                    const { data: bazaarData } = await supabase
-                        .from('bazaar_expenses')
-                        .select('total_amount')
-                        .eq('cycle_id', activeCycleId)
-                        .eq('shopper_id', m.id);
-
-                    const bazaarSpent = (bazaarData || []).reduce((s, e) => s + Number(e.total_amount), 0);
-                    const bal = balance as Record<string, unknown>;
-
-                    return {
-                        memberName: profile?.full_name || 'Unknown',
-                        totalMeals: Number(bal.totalMeals) || 0,
-                        mealRate: Number(bal.mealRate) || 0,
-                        mealCost: Number(bal.mealCost) || 0,
-                        bazaarSpent,
-                        deposits: Number(bal.totalDeposits) || 0,
-                        fixedCostShare: Number(bal.fixedCostShare) || 0,
-                        individualCosts: Number(bal.individualCostTotal) || 0,
-                        balance: Number(bal.currentBalance) || 0,
-                    };
-                })
-            );
-
-            const fixedCostsData = (fixedRes.data || []).map((c: Record<string, unknown>) => ({
-                type: (c.cost_type as string) || 'other',
-                amount: Number(c.amount),
-            }));
-
-            const { data: allDeposits } = await supabase.from('transactions').select('amount').eq('cycle_id', activeCycleId);
-            const { data: allBazaar } = await supabase.from('bazaar_expenses').select('total_amount').eq('cycle_id', activeCycleId);
-
-            exportAllMembersPDF(
-                memberData,
-                cycleMeta,
-                fixedCostsData,
-                (allBazaar || []).reduce((s, e) => s + Number(e.total_amount), 0),
-                (allDeposits || []).reduce((s, d) => s + Number(d.amount), 0)
-            );
-
+            await downloadFullMessReport(messId, activeCycleId, supabase);
             toast.success('PDF report downloaded!');
         } catch (err) {
             console.error('Export error:', err);
