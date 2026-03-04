@@ -237,3 +237,37 @@ export async function resetMess(messId: string) {
     revalidatePath('/dashboard/options');
     return { success: true, message: 'Mess has been permanently reset globally.' };
 }
+
+// ============================================================================
+// LEAVE MESS
+// ============================================================================
+
+export async function leaveMess(messId: string) {
+    const supabase = await getSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { data: member } = await supabase
+        .from('mess_members')
+        .select('id, role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    if (!member) return { error: 'You are not a member of this mess' };
+
+    if (member.role === 'manager') {
+        return { error: 'You are the manager! You must transfer your manager role to someone else before leaving the mess. (Or Delete the mess if you are the only one left)' };
+    }
+
+    // Delete the member record
+    const { error } = await supabase
+        .from('mess_members')
+        .delete()
+        .eq('id', member.id);
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/', 'layout');
+    return { success: true, message: 'You have left the mess successfully.' };
+}

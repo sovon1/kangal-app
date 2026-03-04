@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { getAllMonths, renameCycle, deleteMess, resetMess } from '@/lib/actions/options';
+import { getAllMonths, renameCycle, deleteMess, resetMess, leaveMess } from '@/lib/actions/options';
 import { closeMonth, getMemberBalance } from '@/lib/actions/finance';
 import { exportAllMembersPDF } from '@/lib/pdf-export';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -31,7 +31,8 @@ import {
     BarChart3,
     FileDown,
     ArrowRight,
-    RotateCcw
+    RotateCcw,
+    LogOut
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -71,6 +72,10 @@ export default function OptionsPage() {
     const [resetDialogOpen, setResetDialogOpen] = useState(false);
     const [resetConfirmText, setResetConfirmText] = useState('');
     const [submittingReset, setSubmittingReset] = useState(false);
+
+    // Leave Mess Dialog
+    const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+    const [leavingMess, setLeavingMess] = useState(false);
 
     // Loading States
     const [submittingDelete, setSubmittingDelete] = useState(false);
@@ -292,6 +297,21 @@ export default function OptionsPage() {
         }
     }
 
+    // ====================== LEAVE MESS ======================
+    async function handleLeaveMess() {
+        if (!messId) return;
+        setLeavingMess(true);
+        const result = await leaveMess(messId);
+        setLeavingMess(false);
+
+        if (result.error) {
+            toast.error(result.error);
+        } else {
+            toast.success("Successfully left the mess.");
+            router.push('/');
+        }
+    }
+
     if (loading) {
         return <div className="p-8 space-y-6">
             <Skeleton className="h-8 w-48" />
@@ -304,13 +324,13 @@ export default function OptionsPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-6xl mx-auto pb-10">
+        <div className="space-y-8 max-w-7xl mx-auto pb-10">
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">Options</h1>
                 <p className="text-muted-foreground text-sm">Manage mess cycles and settings</p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 
                 {/* 1. CLOSE MONTH */}
                 <Card className="border-border/50 bg-gradient-to-br from-orange-500/5 to-red-500/5 border-orange-500/20">
@@ -411,8 +431,33 @@ export default function OptionsPage() {
                     </CardContent>
                 </Card>
 
-                {/* 4. ALL MONTH LIST (Full width) */}
-                <Card className="border-border/50 md:col-span-2 lg:col-span-3">
+                {/* 4. LEAVE MESS */}
+                <Card className="border-border/50">
+                    <CardHeader className="text-center pb-2">
+                        <div className="mx-auto w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center mb-2">
+                            <LogOut className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+                        </div>
+                        <CardTitle className="text-xl font-bold">Leave Mess</CardTitle>
+                        <CardDescription>Withdraw yourself from this mess</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 flex flex-col justify-between h-[calc(100%-80px)]">
+                        <div className="text-center text-xs text-muted-foreground px-2">
+                            (মেস থেকে বের হয়ে গেলে আর ফিরে আসতে পারবেন না, সব ব্যালেন্স মুছে যাবে। ম্যানেজারকে রিকোয়েস্ট করে আবার জয়েন করতে পারবেন)
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            className="w-full mt-auto text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                            onClick={() => setLeaveDialogOpen(true)}
+                        >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Leave this Mess
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                {/* 5. ALL MONTH LIST (Full width) */}
+                <Card className="border-border/50 col-span-1 md:col-span-2 lg:col-span-4">
                     <CardHeader className="text-center">
                         <CardTitle className="text-xl font-bold flex items-center justify-center gap-2">
                             <CalendarSearch className="h-5 w-5 text-primary" />
@@ -625,6 +670,52 @@ export default function OptionsPage() {
                                 )}
                             </Button>
                         </form>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* ======== LEAVE MESS DIALOG ======== */}
+            <Dialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-lg">
+                            <LogOut className="h-5 w-5" />
+                            Leave Mess Confirmation
+                        </DialogTitle>
+                        <DialogDescription>
+                            Are you absolutely sure you want to leave this mess?
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 pt-2">
+                        {role === 'manager' && (
+                            <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-lg border border-red-200 dark:border-red-500/20 text-xs text-red-700 dark:text-red-400 flex items-start gap-2">
+                                <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                                <div>
+                                    <strong>You are the Manager!</strong> You cannot leave the mess until you transfer your manager permissions to someone else on the Members page. If you are the only member left, you can use the "Delete Mess" option instead.
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="bg-orange-50 dark:bg-orange-500/10 p-3 rounded-lg border border-orange-200 dark:border-orange-500/20 text-xs text-orange-700 dark:text-orange-400 flex items-start gap-2">
+                            <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                            <div>
+                                This will instantly remove you from the mess and disconnect your account.
+                            </div>
+                        </div>
+
+                        <Button
+                            variant="destructive"
+                            className="w-full h-11 gap-2"
+                            onClick={handleLeaveMess}
+                            disabled={leavingMess || role === 'manager'}
+                        >
+                            {leavingMess ? (
+                                <><Loader2 className="h-4 w-4 animate-spin" /> Leaving...</>
+                            ) : (
+                                <><LogOut className="h-4 w-4" /> I understand, leave mess</>
+                            )}
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>
