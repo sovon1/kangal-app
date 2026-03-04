@@ -12,6 +12,8 @@ import {
     Users2,
     DollarSign,
     FileText,
+    FileDown,
+    Eye
 } from 'lucide-react';
 
 interface MessOverviewData {
@@ -111,12 +113,13 @@ export function MessOverview({ data, loading, onExport, exporting }: MessOvervie
                     <div className="flex items-center gap-2.5 text-sm pt-1 border-t border-border/30">
                         <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                         <span className="text-muted-foreground">This Month Full Details:</span>
-                        <div className="ml-auto flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={onExport}
                                 disabled={exporting}
-                                className="text-primary text-xs cursor-pointer hover:underline flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-2.5 py-1 rounded border border-border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.1)] text-primary text-[10px] font-semibold cursor-pointer hover:bg-muted/50 hover:shadow-sm transition-all flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
+                                <FileDown className="h-3 w-3" />
                                 {exporting ? '...' : 'PDF'}
                             </button>
                             <a
@@ -125,8 +128,9 @@ export function MessOverview({ data, loading, onExport, exporting }: MessOvervie
                                     e.preventDefault();
                                     document.getElementById('all-member-info')?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="text-primary text-xs cursor-pointer hover:underline flex items-center gap-1"
+                                className="px-2.5 py-1 rounded border border-border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.1)] text-primary text-[10px] font-semibold cursor-pointer hover:bg-muted/50 hover:shadow-sm transition-all flex items-center gap-1"
                             >
+                                <Eye className="h-3 w-3" />
                                 View
                             </a>
                         </div>
