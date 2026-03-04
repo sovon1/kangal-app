@@ -260,13 +260,26 @@ export async function leaveMess(messId: string) {
         return { error: 'You are the manager! You must transfer your manager role to someone else before leaving the mess. (Or Delete the mess if you are the only one left)' };
     }
 
-    // Delete the member record
+    // SOFT DELETE: Mark as inactive instead of deleting to prevent catastrophic cascading deletion
+    // of all their historical deposits, meals, and bazaar expenses.
+    const todayStr = new Date().toISOString().split('T')[0];
     const { error } = await supabase
         .from('mess_members')
-        .delete()
+        .update({
+            status: 'inactive',
+            leave_date: todayStr
+        })
         .eq('id', member.id);
 
     if (error) return { error: error.message };
+
+    // Log the action
+    await supabase.from('activity_log').insert({
+        mess_id: messId,
+        actor_id: user.id,
+        action: 'member_left',
+        details: { status: 'inactive' }
+    });
 
     revalidatePath('/', 'layout');
     return { success: true, message: 'You have left the mess successfully.' };
