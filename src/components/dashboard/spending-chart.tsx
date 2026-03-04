@@ -140,7 +140,7 @@ export function MealComparison({ cycleId, messId }: MealComparisonProps) {
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-semibold flex items-center gap-2">
                         <Trophy className="h-4 w-4 text-amber-500" />
-                        Top Eaters
+                        😬
                     </CardTitle>
                     <div className="flex items-center gap-2">
                         <div className="text-right">
