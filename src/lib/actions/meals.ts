@@ -303,14 +303,13 @@ export async function getAllMealsForMonth(messId: string, cycleId: string) {
         .order('meal_date', { ascending: true });
 
     // Use BD timezone (UTC+6) for consistent date handling
-    const getBDDateStr = (d: Date): string => {
-        const bd = new Date(d.getTime() + 6 * 60 * 60 * 1000);
-        return bd.toISOString().split('T')[0];
-    };
-    const todayStr = getBDDateStr(new Date());
+    // First normalize to UTC, then add BD offset — same pattern as getBDTime()
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    const bdNow = new Date(utcMs + 6 * 3600000);
+    const todayStr = bdNow.toISOString().split('T')[0];
 
     // Build date list from cycle start to min(end_date, today)
-    // Use date-only strings to avoid timezone issues
     const startStr = cycle.start_date as string; // "YYYY-MM-DD"
     const endStr = cycle.end_date as string;
     const limitStr = todayStr < endStr ? todayStr : endStr;
@@ -322,13 +321,18 @@ export async function getAllMealsForMonth(messId: string, cycleId: string) {
     const startD = new Date(sy, sm - 1, sd);
     const limitD = new Date(ly, lm - 1, ld);
 
-    const cursor = new Date(startD);
-    while (cursor <= limitD) {
-        const yyyy = cursor.getFullYear();
-        const mm = String(cursor.getMonth() + 1).padStart(2, '0');
-        const dd = String(cursor.getDate()).padStart(2, '0');
-        dates.push(`${yyyy}-${mm}-${dd}`);
-        cursor.setDate(cursor.getDate() + 1);
+    // Always include at least the start date even if today < start (edge case)
+    if (startD > limitD) {
+        dates.push(startStr);
+    } else {
+        const cursor = new Date(startD);
+        while (cursor <= limitD) {
+            const yyyy = cursor.getFullYear();
+            const mm = String(cursor.getMonth() + 1).padStart(2, '0');
+            const dd = String(cursor.getDate()).padStart(2, '0');
+            dates.push(`${yyyy}-${mm}-${dd}`);
+            cursor.setDate(cursor.getDate() + 1);
+        }
     }
 
     // Build a map: date -> memberId -> meal data

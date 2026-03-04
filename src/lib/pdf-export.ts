@@ -106,29 +106,36 @@ function drawFooter(doc: jsPDF) {
     }
 }
 
-// ── Info row helper (ASCII only) ───────────────────────────────────────────
+// ── Info row helper (uses autoTable for proper alignment) ──────────────────
 function drawInfoRows(
     doc: jsPDF,
     startY: number,
     rows: Array<{ label: string; value: string; unit?: string }>
 ): number {
-    let y = startY;
-    doc.setFontSize(10);
+    autoTable(doc as unknown as jsPDF, {
+        startY,
+        body: rows.map(row => [
+            row.label,
+            `${row.value}${row.unit ? ` ${row.unit}` : ''}`,
+        ]),
+        theme: 'plain',
+        bodyStyles: {
+            fontSize: 10,
+            textColor: DARK,
+            cellPadding: { top: 2, bottom: 2, left: 4, right: 4 },
+        },
+        columnStyles: {
+            0: { fontStyle: 'bold', cellWidth: 80 },
+            1: { halign: 'left' },
+        },
+        styles: {
+            lineWidth: 0,
+            overflow: 'linebreak',
+        },
+        margin: { left: 16, right: 16 },
+    });
 
-    for (const row of rows) {
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...DARK);
-        doc.text(`${row.label}: `, 20, y);
-
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(...DARK);
-        const labelWidth = doc.getTextWidth(`${row.label}: `);
-        doc.text(`${row.value}${row.unit ? ` ${row.unit}` : ''}`, 20 + labelWidth, y);
-
-        y += 7;
-    }
-
-    return y;
+    return getFinalY(doc, startY + rows.length * 7);
 }
 
 // ── Section heading ────────────────────────────────────────────────────────

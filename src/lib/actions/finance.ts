@@ -360,7 +360,11 @@ export async function getMessOverview(messId: string, cycleId: string) {
     const totalBazaarCost = (bazaarResult.data || []).reduce((s, e) => s + Number(e.total_amount), 0);
     const totalFixedCost = (fixedResult.data || []).reduce((s, e) => s + Number(e.amount), 0);
     const totalIndividualCost = (individualResult.data || []).reduce((s, e) => s + Number(e.amount), 0);
-    const messBalance = totalDeposits - (totalMealCost + totalBazaarCost + totalFixedCost + totalIndividualCost);
+
+    // messBalance represents the actual CASH in the mess pool.
+    // We spent money on Bazaar, Fixed Costs, and Individual Costs payouts.
+    // Total Meal Cost is NOT a cash expense (it's just bazaar distributed).
+    const messBalance = totalDeposits - (totalBazaarCost + totalFixedCost + totalIndividualCost);
 
     // Format month name from cycle
     let monthLabel = '';
@@ -478,4 +482,76 @@ export async function getRecentActivity(messId: string, limit = 5) {
     if (error) return { error: error.message };
 
     return { data };
+}
+
+// ============================================================================
+// SETTLE MEMBER BALANCE (Pay Up Feature)
+// ============================================================================
+
+export async function settleMemberBalance(
+    messId: string,
+    cycleId: string,
+    memberId: string,
+    balance: number // negative means they owe, positive means they get refund
+) {
+    const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    // Manager check
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    if (currentMember?.role !== 'manager') {
+        return { error: 'Only managers can settle balances' };
+    }
+
+    if (balance < 0) {
+        // They owe money: add a Deposit to bring balance to 0
+        const amount = Math.abs(balance);
+        const { error } = await supabase.from('transactions').insert({
+            mess_id: messId,
+            cycle_id: cycleId,
+            member_id: memberId,
+            amount: amount,
+            payment_method: 'cash',
+            notes: 'Balance Settlement (Collection)',
+            approval_status: 'approved',
+            approved_by: user.id,
+            created_by: user.id,
+        });
+        if (error) return { error: error.message };
+
+        // Log
+        await supabase.from('activity_log').insert({
+            mess_id: messId, actor_id: user.id, action: 'balance_settled',
+            details: { member_id: memberId, type: 'collection', amount }
+        });
+
+    } else if (balance > 0) {
+        // They have extra: add an Individual Cost to bring balance to 0 (cash out)
+        const { error } = await supabase.from('individual_costs').insert({
+            mess_id: messId,
+            cycle_id: cycleId,
+            member_id: memberId,
+            amount: balance,
+            description: 'Balance Settlement (Refund)',
+            approval_status: 'approved',
+            approved_by: user.id,
+            created_by: user.id,
+        });
+        if (error) return { error: error.message };
+
+        // Log
+        await supabase.from('activity_log').insert({
+            mess_id: messId, actor_id: user.id, action: 'balance_settled',
+            details: { member_id: memberId, type: 'refund', amount: balance }
+        });
+    }
+
+    return { success: true };
 }

@@ -3,16 +3,16 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { addDeposit, approveDeposit } from '@/lib/actions/finance';
+import { addDeposit, approveDeposit, getAllMemberBalances, settleMemberBalance } from '@/lib/actions/finance';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wallet, Plus, Loader2, Banknote, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Wallet, Plus, Loader2, Banknote, CheckCircle2, XCircle, Clock, ArrowRightLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
 
@@ -21,6 +21,9 @@ export default function DepositsPage() {
     const queryClient = useQueryClient();
     const ctx = useMessContext();
     const [addOpen, setAddOpen] = useState(false);
+    const [settleOpen, setSettleOpen] = useState(false);
+
+    // Deposit Form State
     const [selectedMember, setSelectedMember] = useState(ctx?.memberId || '');
     const [amount, setAmount] = useState('');
     const [method, setMethod] = useState('cash');
@@ -28,6 +31,7 @@ export default function DepositsPage() {
     const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [approvingId, setApprovingId] = useState<string | null>(null);
+    const [settlingId, setSettlingId] = useState<string | null>(null);
 
     const isManager = ctx?.role === 'manager';
 
@@ -61,6 +65,17 @@ export default function DepositsPage() {
         enabled: !!ctx,
     });
 
+    // Fetch balances for the settlement dialog
+    const balancesQuery = useQuery({
+        queryKey: ['all-balances', ctx?.cycleId],
+        queryFn: async () => {
+            if (!ctx?.messId || !ctx?.cycleId) return [];
+            const result = await getAllMemberBalances(ctx.messId, ctx.cycleId);
+            return result.data || [];
+        },
+        enabled: settleOpen && !!ctx,
+    });
+
     const handleSubmit = async () => {
         if (!ctx || !amount || Number(amount) <= 0) { toast.error('Enter a valid amount'); return; }
         const targetMember = isManager ? selectedMember : ctx.memberId;
@@ -79,6 +94,7 @@ export default function DepositsPage() {
         setAmount(''); setRefNo(''); setNotes('');
         queryClient.invalidateQueries({ queryKey: ['deposits'] });
         queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     };
 
     const handleApproval = async (depositId: string, action: 'approved' | 'rejected') => {
@@ -90,6 +106,24 @@ export default function DepositsPage() {
         queryClient.invalidateQueries({ queryKey: ['deposits'] });
         queryClient.invalidateQueries({ queryKey: ['member-balance'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+    };
+
+    const handleSettle = async (memberId: string, balance: number) => {
+        if (!ctx) return;
+        setSettlingId(memberId);
+        const result = await settleMemberBalance(ctx.messId, ctx.cycleId, memberId, balance);
+        setSettlingId(null);
+
+        if (result.error) {
+            toast.error(result.error as string);
+        } else {
+            toast.success('Balance settled to 0');
+            queryClient.invalidateQueries({ queryKey: ['all-balances'] });
+            queryClient.invalidateQueries({ queryKey: ['deposits'] });
+            queryClient.invalidateQueries({ queryKey: ['individual-costs'] });
+            queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+        }
     };
 
     const approvedDeposits = (depositsQuery.data || []).filter((d: Record<string, unknown>) => d.approval_status === 'approved');
@@ -106,14 +140,16 @@ export default function DepositsPage() {
         }
     };
 
+    // Filter out members with exactly 0 balance for the settlement view
+    const unsettleMembers = (balancesQuery.data || []).filter((b: any) => Math.round(b.currentBalance) !== 0);
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-5xl mx-auto pb-10">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Deposits</h1>
                     <p className="text-muted-foreground text-sm mt-0.5">Track member deposits and payments</p>
                 </div>
-                <Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="h-4 w-4" /> Add Deposit</Button>
             </div>
 
             {/* Summary */}
@@ -126,6 +162,18 @@ export default function DepositsPage() {
                     <div className="p-3 rounded-xl bg-emerald-500/10"><Wallet className="h-6 w-6 text-emerald-500" /></div>
                 </CardContent>
             </Card>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+                <Button onClick={() => setAddOpen(true)} className="flex-1 max-w-sm gap-2">
+                    <Plus className="h-4 w-4" /> Record Deposit
+                </Button>
+                {isManager && (
+                    <Button onClick={() => setSettleOpen(true)} variant="outline" className="flex-1 max-w-sm border-emerald-500/20 text-emerald-600 bg-emerald-500/5 hover:bg-emerald-500/10 gap-2">
+                        <ArrowRightLeft className="h-4 w-4" /> Settle Balances
+                    </Button>
+                )}
+            </div>
 
             {/* Deposits List */}
             {depositsQuery.isLoading ? (
@@ -191,7 +239,62 @@ export default function DepositsPage() {
                 </div>
             )}
 
-            {/* Add Dialog */}
+            {/* Settle Balances Dialog (Manager Only) */}
+            <Dialog open={settleOpen} onOpenChange={setSettleOpen}>
+                <DialogContent className="max-w-xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <ArrowRightLeft className="h-5 w-5 text-emerald-500" />
+                            Settle Member Balances
+                        </DialogTitle>
+                        <DialogDescription>
+                            Easily zero out balances before starting a new month. Collect money from members who owe, and refund members who have a positive balance.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 pt-4">
+                        {balancesQuery.isLoading ? (
+                            <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
+                        ) : unsettleMembers.length === 0 ? (
+                            <div className="text-center py-8 text-muted-foreground border border-dashed rounded-lg">
+                                <CheckCircle2 className="h-10 w-10 mx-auto text-emerald-500 mb-2 opacity-50" />
+                                <p>All members are settled to 0!</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {unsettleMembers.map((member: any) => {
+                                    const owes = member.currentBalance < 0;
+                                    const amount = Math.abs(Math.round(member.currentBalance));
+                                    const isSettling = settlingId === member.memberId;
+
+                                    return (
+                                        <div key={member.memberId} className="flex items-center justify-between p-3 border rounded-xl bg-card">
+                                            <div>
+                                                <p className="font-semibold text-sm">{member.name}</p>
+                                                <p className={`text-xs font-bold ${owes ? 'text-red-500' : 'text-emerald-500'}`}>
+                                                    {owes ? 'Owes' : 'Gets Refund'}: ৳{amount.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className={`gap-1.5 ${owes ? 'border-emerald-500 text-emerald-600 hover:bg-emerald-50' : 'border-blue-500 text-blue-600 hover:bg-blue-50'}`}
+                                                onClick={() => handleSettle(member.memberId, member.currentBalance)}
+                                                disabled={isSettling}
+                                            >
+                                                {isSettling ? <Loader2 className="h-3 w-3 animate-spin" /> : owes ? <Plus className="h-3 w-3" /> : <Wallet className="h-3 w-3" />}
+                                                {owes ? `Collect ৳${amount}` : `Refund ৳${amount}`}
+                                            </Button>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Add Deposit Dialog */}
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>

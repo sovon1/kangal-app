@@ -49,7 +49,6 @@ const navItems = [
 const adminItems = [
     { href: '/dashboard/admin/costs', label: 'Costs', icon: DollarSign },
     { href: '/dashboard/admin/members', label: 'Members', icon: UserCog },
-    { href: '/dashboard/admin/month-close', label: 'Close Month', icon: BarChart3 },
 ];
 
 export function Navbar({ userName = 'User', userRole = 'member' }: NavbarProps) {

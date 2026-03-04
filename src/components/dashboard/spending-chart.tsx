@@ -1,19 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Cell,
-} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users } from 'lucide-react';
+import { Users, Trophy } from 'lucide-react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 interface MemberMealData {
@@ -26,21 +16,33 @@ interface MealComparisonProps {
     messId: string;
 }
 
-const BAR_COLORS = [
-    'hsl(142, 76%, 36%)',
-    'hsl(199, 89%, 48%)',
-    'hsl(262, 83%, 58%)',
-    'hsl(24, 95%, 53%)',
-    'hsl(340, 82%, 52%)',
-    'hsl(47, 96%, 53%)',
-    'hsl(173, 80%, 40%)',
-    'hsl(291, 64%, 42%)',
+const RANK_BADGES = ['🥇', '🥈', '🥉'];
+
+const GRADIENT_COLORS = [
+    'from-emerald-500 to-green-400',
+    'from-blue-500 to-cyan-400',
+    'from-violet-500 to-purple-400',
+    'from-amber-500 to-orange-400',
+    'from-pink-500 to-rose-400',
+    'from-teal-500 to-emerald-400',
+    'from-indigo-500 to-blue-400',
+    'from-red-500 to-orange-400',
+];
+
+const AVATAR_COLORS = [
+    'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+    'bg-violet-500/15 text-violet-600 dark:text-violet-400',
+    'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+    'bg-pink-500/15 text-pink-600 dark:text-pink-400',
+    'bg-teal-500/15 text-teal-600 dark:text-teal-400',
+    'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+    'bg-red-500/15 text-red-600 dark:text-red-400',
 ];
 
 async function fetchMealComparison(cycleId: string, messId: string): Promise<MemberMealData[]> {
     const supabase = getSupabaseBrowserClient();
 
-    // Parallel fetches for members and meals
     const [membersRes, mealsRes] = await Promise.all([
         supabase
             .from('mess_members')
@@ -58,7 +60,6 @@ async function fetchMealComparison(cycleId: string, messId: string): Promise<Mem
 
     if (!members || members.length === 0) return [];
 
-    // Count meals per member
     const memberMeals: Record<string, number> = {};
     (meals || []).forEach((m) => {
         const id = m.member_id as string;
@@ -72,17 +73,15 @@ async function fetchMealComparison(cycleId: string, messId: string): Promise<Mem
         memberMeals[id] = (memberMeals[id] || 0) + count;
     });
 
-    // Map to chart data
     const chartData: MemberMealData[] = members.map((member) => {
         const profile = member.profile as unknown as { full_name: string } | null;
-        const firstName = (profile?.full_name || 'Unknown').split(' ')[0];
+        const name = profile?.full_name || 'Unknown';
         return {
-            name: firstName,
+            name,
             meals: memberMeals[member.id] || 0,
         };
     });
 
-    // Sort by meal count descending
     chartData.sort((a, b) => b.meals - a.meals);
     return chartData;
 }
@@ -92,7 +91,7 @@ export function MealComparison({ cycleId, messId }: MealComparisonProps) {
         queryKey: ['meal-comparison', cycleId, messId],
         queryFn: () => fetchMealComparison(cycleId, messId),
         enabled: !!cycleId && !!messId,
-        staleTime: 60000, // Cache for 60 seconds
+        staleTime: 60000,
     });
 
     if (isLoading) {
@@ -104,8 +103,10 @@ export function MealComparison({ cycleId, messId }: MealComparisonProps) {
                         Member Meal Comparison
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-[200px] w-full rounded-lg" />
+                <CardContent className="space-y-3">
+                    {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-14 rounded-xl" />
+                    ))}
                 </CardContent>
             </Card>
         );
@@ -121,7 +122,7 @@ export function MealComparison({ cycleId, messId }: MealComparisonProps) {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+                    <div className="h-[140px] flex items-center justify-center text-sm text-muted-foreground">
                         No meal data recorded yet this cycle.
                     </div>
                 </CardContent>
@@ -131,76 +132,44 @@ export function MealComparison({ cycleId, messId }: MealComparisonProps) {
 
     const maxMeals = Math.max(...data.map((d) => d.meals));
     const totalMeals = data.reduce((s, d) => s + d.meals, 0);
+    const avgMeals = data.length > 0 ? Math.round(totalMeals / data.length) : 0;
 
     return (
         <Card className="border-border/50">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3 border-b">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <Users className="h-5 w-5 text-primary" />
-                        Member Meal Comparison
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-amber-500" />
+                        Top Eaters
                     </CardTitle>
-                    <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Total meals</p>
-                        <p className="text-sm font-semibold">{totalMeals}</p>
+                    <div className="flex items-center gap-2">
+                        <div className="text-right">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+                            <p className="text-xs font-bold">{totalMeals}</p>
+                        </div>
                     </div>
                 </div>
             </CardHeader>
-            <CardContent>
-                <div style={{ height: Math.max(200, data.length * 44) }} className="w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            data={data}
-                            layout="vertical"
-                            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="hsl(var(--border))"
-                                opacity={0.3}
-                                horizontal={false}
-                            />
-                            <XAxis
-                                type="number"
-                                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-                                tickLine={false}
-                                axisLine={false}
-                                domain={[0, maxMeals + 2]}
-                            />
-                            <YAxis
-                                type="category"
-                                dataKey="name"
-                                tick={{ fontSize: 12, fill: 'hsl(var(--foreground))', fontWeight: 500 }}
-                                tickLine={false}
-                                axisLine={false}
-                                width={70}
-                            />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'hsl(var(--card))',
-                                    border: '1px solid hsl(var(--border))',
-                                    borderRadius: '8px',
-                                    fontSize: '13px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                }}
-                                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
-                                formatter={(value: number | undefined) => [`${value ?? 0} meals`, 'Total']}
-                            />
-                            <Bar
-                                dataKey="meals"
-                                radius={[0, 6, 6, 0]}
-                                barSize={24}
-                            >
-                                {data.map((_entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={BAR_COLORS[index % BAR_COLORS.length]}
-                                        opacity={0.85}
-                                    />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
+            <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-muted/50 text-muted-foreground uppercase text-[11px] tracking-wider border-b">
+                            <tr>
+                                <th className="px-4 py-3 font-semibold">SN</th>
+                                <th className="px-4 py-3 font-semibold">Name</th>
+                                <th className="px-4 py-3 font-semibold text-right">Meals</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                            {data.map((stat, i) => (
+                                <tr key={stat.name} className="hover:bg-muted/50 transition-colors">
+                                    <td className="px-4 py-3 font-medium text-muted-foreground w-12">{i + 1}.</td>
+                                    <td className="px-4 py-3 font-semibold">{stat.name}</td>
+                                    <td className="px-4 py-3 font-bold text-right text-emerald-600 dark:text-emerald-500 w-20">{stat.meals}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </CardContent>
         </Card>
