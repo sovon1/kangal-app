@@ -43,17 +43,17 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
     const stats = [
         {
             id: 'meals',
-            label: 'Total Meals',
+            label: 'মোট মিল',
             value: balance.totalMeals.toString(),
             icon: UtensilsCrossed,
             color: 'text-slate-700 dark:text-slate-300',
             ringColor: 'stroke-slate-400 dark:stroke-slate-500',
             prefix: '',
-            suffix: ' plts'
+            suffix: ' মিল'
         },
         {
             id: 'deposit',
-            label: 'Net Deposit',
+            label: 'মোট জমা',
             value: formatCurrency(Math.abs(balance.totalDeposits)),
             icon: Wallet,
             color: 'text-blue-600 dark:text-blue-400',
@@ -63,7 +63,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
         },
         {
             id: 'cost',
-            label: 'Total Cost',
+            label: 'মোট খরচ',
             value: formatCurrency(totalCost),
             icon: ShoppingCart,
             color: 'text-amber-600 dark:text-amber-400',
@@ -73,7 +73,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
         },
         {
             id: 'balance',
-            label: 'Net Balance',
+            label: 'বর্তমান ব্যালেন্স',
             value: formatCurrency(Math.abs(balance.currentBalance)),
             icon: Scale,
             color: isNegativeBalance ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400',
@@ -85,75 +85,36 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
     ];
 
     return (
-        <div className="flex flex-wrap md:flex-nowrap justify-center items-center gap-4 sm:gap-6 md:gap-8 w-full font-sans">
-            <style>{`
-                .circle-stat-group:hover .animated-ring {
-                    stroke-dashoffset: 0 !important;
-                }
-            `}</style>
-
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full font-sans">
             {stats.map((stat) => {
                 const Icon = stat.icon;
                 return (
-                    <div
-                        key={stat.id}
-                        className="circle-stat-group relative w-36 h-36 sm:w-44 sm:h-44 lg:w-56 lg:h-56 flex items-center justify-center transition-transform duration-500 hover:-translate-y-2 cursor-default"
-                    >
-                        {/* Background Base */}
-                        <div className="absolute inset-0 rounded-full bg-white dark:bg-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-800 transition-shadow duration-300 circle-stat-group-hover:shadow-2xl"></div>
-
-                        {/* SVG Ring Animation */}
-                        <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
-                            <circle
-                                cx="50"
-                                cy="50"
-                                r="48"
-                                fill="none"
-                                className="stroke-slate-100 dark:stroke-slate-800"
-                                strokeWidth="1"
-                            />
-                            <circle
-                                cx="50"
-                                cy="50"
-                                r="48"
-                                fill="none"
-                                className={`animated-ring stroke-transparent transition-all duration-700 ease-in-out stroke-[2px] ${stat.ringColor}`}
-                                strokeDasharray="300"
-                                strokeDashoffset="300"
-                            />
-                        </svg>
-
-                        {/* Inner Content */}
-                        <div className="relative z-10 flex flex-col items-center text-center p-2 sm:p-4 w-full">
-                            <div className={`p-2 lg:p-3 rounded-full bg-slate-50 dark:bg-slate-800/50 mb-1 lg:mb-2 shadow-inner ${stat.color} transition-transform duration-300 circle-stat-group-hover:scale-110`}>
-                                <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" strokeWidth={2} />
-                            </div>
-
-                            <h4 className="text-[0.6rem] sm:text-[0.65rem] lg:text-xs uppercase tracking-[0.1em] lg:tracking-[0.2em] text-slate-400 dark:text-slate-500 font-semibold mb-0.5 lg:mb-1 w-full truncate px-2">
-                                {stat.label}
-                            </h4>
-
-                            <div className="flex items-baseline justify-center gap-0.5 lg:gap-1">
-                                <span className={`text-[0.8rem] sm:text-lg lg:text-2xl font-bold tracking-tight ${stat.color}`}>
-                                    {stat.prefix}{stat.value}
-                                </span>
-                                {stat.suffix && (
-                                    <span className="text-[0.55rem] sm:text-xs lg:text-sm font-medium text-slate-400 dark:text-slate-500">
-                                        {stat.suffix}
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Minimalist trending indicator for balance */}
-                            {stat.trending && (
-                                <div className={`mt-1.5 lg:mt-3 flex items-center gap-1 text-[9px] sm:text-[10px] lg:text-xs font-medium px-2 lg:px-2.5 py-0.5 rounded-full ${isNegativeBalance ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400' : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400'
-                                    }`}>
-                                    {isNegativeBalance ? <TrendingDown className="w-2.5 h-2.5 lg:w-3 lg:h-3" /> : <TrendingUp className="w-2.5 h-2.5 lg:w-3 lg:h-3" />}
-                                    <span className="hidden sm:inline">{isNegativeBalance ? 'Deficit' : 'Surplus'}</span>
+                    <Card key={stat.id} className="relative overflow-hidden group hover:shadow-md transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm">
+                        <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-current to-transparent opacity-[0.03] rounded-bl-full -mr-4 -mt-4 transition-transform duration-500 group-hover:scale-110 ${stat.color}`} />
+                        <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className={`p-2 rounded-xl bg-background/80 shadow-sm border border-border/50 ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
+                                    <Icon className="w-5 h-5" strokeWidth={2} />
                                 </div>
-                            )}
-                        </div>
-                    </div>
+                            </div>
+
+                            <div>
+                                <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-1 truncate">
+                                    {stat.label}
+                                </h4>
+                                <div className="flex items-baseline gap-1">
+                                    <span className={`text-2xl font-bold tracking-tight ${stat.color}`}>
+                                        {stat.prefix}{stat.value}
+                                    </span>
+                                    {stat.suffix && (
+                                        <span className="text-sm font-medium text-muted-foreground">
+                                            {stat.suffix}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 );
             })}
         </div>
