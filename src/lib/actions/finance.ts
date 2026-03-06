@@ -188,6 +188,20 @@ export async function approveDeposit(
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Not authenticated' };
 
+    const { data: currentMember } = await supabase
+        .from('transactions')
+        .select('mess_id, mess_members!inner(role, user_id)')
+        .eq('id', depositId)
+        .eq('mess_members.user_id', user.id)
+        .single();
+
+    // In order to check role, we need the mess_id. Let's get the deposit's mess_id first.
+    const { data: deposit } = await supabase.from('transactions').select('mess_id').eq('id', depositId).single();
+    if (!deposit) return { error: 'Deposit not found' };
+
+    const { data: memberRole } = await supabase.from('mess_members').select('role').eq('mess_id', deposit.mess_id).eq('user_id', user.id).single();
+    if (memberRole?.role !== 'manager') return { error: 'Only managers can approve or reject deposits' };
+
     const { error } = await supabase
         .from('transactions')
         .update({
@@ -216,6 +230,9 @@ export async function addFixedCost(input: unknown) {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Not authenticated' };
+
+    const { data: memberRole } = await supabase.from('mess_members').select('role').eq('mess_id', messId).eq('user_id', user.id).single();
+    if (memberRole?.role !== 'manager') return { error: 'Only managers can add fixed costs' };
 
     const { error } = await supabase
         .from('fixed_costs')
@@ -290,6 +307,12 @@ export async function updateCostApproval(
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Not authenticated' };
+
+    const { data: cost } = await supabase.from('individual_costs').select('mess_id').eq('id', costId).single();
+    if (!cost) return { error: 'Cost not found' };
+
+    const { data: memberRole } = await supabase.from('mess_members').select('role').eq('mess_id', cost.mess_id).eq('user_id', user.id).single();
+    if (memberRole?.role !== 'manager') return { error: 'Only managers can approve or reject costs' };
 
     const updateData: Record<string, unknown> = {
         approval_status: action,

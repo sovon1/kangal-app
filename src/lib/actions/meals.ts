@@ -68,12 +68,16 @@ export async function toggleMeal(input: unknown) {
 
     const { data: currentMember } = await supabase
         .from('mess_members')
-        .select('role')
+        .select('id, role')
         .eq('mess_id', messId)
         .eq('user_id', user.id)
         .single();
 
     const isManager = currentMember?.role === 'manager';
+
+    if (!isManager && currentMember?.id !== memberId) {
+        return { error: 'Unauthorized. You can only edit your own meals.' };
+    }
 
     // 1. Get cutoff config
     const { data: config } = await supabase
@@ -145,6 +149,21 @@ export async function updateGuestMeal(input: unknown) {
 
     const { memberId, cycleId, messId, mealDate, mealType, count } = parsed.data;
     const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('id, role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    const isManager = currentMember?.role === 'manager';
+
+    if (!isManager && currentMember?.id !== memberId) {
+        return { error: 'Unauthorized. You can only edit your own guest meals.' };
+    }
 
     const guestField = `guest_${mealType}` as const;
 
@@ -418,9 +437,7 @@ export async function managerBulkUpdateMeals(
                     breakfast: update.breakfast,
                     lunch: update.lunch,
                     dinner: update.dinner,
-                    guest_breakfast: 0,
-                    guest_lunch: 0,
-                    guest_dinner: 0,
+                    // We purposefully DO NOT touch guest meals here so they aren't accidentally wiped out
                 })
                 .eq('id', existing.id);
 
