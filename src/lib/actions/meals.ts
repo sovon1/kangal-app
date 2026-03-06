@@ -211,9 +211,9 @@ export async function getTodayMeals(memberId: string, messId: string) {
 
     return {
         date: today,
-        breakfast: meal?.breakfast ?? false,
-        lunch: meal?.lunch ?? false,
-        dinner: meal?.dinner ?? false,
+        breakfast: Number(meal?.breakfast || 0),
+        lunch: Number(meal?.lunch || 0),
+        dinner: Number(meal?.dinner || 0),
         guestBreakfast: meal?.guest_breakfast ?? 0,
         guestLunch: meal?.guest_lunch ?? 0,
         guestDinner: meal?.guest_dinner ?? 0,
@@ -256,9 +256,9 @@ export async function getAllMealsForDate(messId: string, cycleId: string, mealDa
             memberId: member.id,
             name: profile?.full_name || 'Unknown',
             avatarUrl: profile?.avatar_url || null,
-            breakfast: meal?.breakfast ? 1 : 0,
-            lunch: meal?.lunch ? 1 : 0,
-            dinner: meal?.dinner ? 1 : 0,
+            breakfast: Number(meal?.breakfast || 0),
+            lunch: Number(meal?.lunch || 0),
+            dinner: Number(meal?.dinner || 0),
             guestBreakfast: meal?.guest_breakfast || 0,
             guestLunch: meal?.guest_lunch || 0,
             guestDinner: meal?.guest_dinner || 0,
@@ -342,9 +342,9 @@ export async function getAllMealsForMonth(messId: string, cycleId: string) {
         const memberId = meal.member_id as string;
         if (!mealsMap[date]) mealsMap[date] = {};
         mealsMap[date][memberId] = {
-            breakfast: meal.breakfast ? 1 : 0,
-            lunch: meal.lunch ? 1 : 0,
-            dinner: meal.dinner ? 1 : 0,
+            breakfast: Number(meal.breakfast) || 0,
+            lunch: Number(meal.lunch) || 0,
+            dinner: Number(meal.dinner) || 0,
             guestBreakfast: (meal.guest_breakfast as number) || 0,
             guestLunch: (meal.guest_lunch as number) || 0,
             guestDinner: (meal.guest_dinner as number) || 0,
@@ -409,12 +409,12 @@ export async function managerBulkUpdateMeals(
             const { error } = await supabase
                 .from('daily_meals')
                 .update({
-                    breakfast: update.breakfast > 0,
-                    lunch: update.lunch > 0,
-                    dinner: update.dinner > 0,
-                    guest_breakfast: Math.max(0, update.breakfast - 1),
-                    guest_lunch: Math.max(0, update.lunch - 1),
-                    guest_dinner: Math.max(0, update.dinner - 1),
+                    breakfast: update.breakfast,
+                    lunch: update.lunch,
+                    dinner: update.dinner,
+                    guest_breakfast: 0,
+                    guest_lunch: 0,
+                    guest_dinner: 0,
                 })
                 .eq('id', existing.id);
 
@@ -429,12 +429,12 @@ export async function managerBulkUpdateMeals(
                         cycle_id: cycleId,
                         member_id: update.memberId,
                         meal_date: mealDate,
-                        breakfast: update.breakfast > 0,
-                        lunch: update.lunch > 0,
-                        dinner: update.dinner > 0,
-                        guest_breakfast: Math.max(0, update.breakfast - 1),
-                        guest_lunch: Math.max(0, update.lunch - 1),
-                        guest_dinner: Math.max(0, update.dinner - 1),
+                        breakfast: update.breakfast,
+                        lunch: update.lunch,
+                        dinner: update.dinner,
+                        guest_breakfast: 0,
+                        guest_lunch: 0,
+                        guest_dinner: 0,
                     });
 
                 if (error) errors.push(`${update.memberId}: ${error.message}`);

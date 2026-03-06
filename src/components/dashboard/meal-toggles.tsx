@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sun, Cloud, Moon, Lock, Plus, Minus, Users } from 'lucide-react';
+import { Sun, Cloud, Moon, Lock, Plus, Minus, Users, UtensilsCrossed } from 'lucide-react';
 import { toast } from 'sonner';
 import type { MealToggleState } from '@/types';
 
@@ -16,7 +16,7 @@ interface MealTogglesProps {
     cycleId: string;
     messId: string;
     loading?: boolean;
-    onToggle: (mealType: 'breakfast' | 'lunch' | 'dinner', value: boolean) => Promise<void>;
+    onToggle: (mealType: 'breakfast' | 'lunch' | 'dinner', value: number) => Promise<void>;
     onGuestUpdate: (mealType: 'breakfast' | 'lunch' | 'dinner', count: number) => Promise<void>;
 }
 
@@ -78,7 +78,7 @@ export function MealToggles({
     }
 
     const getMealValue = (type: 'breakfast' | 'lunch' | 'dinner') => {
-        return optimistic[type] !== undefined ? optimistic[type] as boolean : meals[type];
+        return (optimistic[type] !== undefined ? optimistic[type] : meals[type]) as number;
     };
 
     const getGuestCount = (type: 'breakfast' | 'lunch' | 'dinner') => {
@@ -91,7 +91,7 @@ export function MealToggles({
         return meals[key] as boolean;
     };
 
-    const handleToggle = (type: 'breakfast' | 'lunch' | 'dinner', value: boolean) => {
+    const handleToggle = (type: 'breakfast' | 'lunch' | 'dinner', value: number) => {
         if (isLocked(type)) {
             toast.error(`${type.charAt(0).toUpperCase() + type.slice(1)} is locked`);
             return;
@@ -149,7 +149,8 @@ export function MealToggles({
             </CardHeader>
             <CardContent className="space-y-3">
                 {mealConfig.map(({ type, label, icon: Icon, gradient, activeColor, iconColor, lockText }) => {
-                    const enabled = getMealValue(type);
+                    const val = getMealValue(type);
+                    const enabled = val > 0;
                     const locked = isLocked(type);
                     const guestCount = getGuestCount(type);
 
@@ -157,8 +158,8 @@ export function MealToggles({
                         <div
                             key={type}
                             className={`relative rounded-xl border p-4 transition-all duration-300 ${enabled
-                                    ? `bg-gradient-to-r ${gradient} border-border/50 shadow-sm`
-                                    : 'bg-card/50 border-border/30'
+                                ? `bg-gradient-to-r ${gradient} border-border/50 shadow-sm`
+                                : 'bg-card/50 border-border/30'
                                 } ${locked ? 'opacity-70' : ''}`}
                         >
                             <div className="flex items-center justify-between">
@@ -181,39 +182,69 @@ export function MealToggles({
                                 </div>
                                 <Switch
                                     checked={enabled}
-                                    onCheckedChange={(v) => handleToggle(type, v)}
+                                    onCheckedChange={(v) => handleToggle(type, v ? 1 : 0)}
                                     disabled={locked || isPending}
                                     className="data-[state=checked]:bg-primary"
                                 />
                             </div>
 
-                            {/* Guest Meals */}
+                            {/* Portion and Guest Meals */}
                             {enabled && (
-                                <div className="mt-3 pt-3 border-t border-border/30 flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                        <Users className="h-3.5 w-3.5" />
-                                        <span>Guest meals</span>
+                                <div className="mt-3 pt-3 border-t border-border/30 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                            <UtensilsCrossed className="h-3.5 w-3.5" />
+                                            <span>Portion</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleToggle(type, Math.max(0.5, val - 0.5))}
+                                                disabled={val <= 0.5 || locked || isPending}
+                                            >
+                                                <Minus className="h-3 w-3" />
+                                            </Button>
+                                            <span className="text-sm font-semibold w-6 text-center">{val}</span>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleToggle(type, Math.min(10, val + 0.5))}
+                                                disabled={val >= 10 || locked || isPending}
+                                            >
+                                                <Plus className="h-3 w-3" />
+                                            </Button>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            className="h-7 w-7"
-                                            onClick={() => handleGuestChange(type, -1)}
-                                            disabled={guestCount <= 0 || isPending}
-                                        >
-                                            <Minus className="h-3 w-3" />
-                                        </Button>
-                                        <span className="text-sm font-semibold w-6 text-center">{guestCount}</span>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            className="h-7 w-7"
-                                            onClick={() => handleGuestChange(type, 1)}
-                                            disabled={guestCount >= 10 || isPending}
-                                        >
-                                            <Plus className="h-3 w-3" />
-                                        </Button>
+
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                            <Users className="h-3.5 w-3.5" />
+                                            <span>Guest meals</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleGuestChange(type, -0.5)}
+                                                disabled={guestCount <= 0 || locked || isPending}
+                                            >
+                                                <Minus className="h-3 w-3" />
+                                            </Button>
+                                            <span className="text-sm font-semibold w-6 text-center">{guestCount}</span>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleGuestChange(type, 0.5)}
+                                                disabled={guestCount >= 10 || locked || isPending}
+                                            >
+                                                <Plus className="h-3 w-3" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             )}

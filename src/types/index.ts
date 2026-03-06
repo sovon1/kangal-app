@@ -279,9 +279,9 @@ export interface MemberBalance {
 
 export interface MealToggleState {
   date: string;
-  breakfast: boolean;
-  lunch: boolean;
-  dinner: boolean;
+  breakfast: number;
+  lunch: number;
+  dinner: number;
   guestBreakfast: number;
   guestLunch: number;
   guestDinner: number;

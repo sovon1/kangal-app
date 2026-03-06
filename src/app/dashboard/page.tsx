@@ -174,7 +174,7 @@ export default function DashboardPage() {
     });
 
     // Meal toggle handlers
-    const handleMealToggle = useCallback(async (mealType: 'breakfast' | 'lunch' | 'dinner', value: boolean) => {
+    const handleMealToggle = useCallback(async (mealType: 'breakfast' | 'lunch' | 'dinner', value: number) => {
         if (!userContext) return;
         const today = new Date().toISOString().split('T')[0];
         const result = await toggleMeal({
@@ -189,7 +189,7 @@ export default function DashboardPage() {
             toast.error(result.error);
             throw new Error(result.error);
         }
-        toast.success(`${mealType.charAt(0).toUpperCase() + mealType.slice(1)} ${value ? 'added' : 'removed'}`);
+        toast.success(`${mealType.charAt(0).toUpperCase() + mealType.slice(1)} set to ${value}`);
     }, [userContext]);
 
     const handleGuestUpdate = useCallback(async (mealType: 'breakfast' | 'lunch' | 'dinner', count: number) => {

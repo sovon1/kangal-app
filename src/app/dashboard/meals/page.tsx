@@ -62,7 +62,7 @@ export default function MealsPage() {
         return mealsQuery.data?.find((m: Record<string, unknown>) => m.meal_date === date);
     };
 
-    const handleToggle = async (date: string, mealType: 'breakfast' | 'lunch' | 'dinner', value: boolean) => {
+    const handleToggle = async (date: string, mealType: 'breakfast' | 'lunch' | 'dinner', value: number) => {
         if (!ctx) return;
         const result = await toggleMeal({
             memberId: ctx.memberId, cycleId: ctx.cycleId, messId: ctx.messId,
@@ -73,7 +73,7 @@ export default function MealsPage() {
             return;
         }
         queryClient.invalidateQueries({ queryKey: ['week-meals'] });
-        toast.success(`${mealType} ${value ? 'on' : 'off'}`);
+        toast.success(`${mealType} set to ${value}`);
     };
 
     const handleGuest = async (date: string, mealType: 'breakfast' | 'lunch' | 'dinner', count: number) => {
@@ -155,31 +155,43 @@ export default function MealsPage() {
                                 <CardContent className="p-2 space-y-1.5">
                                     {MEAL_TYPES.map((type) => {
                                         const Icon = MEAL_ICONS[type];
-                                        const enabled = meal?.[type] ?? false;
+                                        const val = (meal?.[type] as number) || 0;
                                         const guestKey = `guest_${type}` as string;
                                         const guestCount = (meal as Record<string, unknown>)?.[guestKey] as number ?? 0;
                                         return (
-                                            <div key={type} className={`rounded-lg p-2 transition-all ${enabled ? 'bg-accent/50' : ''}`}>
+                                            <div key={type} className={`rounded-lg p-2 transition-all ${val > 0 ? 'bg-accent/50' : ''}`}>
                                                 <div className="flex items-center justify-between">
                                                     <div className={`flex items-center gap-1.5 ${MEAL_COLORS[type]}`}>
                                                         <Icon className="h-3.5 w-3.5" />
                                                         <span className="text-xs font-medium capitalize">{type}</span>
                                                     </div>
                                                     <Switch
-                                                        checked={enabled as boolean}
-                                                        onCheckedChange={(v) => handleToggle(date, type, v)}
+                                                        checked={val > 0}
+                                                        onCheckedChange={(v) => handleToggle(date, type, v ? 1 : 0)}
                                                         className="scale-75"
                                                     />
                                                 </div>
-                                                {enabled && (
-                                                    <div className="flex items-center justify-between mt-1.5 pl-5">
-                                                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                                                            <Users className="h-2.5 w-2.5" /> Guest
-                                                        </span>
-                                                        <div className="flex items-center gap-1">
-                                                            <button onClick={() => handleGuest(date, type, Math.max(0, guestCount - 1))} className="h-5 w-5 rounded bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition"><Minus className="h-2.5 w-2.5" /></button>
-                                                            <span className="text-xs w-4 text-center font-medium">{guestCount}</span>
-                                                            <button onClick={() => handleGuest(date, type, Math.min(10, guestCount + 1))} className="h-5 w-5 rounded bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition"><Plus className="h-2.5 w-2.5" /></button>
+                                                {val > 0 && (
+                                                    <div className="space-y-1.5 mt-1.5 pl-5">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                                <UtensilsCrossed className="h-2.5 w-2.5" /> Portion
+                                                            </span>
+                                                            <div className="flex items-center gap-1">
+                                                                <button onClick={() => handleToggle(date, type, Math.max(0, val - 0.5))} className="h-5 w-5 rounded bg-background shadow-sm border border-border/50 flex items-center justify-center hover:bg-muted transition"><Minus className="h-2.5 w-2.5" /></button>
+                                                                <span className="text-xs w-4 text-center font-bold px-1">{val}</span>
+                                                                <button onClick={() => handleToggle(date, type, Math.min(10, val + 0.5))} className="h-5 w-5 rounded bg-background shadow-sm border border-border/50 flex items-center justify-center hover:bg-muted transition"><Plus className="h-2.5 w-2.5" /></button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                                <Users className="h-2.5 w-2.5" /> Guest
+                                                            </span>
+                                                            <div className="flex items-center gap-1">
+                                                                <button onClick={() => handleGuest(date, type, Math.max(0, guestCount - 0.5))} className="h-5 w-5 rounded bg-background shadow-sm border border-border/50 flex items-center justify-center hover:bg-muted transition"><Minus className="h-2.5 w-2.5" /></button>
+                                                                <span className="text-xs w-4 text-center font-bold px-1">{guestCount}</span>
+                                                                <button onClick={() => handleGuest(date, type, Math.min(10, guestCount + 0.5))} className="h-5 w-5 rounded bg-background shadow-sm border border-border/50 flex items-center justify-center hover:bg-muted transition"><Plus className="h-2.5 w-2.5" /></button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}

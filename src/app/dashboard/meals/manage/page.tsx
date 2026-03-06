@@ -200,8 +200,9 @@ export default function ManageMealsPage() {
                                                             <Input
                                                                 type="number"
                                                                 min={0}
+                                                                step={0.5}
                                                                 value={meals[meal]}
-                                                                onChange={(e) => updateMeal(member.memberId, meal, parseInt(e.target.value) || 0)}
+                                                                onChange={(e) => updateMeal(member.memberId, meal, parseFloat(e.target.value) || 0)}
                                                                 className="h-10 text-center text-base font-medium"
                                                             />
                                                         </div>

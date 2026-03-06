@@ -10,7 +10,7 @@ export const mealToggleSchema = z.object({
     messId: z.string().uuid(),
     mealDate: z.string().date(),
     mealType: z.enum(['breakfast', 'lunch', 'dinner']),
-    value: z.boolean(),
+    value: z.number().min(0).max(10),
 });
 
 export const guestMealSchema = z.object({
@@ -19,7 +19,7 @@ export const guestMealSchema = z.object({
     messId: z.string().uuid(),
     mealDate: z.string().date(),
     mealType: z.enum(['breakfast', 'lunch', 'dinner']),
-    count: z.number().int().min(0).max(10),
+    count: z.number().min(0).max(10),
 });
 
 // ============================================================================
