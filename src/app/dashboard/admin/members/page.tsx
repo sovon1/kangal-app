@@ -134,17 +134,17 @@ export default function MembersPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Members</h1>
                     <p className="text-muted-foreground text-sm mt-0.5">Manage your mess members</p>
                 </div>
                 {isManager && (
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={() => { setAddManualStep('warning1'); setAddManualConfirm(''); setAddManualOpen(true); }} className="gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                        <Button variant="outline" onClick={() => { setAddManualStep('warning1'); setAddManualConfirm(''); setAddManualOpen(true); }} className="gap-2 w-full sm:w-auto justify-center">
                             <UserCog className="h-4 w-4" /> Add Manual Member
                         </Button>
-                        <Button variant="outline" onClick={() => setTransferOpen(true)} className="gap-2">
+                        <Button variant="outline" onClick={() => setTransferOpen(true)} className="gap-2 w-full sm:w-auto justify-center">
                             <ArrowRightLeft className="h-4 w-4" /> Transfer Manager
                         </Button>
                     </div>
