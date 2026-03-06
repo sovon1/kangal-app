@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,7 +18,9 @@ export default function BazaarPage() {
     const queryClient = useQueryClient();
     const ctx = useMessContext();
     const [addOpen, setAddOpen] = useState(false);
+    const [addMode, setAddMode] = useState<'detailed' | 'summary'>('detailed');
     const [items, setItems] = useState([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
+    const [summaryItem, setSummaryItem] = useState({ itemName: '', totalCost: 0 });
     const [submitting, setSubmitting] = useState(false);
     const [approvingId, setApprovingId] = useState<string | null>(null);
 
@@ -44,8 +47,26 @@ export default function BazaarPage() {
 
     const handleSubmit = async () => {
         if (!ctx) return;
-        const validItems = items.filter(i => i.itemName.trim() && i.quantity > 0 && i.unitPrice > 0);
-        if (validItems.length === 0) { toast.error('Add at least one valid item'); return; }
+
+        // Determine valid items based on the active mode
+        let validItems: { itemName: string; quantity: number; unit: string; unitPrice: number; }[] = [];
+        if (addMode === 'detailed') {
+            validItems = items.filter(i => i.itemName.trim() && i.quantity > 0 && i.unitPrice > 0);
+        } else {
+            if (summaryItem.itemName.trim() && summaryItem.totalCost > 0) {
+                validItems = [{
+                    itemName: summaryItem.itemName,
+                    quantity: 1,
+                    unit: 'trip',
+                    unitPrice: summaryItem.totalCost
+                }];
+            }
+        }
+
+        if (validItems.length === 0) {
+            toast.error(addMode === 'detailed' ? 'Add at least one valid item' : 'Enter a valid name and amount');
+            return;
+        }
 
         setSubmitting(true);
         const result = await addBazaarExpense({
@@ -59,6 +80,7 @@ export default function BazaarPage() {
         toast.success(isManager ? 'Bazaar expense approved & saved!' : 'Bazaar expense submitted for approval!');
         setAddOpen(false);
         setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
+        setSummaryItem({ itemName: '', totalCost: 0 });
         queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
     };
 
@@ -194,37 +216,76 @@ export default function BazaarPage() {
                             <p className="text-xs text-amber-600 mt-1">Your expense will be submitted for manager approval.</p>
                         )}
                     </DialogHeader>
-                    <div className="space-y-4">
-                        {items.map((item, i) => (
-                            <div key={i} className="p-3 rounded-lg border bg-muted/30 space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-muted-foreground">Item {i + 1}</span>
-                                    {items.length > 1 && (
-                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeItem(i)}>
-                                            <Trash2 className="h-3 w-3 text-destructive" />
-                                        </Button>
-                                    )}
+                    <Tabs value={addMode} onValueChange={(v) => setAddMode(v as 'detailed' | 'summary')} className="w-full mt-4">
+                        <TabsList className="grid w-full grid-cols-2 mb-4">
+                            <TabsTrigger value="detailed">Detailed Items</TabsTrigger>
+                            <TabsTrigger value="summary">Quick Summary</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="detailed" className="space-y-4 outline-none">
+                            {items.map((item, i) => (
+                                <div key={i} className="p-3 rounded-lg border bg-muted/30 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-muted-foreground">Item {i + 1}</span>
+                                        {items.length > 1 && (
+                                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeItem(i)}>
+                                                <Trash2 className="h-3 w-3 text-destructive" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <Input placeholder="Item name" value={item.itemName} onChange={e => updateItem(i, 'itemName', e.target.value)} className="h-9" />
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <Input type="number" placeholder="Qty" value={item.quantity || ''} onChange={e => updateItem(i, 'quantity', Number(e.target.value))} className="h-9" />
+                                        <Input placeholder="Unit" value={item.unit} onChange={e => updateItem(i, 'unit', e.target.value)} className="h-9" />
+                                        <Input type="number" placeholder="Price" value={item.unitPrice || ''} onChange={e => updateItem(i, 'unitPrice', Number(e.target.value))} className="h-9" />
+                                    </div>
+                                    <p className="text-xs text-right text-muted-foreground">
+                                        Subtotal: ৳{(item.quantity * item.unitPrice).toLocaleString()}
+                                    </p>
                                 </div>
-                                <Input placeholder="Item name" value={item.itemName} onChange={e => updateItem(i, 'itemName', e.target.value)} className="h-9" />
-                                <div className="grid grid-cols-3 gap-2">
-                                    <Input type="number" placeholder="Qty" value={item.quantity || ''} onChange={e => updateItem(i, 'quantity', Number(e.target.value))} className="h-9" />
-                                    <Input placeholder="Unit" value={item.unit} onChange={e => updateItem(i, 'unit', e.target.value)} className="h-9" />
-                                    <Input type="number" placeholder="Price" value={item.unitPrice || ''} onChange={e => updateItem(i, 'unitPrice', Number(e.target.value))} className="h-9" />
+                            ))}
+                            <Button variant="outline" className="w-full gap-2" onClick={addItem}>
+                                <Plus className="h-4 w-4" /> Add Item
+                            </Button>
+                        </TabsContent>
+
+                        <TabsContent value="summary" className="space-y-4 outline-none">
+                            <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-muted-foreground">Trip Name / Description</label>
+                                    <Input
+                                        placeholder='e.g., "23 tarikher bajar"'
+                                        value={summaryItem.itemName}
+                                        onChange={e => setSummaryItem({ ...summaryItem, itemName: e.target.value })}
+                                        className="h-10"
+                                    />
                                 </div>
-                                <p className="text-xs text-right text-muted-foreground">
-                                    Subtotal: ৳{(item.quantity * item.unitPrice).toLocaleString()}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-muted-foreground">Total Cost (৳)</label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Enter total amount"
+                                        value={summaryItem.totalCost || ''}
+                                        onChange={e => setSummaryItem({ ...summaryItem, totalCost: Number(e.target.value) })}
+                                        className="h-10 font-bold"
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground text-center pt-2">
+                                    Use this option to quickly add the total cost without listing every item.
                                 </p>
                             </div>
-                        ))}
-                        <Button variant="outline" className="w-full gap-2" onClick={addItem}>
-                            <Plus className="h-4 w-4" /> Add Item
+                        </TabsContent>
+                    </Tabs>
+
+                    <div className="border-t pt-4 flex items-center justify-between mt-2">
+                        <span className="font-semibold text-lg">
+                            Total: ৳{addMode === 'detailed'
+                                ? items.reduce((s, i) => s + i.quantity * i.unitPrice, 0).toLocaleString()
+                                : (summaryItem.totalCost || 0).toLocaleString()}
+                        </span>
+                        <Button onClick={handleSubmit} disabled={submitting}>
+                            {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : isManager ? 'Approve & Save' : 'Submit for Approval'}
                         </Button>
-                        <div className="border-t pt-3 flex items-center justify-between">
-                            <span className="font-semibold">Total: ৳{items.reduce((s, i) => s + i.quantity * i.unitPrice, 0).toLocaleString()}</span>
-                            <Button onClick={handleSubmit} disabled={submitting}>
-                                {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : isManager ? 'Approve & Save' : 'Submit for Approval'}
-                            </Button>
-                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
