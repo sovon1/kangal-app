@@ -42,6 +42,10 @@ export const bazaarExpenseSchema = z.object({
     items: z.array(bazaarItemSchema).min(1, 'At least one item is required'),
 });
 
+export const updateBazaarExpenseSchema = bazaarExpenseSchema.extend({
+    id: z.string().uuid(),
+});
+
 // ============================================================================
 // TRANSACTION SCHEMAS
 // ============================================================================
@@ -115,6 +119,7 @@ export const joinMessSchema = z.object({
 export type MealToggleInput = z.infer<typeof mealToggleSchema>;
 export type GuestMealInput = z.infer<typeof guestMealSchema>;
 export type BazaarExpenseInput = z.infer<typeof bazaarExpenseSchema>;
+export type UpdateBazaarExpenseInput = z.infer<typeof updateBazaarExpenseSchema>;
 export type BazaarItemInput = z.infer<typeof bazaarItemSchema>;
 export type DepositInput = z.infer<typeof depositSchema>;
 export type FixedCostInput = z.infer<typeof fixedCostSchema>;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { addBazaarExpense, getBazaarExpenses, approveBazaarExpense } from '@/lib/actions/bazaar';
+import { addBazaarExpense, getBazaarExpenses, approveBazaarExpense, updateBazaarExpense, deleteBazaarExpense } from '@/lib/actions/bazaar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
 
@@ -23,6 +23,8 @@ export default function BazaarPage() {
     const [summaryItem, setSummaryItem] = useState({ itemName: '', totalCost: 0 });
     const [submitting, setSubmitting] = useState(false);
     const [approvingId, setApprovingId] = useState<string | null>(null);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const isManager = ctx?.role === 'manager';
 
@@ -69,19 +71,66 @@ export default function BazaarPage() {
         }
 
         setSubmitting(true);
-        const result = await addBazaarExpense({
-            cycleId: ctx.cycleId, messId: ctx.messId, shopperId: ctx.memberId,
-            expenseDate: new Date().toISOString().split('T')[0],
-            items: validItems,
-        });
-        setSubmitting(false);
+        if (editingId) {
+            const result = await updateBazaarExpense({
+                id: editingId,
+                cycleId: ctx.cycleId, messId: ctx.messId, shopperId: ctx.memberId,
+                expenseDate: new Date().toISOString().split('T')[0],
+                items: validItems,
+            });
+            setSubmitting(false);
+            if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
+            toast.success('Bazaar expense updated!');
+        } else {
+            const result = await addBazaarExpense({
+                cycleId: ctx.cycleId, messId: ctx.messId, shopperId: ctx.memberId,
+                expenseDate: new Date().toISOString().split('T')[0],
+                items: validItems,
+            });
+            setSubmitting(false);
+            if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
+            toast.success(isManager ? 'Bazaar expense approved & saved!' : 'Bazaar expense submitted for approval!');
+        }
 
-        if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
-        toast.success(isManager ? 'Bazaar expense approved & saved!' : 'Bazaar expense submitted for approval!');
         setAddOpen(false);
+        setEditingId(null);
         setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
         setSummaryItem({ itemName: '', totalCost: 0 });
         queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
+        queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+    };
+
+    const handleEditClick = (expense: Record<string, unknown>) => {
+        setEditingId(expense.id as string);
+        const expenseItems = (expense.items as Record<string, unknown>[]) || [];
+        if (expenseItems.length === 1 && expenseItems[0].unit === 'trip') {
+            setAddMode('summary');
+            setSummaryItem({ itemName: expenseItems[0].item_name as string, totalCost: Number(expenseItems[0].total_price) });
+            setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
+        } else {
+            setAddMode('detailed');
+            setItems(expenseItems.map(item => ({
+                itemName: item.item_name as string,
+                quantity: Number(item.quantity),
+                unit: item.unit as string,
+                unitPrice: Number(item.unit_price)
+            })));
+        }
+        setAddOpen(true);
+    };
+
+    const handleDelete = async (expenseId: string) => {
+        if (!ctx) return;
+        if (!confirm('Are you sure you want to delete this expense?')) return;
+        setDeletingId(expenseId);
+        const result = await deleteBazaarExpense(expenseId, ctx.messId);
+        setDeletingId(null);
+        if (result.error) { toast.error(result.error); return; }
+        toast.success('Expense deleted!');
+        queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
+        queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     };
 
     const handleApproval = async (expenseId: string, action: 'approved' | 'rejected') => {
@@ -168,6 +217,19 @@ export default function BazaarPage() {
                                         <Badge variant="outline" className="text-xs">
                                             {((expense.items as unknown[]) || []).length} items
                                         </Badge>
+
+                                        {/* Edit & Delete Buttons */}
+                                        {(isManager || expense.created_by === ctx?.userId) && (
+                                            <div className="flex gap-1 ml-1">
+                                                <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEditClick(expense)}>
+                                                    <Edit2 className="h-4 w-4" />
+                                                </Button>
+                                                <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600 hover:bg-red-500/10" onClick={() => handleDelete(expense.id as string)} disabled={deletingId === expense.id}>
+                                                    {deletingId === expense.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                </Button>
+                                            </div>
+                                        )}
+
                                         {/* Manager approve/reject buttons for pending expenses */}
                                         {isManager && expense.approval_status === 'pending' && (
                                             <div className="flex gap-1">
@@ -206,12 +268,21 @@ export default function BazaarPage() {
                 </div>
             )}
 
-            {/* Add Expense Dialog */}
-            <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            {/* Add/Edit Expense Dialog */}
+            <Dialog open={addOpen} onOpenChange={(open) => {
+                setAddOpen(open);
+                if (!open) {
+                    setEditingId(null);
+                    setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
+                    setSummaryItem({ itemName: '', totalCost: 0 });
+                }
+            }}>
                 <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Add Bazaar Expense</DialogTitle>
-                        <DialogDescription>Add items purchased during a shopping trip.</DialogDescription>
+                        <DialogTitle>{editingId ? 'Edit Bazaar Expense' : 'Add Bazaar Expense'}</DialogTitle>
+                        <DialogDescription>
+                            {editingId ? 'Modify the items of your submitted bazaar expense.' : 'Add items purchased during a shopping trip.'}
+                        </DialogDescription>
                         {!isManager && (
                             <p className="text-xs text-amber-600 mt-1">Your expense will be submitted for manager approval.</p>
                         )}

@@ -16,7 +16,7 @@ export function PricingSection() {
                         Simple Pricing, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-300">Premium Experience</span>
                     </h2>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                        Choose the plan that fits your mess. As a special launch offer, our developer is making all Pro features absolutely <span className="font-semibold text-foreground">FREE for the next 2 years!</span>
+                        Choose the plan that fits your mess. As a special launch offer, your developer is making all Pro features absolutely <span className="font-semibold text-foreground">FREE for the next 2 years!</span>
                     </p>
                 </div>
 

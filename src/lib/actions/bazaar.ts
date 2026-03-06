@@ -1,7 +1,7 @@
 'use server';
 
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { bazaarExpenseSchema } from '@/lib/validations';
+import { bazaarExpenseSchema, updateBazaarExpenseSchema } from '@/lib/validations';
 
 // ============================================================================
 // ADD BAZAAR EXPENSE (with items → triggers inventory deduction)
@@ -163,4 +163,69 @@ export async function getConsumptionRates(cycleId: string) {
     }));
 
     return { data: rates };
+}
+
+// ============================================================================
+// DELETE BAZAAR EXPENSE
+// ============================================================================
+
+export async function deleteBazaarExpense(expenseId: string, messId: string) {
+    const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { error } = await supabase.rpc('delete_bazaar_expense_transaction', {
+        p_expense_id: expenseId,
+        p_mess_id: messId,
+        p_actor_id: user.id
+    });
+
+    if (error) return { error: error.message };
+
+    return { success: true };
+}
+
+// ============================================================================
+// UPDATE BAZAAR EXPENSE
+// ============================================================================
+
+export async function updateBazaarExpense(input: unknown) {
+    const parsed = updateBazaarExpenseSchema.safeParse(input);
+    if (!parsed.success) return { error: 'Invalid input', details: parsed.error.issues };
+
+    const { id, cycleId, messId, shopperId, expenseDate, notes, items } = parsed.data;
+    const supabase = await getSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const totalAmount = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
+
+    const expenseData = {
+        mess_id: messId,
+        shopper_id: shopperId,
+        expense_date: expenseDate,
+        notes: notes || null,
+        total_amount: totalAmount,
+        approval_status: 'pending', // Assume edit requires re-approval unless manager (handled in RPC)
+        approved_by: null,
+        acted_by: user.id
+    };
+
+    const itemsData = items.map(item => ({
+        item_name: item.itemName,
+        quantity: item.quantity,
+        unit: item.unit,
+        unit_price: item.unitPrice
+    }));
+
+    const { error } = await supabase.rpc('update_bazaar_expense_transaction', {
+        p_expense_id: id,
+        p_expense_data: expenseData,
+        p_items_data: itemsData
+    });
+
+    if (error) return { error: error.message };
+
+    return { success: true };
 }
