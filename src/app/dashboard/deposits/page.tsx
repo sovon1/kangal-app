@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { addDeposit, approveDeposit, getAllMemberBalances, settleMemberBalance } from '@/lib/actions/finance';
+import { addDeposit, updateDeposit, deleteDeposit, approveDeposit, getAllMemberBalances, settleMemberBalance } from '@/lib/actions/finance';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wallet, Plus, Loader2, Banknote, CheckCircle2, XCircle, Clock, ArrowRightLeft } from 'lucide-react';
+import { Wallet, Plus, Loader2, Banknote, CheckCircle2, XCircle, Clock, ArrowRightLeft, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
 
@@ -30,6 +30,8 @@ export default function DepositsPage() {
     const [refNo, setRefNo] = useState('');
     const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [editingDepositId, setEditingDepositId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [approvingId, setApprovingId] = useState<string | null>(null);
     const [settlingId, setSettlingId] = useState<string | null>(null);
 
@@ -82,16 +84,49 @@ export default function DepositsPage() {
         if (!targetMember) { toast.error('Select a member'); return; }
 
         setSubmitting(true);
-        const result = await addDeposit({
-            cycleId: ctx.cycleId, messId: ctx.messId, memberId: targetMember,
-            amount: Number(amount), paymentMethod: method,
-            referenceNo: refNo || undefined, notes: notes || undefined,
-        });
+        let result;
+        if (editingDepositId) {
+            result = await updateDeposit({
+                id: editingDepositId, cycleId: ctx.cycleId, messId: ctx.messId, memberId: targetMember,
+                amount: Number(amount), paymentMethod: method,
+                referenceNo: refNo || undefined, notes: notes || undefined,
+            });
+        } else {
+            result = await addDeposit({
+                cycleId: ctx.cycleId, messId: ctx.messId, memberId: targetMember,
+                amount: Number(amount), paymentMethod: method,
+                referenceNo: refNo || undefined, notes: notes || undefined,
+            });
+        }
+
         setSubmitting(false);
         if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
-        toast.success(isManager ? 'Deposit approved & recorded!' : 'Deposit submitted for approval!');
+        toast.success(editingDepositId ? 'Deposit updated!' : (isManager ? 'Deposit approved & recorded!' : 'Deposit submitted for approval!'));
         setAddOpen(false);
+        setEditingDepositId(null);
         setAmount(''); setRefNo(''); setNotes('');
+        queryClient.invalidateQueries({ queryKey: ['deposits'] });
+        queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+    };
+
+    const handleEdit = (deposit: any) => {
+        setEditingDepositId(deposit.id);
+        setSelectedMember(deposit.member_id);
+        setAmount(deposit.amount.toString());
+        setMethod(deposit.payment_method || 'cash');
+        setRefNo(deposit.reference_no || '');
+        setNotes(deposit.notes || '');
+        setAddOpen(true);
+    };
+
+    const handleDelete = async (depositId: string) => {
+        if (!confirm('Are you sure you want to delete this deposit?')) return;
+        setDeletingId(depositId);
+        const result = await deleteDeposit(depositId);
+        setDeletingId(null);
+        if (result.error) { toast.error(result.error as string); return; }
+        toast.success('Deposit deleted');
         queryClient.invalidateQueries({ queryKey: ['deposits'] });
         queryClient.invalidateQueries({ queryKey: ['member-balance'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
@@ -208,29 +243,42 @@ export default function DepositsPage() {
                                         <Badge variant="secondary" className={`text-xs ${methodColors[(d.payment_method as string) || 'cash']}`}>
                                             {methodLabels[(d.payment_method as string) || 'cash']}
                                         </Badge>
-                                        {/* Manager approve/reject buttons for pending deposits */}
-                                        {isManager && d.approval_status === 'pending' && (
-                                            <div className="flex gap-1 ml-2">
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
-                                                    onClick={() => handleApproval(d.id as string, 'approved')}
-                                                    disabled={approvingId === d.id}
-                                                >
-                                                    {approvingId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-500/10"
-                                                    onClick={() => handleApproval(d.id as string, 'rejected')}
-                                                    disabled={approvingId === d.id}
-                                                >
-                                                    <XCircle className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        )}
+
+                                        <div className="flex gap-1 ml-2 items-center">
+                                            {(isManager || (d.created_by === ctx?.userId && d.approval_status === 'pending')) && (
+                                                <>
+                                                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(d)} disabled={deletingId === d.id}>
+                                                        <Pencil className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-500/10" onClick={() => handleDelete(d.id as string)} disabled={deletingId === d.id}>
+                                                        {deletingId === d.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                                                    </Button>
+                                                </>
+                                            )}
+                                            {/* Manager approve/reject buttons for pending deposits */}
+                                            {isManager && d.approval_status === 'pending' && (
+                                                <>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
+                                                        onClick={() => handleApproval(d.id as string, 'approved')}
+                                                        disabled={approvingId === d.id}
+                                                    >
+                                                        {approvingId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                                                        onClick={() => handleApproval(d.id as string, 'rejected')}
+                                                        disabled={approvingId === d.id}
+                                                    >
+                                                        <XCircle className="h-4 w-4" />
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
@@ -294,12 +342,18 @@ export default function DepositsPage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Add Deposit Dialog */}
-            <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            {/* Add/Edit Deposit Dialog */}
+            <Dialog open={addOpen} onOpenChange={(val) => {
+                setAddOpen(val);
+                if (!val) {
+                    setEditingDepositId(null);
+                    setAmount(''); setRefNo(''); setNotes('');
+                }
+            }}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Record Deposit</DialogTitle>
-                        {!isManager && (
+                        <DialogTitle>{editingDepositId ? 'Edit Deposit' : 'Record Deposit'}</DialogTitle>
+                        {!isManager && !editingDepositId && (
                             <p className="text-xs text-amber-600 mt-1">Your deposit will be submitted for manager approval.</p>
                         )}
                     </DialogHeader>
@@ -347,7 +401,7 @@ export default function DepositsPage() {
                             <Input placeholder="Any notes" value={notes} onChange={e => setNotes(e.target.value)} className="h-11" />
                         </div>
                         <Button className="w-full h-11" onClick={handleSubmit} disabled={submitting}>
-                            {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : isManager ? 'Record & Approve Deposit' : 'Submit Deposit for Approval'}
+                            {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : editingDepositId ? 'Save Changes' : isManager ? 'Record & Approve Deposit' : 'Submit Deposit for Approval'}
                         </Button>
                     </div>
                 </DialogContent>

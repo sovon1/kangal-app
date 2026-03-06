@@ -1,7 +1,7 @@
 'use server';
 
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { depositSchema, fixedCostSchema, individualCostSchema } from '@/lib/validations';
+import { depositSchema, updateDepositSchema, fixedCostSchema, individualCostSchema } from '@/lib/validations';
 
 // ============================================================================
 // ADD DEPOSIT
@@ -52,6 +52,124 @@ export async function addDeposit(input: unknown) {
         actor_id: user.id,
         action: 'deposit_added',
         details: { member_id: memberId, amount, payment_method: paymentMethod, status: isManager ? 'approved' : 'pending' },
+    });
+
+    return { success: true };
+}
+
+// ============================================================================
+// UPDATE DEPOSIT
+// ============================================================================
+
+export async function updateDeposit(input: unknown) {
+    const parsed = updateDepositSchema.safeParse(input);
+    if (!parsed.success) {
+        return { error: 'Invalid input', details: parsed.error.issues };
+    }
+
+    const { id, cycleId, messId, memberId, amount, paymentMethod, referenceNo, notes } = parsed.data;
+    const supabase = await getSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    // Fetch existing deposit to check permissions
+    const { data: deposit, error: fetchErr } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (fetchErr || !deposit) return { error: 'Deposit not found' };
+
+    // Check manager status
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', messId)
+        .eq('user_id', user.id)
+        .single();
+
+    const isManager = currentMember?.role === 'manager';
+    const isOwner = deposit.created_by === user.id;
+
+    // Only let managers edit approved deposits, owners can edit pending
+    if (deposit.approval_status === 'approved' && !isManager) {
+        return { error: 'Cannot edit an approved deposit. Ask your manager.' };
+    }
+    if (!isManager && !isOwner) {
+        return { error: 'Unauthorized to edit this deposit.' };
+    }
+
+    const { error } = await supabase
+        .from('transactions')
+        .update({
+            amount,
+            payment_method: paymentMethod,
+            reference_no: referenceNo || null,
+            notes: notes || null,
+            // If it was already approved and manager edits it, it stays approved.
+            // If creator edits a pending, it stays pending.
+        })
+        .eq('id', id);
+
+    if (error) return { error: error.message };
+
+    // Log activity
+    await supabase.from('activity_log').insert({
+        mess_id: messId,
+        actor_id: user.id,
+        action: 'deposit_edited',
+        details: { deposit_id: id, amount, payment_method: paymentMethod },
+    });
+
+    return { success: true };
+}
+
+// ============================================================================
+// DELETE DEPOSIT
+// ============================================================================
+
+export async function deleteDeposit(depositId: string) {
+    const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { data: deposit, error: fetchErr } = await supabase
+        .from('transactions')
+        .select('*, mess_members(role)')
+        .eq('id', depositId)
+        .single();
+
+    if (fetchErr || !deposit) return { error: 'Deposit not found' };
+
+    // Check permissions
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', deposit.mess_id)
+        .eq('user_id', user.id)
+        .single();
+
+    const isManager = currentMember?.role === 'manager';
+    const isOwner = deposit.created_by === user.id;
+
+    if (deposit.approval_status === 'approved' && !isManager) {
+        return { error: 'Cannot delete an approved deposit.' };
+    }
+    if (!isManager && !isOwner) {
+        return { error: 'Unauthorized to delete this deposit.' };
+    }
+
+    const { error: deleteErr } = await supabase.from('transactions').delete().eq('id', depositId);
+    if (deleteErr) return { error: deleteErr.message };
+
+    // Log activity
+    await supabase.from('activity_log').insert({
+        mess_id: deposit.mess_id,
+        actor_id: user.id,
+        action: 'deposit_deleted',
+        details: { deposit_id: depositId, amount: deposit.amount },
     });
 
     return { success: true };

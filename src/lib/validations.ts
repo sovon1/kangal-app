@@ -60,6 +60,10 @@ export const depositSchema = z.object({
     notes: z.string().max(500).optional(),
 });
 
+export const updateDepositSchema = depositSchema.extend({
+    id: z.string().uuid(),
+});
+
 // ============================================================================
 // COST SCHEMAS
 // ============================================================================
