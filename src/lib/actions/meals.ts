@@ -357,9 +357,11 @@ export async function getAllMealsForMonth(messId: string, cycleId: string) {
 
     const memberList = members.map((m) => {
         const profile = m.profile as unknown as { full_name: string };
+        const isManual = Boolean(m.is_manual);
+        const name = isManual ? (m.manual_name as string) : (profile?.full_name || 'Unknown');
         return {
             id: m.id,
-            name: profile?.full_name || 'Unknown',
+            name,
         };
     });
 

@@ -107,6 +107,8 @@ export async function getBazaarExpenses(cycleId: string) {
       items:bazaar_items(*),
       shopper:mess_members(
         *,
+        is_manual,
+        manual_name,
         profile:profiles(full_name, avatar_url)
       )
     `)
