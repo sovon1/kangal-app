@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Utensils, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { AnimatedBackground } from '@/components/auth/animated-background';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -75,11 +76,12 @@ export default function SignupPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
+            <AnimatedBackground />
 
-            <Card className="w-full max-w-md mx-4 relative z-10 border-border/50 bg-card/80 backdrop-blur-xl shadow-2xl">
+            <Card className="w-full max-w-md mx-4 relative z-10 border-border/50 bg-card/80 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
                 <CardHeader className="text-center space-y-4">
-                    <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20">
-                        <Utensils className="h-8 w-8 text-primary" />
+                    <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 hover:scale-110 transition-transform duration-300">
+                        <Utensils className="h-8 w-8 text-primary group-hover:animate-bounce" />
                     </div>
                     <div>
                         <CardTitle className="text-3xl font-bold tracking-tight">Join KANGAL</CardTitle>
