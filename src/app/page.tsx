@@ -189,7 +189,7 @@ export default async function LandingPage() {
               <span className="font-semibold text-foreground">KANGAL</span>
             </div>
             <p className="text-sm">
-              &copy; {new Date().getFullYear()} KANGAL. Built for students, by students.
+              &copy; {new Date().getFullYear()} KANGAL. some lifeless guy from CSTE18 NSTU.
             </p>
           </div>
         </footer>
