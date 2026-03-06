@@ -24,6 +24,25 @@ const FloatingIcon = ({ Icon, className, delay, duration, size }: FloatingIconPr
     </div>
 );
 
+interface FloatingTextProps {
+    text: string;
+    className?: string;
+    delay: string;
+    duration: string;
+}
+
+const FloatingText = ({ text, className, delay, duration }: FloatingTextProps) => (
+    <div
+        className={cn("absolute animate-float opacity-15 font-bold tracking-tight text-primary whitespace-nowrap", className)}
+        style={{
+            animationDelay: delay,
+            animationDuration: duration,
+        }}
+    >
+        {text}
+    </div>
+);
+
 export function AnimatedBackground() {
     const [mounted, setMounted] = useState(false);
 
@@ -87,6 +106,62 @@ export function AnimatedBackground() {
                 delay="7s"
                 duration="22s"
                 size="2.5rem"
+            />
+
+            {/* Floating Bengali Texts (Useful & Funny) */}
+            <FloatingText
+                text="মিল রেট কত?"
+                className="top-[15%] right-[20%] text-2xl -rotate-6"
+                delay="1s"
+                duration="25s"
+            />
+            <FloatingText
+                text="ম্যানেজার টাকা মারছে!"
+                className="top-[55%] right-[15%] text-xl rotate-12"
+                delay="3s"
+                duration="24s"
+            />
+            <FloatingText
+                text="আজকের বাজার"
+                className="top-[45%] left-[10%] text-xl rotate-12"
+                delay="4s"
+                duration="28s"
+            />
+            <FloatingText
+                text="ডিপোজিট দিন"
+                className="top-[75%] right-[30%] text-3xl rotate-3"
+                delay="6s"
+                duration="22s"
+            />
+            <FloatingText
+                text="আজকে ডাল পানি"
+                className="top-[25%] left-[20%] text-2xl rotate-6"
+                delay="7s"
+                duration="27s"
+            />
+            <FloatingText
+                text="ম্যাসের হিসাব"
+                className="top-[80%] left-[15%] text-2xl -rotate-12"
+                delay="8s"
+                duration="26s"
+            />
+            <FloatingText
+                text="বোর্ডিং ফি"
+                className="top-[35%] right-[5%] text-xl rotate-6"
+                delay="2s"
+                duration="20s"
+            />
+            <FloatingText
+                text="ব্রয়লার মুরগি আর কত!"
+                className="top-[90%] right-[10%] text-lg -rotate-6"
+                delay="5s"
+                duration="29s"
+            />
+            <FloatingText
+                text="গ্যাস নাই"
+                className="top-[5%] left-[45%] text-xl lg:text-3xl rotate-3"
+                delay="9s"
+                duration="30s"
             />
 
             {/* Soft Glowing Orbs */}
