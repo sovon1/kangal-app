@@ -44,7 +44,7 @@ export default function DepositsPage() {
             if (!ctx) return [];
             const { data } = await supabase
                 .from('mess_members')
-                .select('id, role, profile:profiles(full_name)')
+                .select('id, role, is_manual, manual_name, profile:profiles(full_name)')
                 .eq('mess_id', ctx.messId)
                 .eq('status', 'active')
                 .order('role', { ascending: true });
@@ -59,7 +59,7 @@ export default function DepositsPage() {
             if (!ctx) return [];
             const { data } = await supabase
                 .from('transactions')
-                .select('*, member:mess_members(*, profile:profiles(full_name))')
+                .select('*, member:mess_members(*, is_manual, manual_name, profile:profiles(full_name))')
                 .eq('cycle_id', ctx.cycleId)
                 .order('created_at', { ascending: false });
             return data || [];
@@ -235,7 +235,11 @@ export default function DepositsPage() {
                                                 {statusBadge(d.approval_status as string)}
                                             </div>
                                             <p className="text-xs text-muted-foreground">
-                                                {((d.member as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string || 'Member'} · {new Date(d.created_at as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                {Boolean((d.member as Record<string, unknown>)?.is_manual)
+                                                    ? ((d.member as Record<string, unknown>)?.manual_name as string)
+                                                    : (((d.member as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string || 'Member')}
+                                                {' · '}
+                                                {new Date(d.created_at as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                             </p>
                                         </div>
                                     </div>
@@ -367,7 +371,7 @@ export default function DepositsPage() {
                                     <SelectContent>
                                         {(membersQuery.data || []).map((m: Record<string, unknown>) => (
                                             <SelectItem key={m.id as string} value={m.id as string}>
-                                                {(m.profile as Record<string, unknown>)?.full_name as string || 'Unknown'}
+                                                {Boolean(m.is_manual) ? (m.manual_name as string) : ((m.profile as Record<string, unknown>)?.full_name as string || 'Unknown')}
                                                 {m.id === ctx?.memberId ? ' (You)' : ''}
                                             </SelectItem>
                                         ))}
