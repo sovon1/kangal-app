@@ -546,7 +546,7 @@ export async function getAllMemberBalances(messId: string, cycleId: string) {
     // Fetch all active members
     const { data: members, error: membersError } = await supabase
         .from('mess_members')
-        .select('id, role, profile:profiles(full_name)')
+        .select('id, role, is_manual, manual_name, profile:profiles(full_name)')
         .eq('mess_id', messId)
         .eq('status', 'active')
         .order('role', { ascending: true });
@@ -565,9 +565,12 @@ export async function getAllMemberBalances(messId: string, cycleId: string) {
             if (error) return null;
             const row = Array.isArray(data) ? data[0] : data;
 
+            const isManual = Boolean(member.is_manual);
+            const name = isManual ? (member.manual_name as string) : ((member.profile as unknown as { full_name: string })?.full_name || 'Unknown');
+
             return {
                 memberId: member.id,
-                name: (member.profile as unknown as { full_name: string })?.full_name || 'Unknown',
+                name,
                 role: member.role,
                 totalMeals: Number(row?.total_meals) || 0,
                 totalDeposits: Number(row?.total_deposits) || 0,

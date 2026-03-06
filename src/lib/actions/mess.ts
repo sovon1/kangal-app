@@ -201,3 +201,65 @@ export async function transferManager(input: {
 
     return { success: true };
 }
+
+// ============================================================================
+// ADD MANUAL / OFFLINE MEMBER
+// ============================================================================
+
+export async function addManualMember(input: {
+    messId: string;
+    manualName: string;
+}) {
+    const supabase = await getSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    // 1. Verify current user is manager
+    const { data: currentMember } = await supabase
+        .from('mess_members')
+        .select('role')
+        .eq('mess_id', input.messId)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+    if (!currentMember || currentMember.role !== 'manager') {
+        return { error: 'Only the manager can add manual members.' };
+    }
+
+    if (!input.manualName || input.manualName.trim().length < 2) {
+        return { error: 'Manual member name must be at least 2 characters.' };
+    }
+
+    // 2. Check member limit
+    const { data: mess } = await supabase.from('messes').select('max_members').eq('id', input.messId).single();
+
+    const { count } = await supabase
+        .from('mess_members')
+        .select('id', { count: 'exact' })
+        .eq('mess_id', input.messId)
+        .eq('status', 'active');
+
+    if (count !== null && mess?.max_members && count >= mess.max_members) {
+        return { error: 'This mess has reached its maximum member capacity.' };
+    }
+
+    // 3. Insert offline member
+    const { error: insertError } = await supabase
+        .from('mess_members')
+        .insert({
+            mess_id: input.messId,
+            role: 'member',
+            status: 'active',
+            is_manual: true,
+            manual_name: input.manualName.trim(),
+        });
+
+    if (insertError) {
+        return { error: insertError.message };
+    }
+
+    revalidatePath('/dashboard', 'layout');
+    return { success: true };
+}

@@ -233,7 +233,7 @@ export async function getAllMealsForDate(messId: string, cycleId: string, mealDa
     // Fetch all active members
     const { data: members, error: membersError } = await supabase
         .from('mess_members')
-        .select('id, role, profile:profiles(full_name, avatar_url)')
+        .select('id, role, is_manual, manual_name, profile:profiles(full_name, avatar_url)')
         .eq('mess_id', messId)
         .eq('status', 'active')
         .order('role', { ascending: true });
@@ -252,10 +252,14 @@ export async function getAllMealsForDate(messId: string, cycleId: string, mealDa
     const result = members.map((member) => {
         const meal = (meals || []).find((m: Record<string, unknown>) => m.member_id === member.id);
         const profile = member.profile as unknown as { full_name: string; avatar_url: string | null };
+        const isManual = Boolean(member.is_manual);
+        const name = isManual ? (member.manual_name as string) : (profile?.full_name || 'Unknown');
+        const avatarUrl = isManual ? null : (profile?.avatar_url || null);
+
         return {
             memberId: member.id,
-            name: profile?.full_name || 'Unknown',
-            avatarUrl: profile?.avatar_url || null,
+            name,
+            avatarUrl,
             breakfast: Number(meal?.breakfast || 0),
             lunch: Number(meal?.lunch || 0),
             dinner: Number(meal?.dinner || 0),
@@ -287,7 +291,7 @@ export async function getAllMealsForMonth(messId: string, cycleId: string) {
     // Fetch all active members
     const { data: members, error: membersError } = await supabase
         .from('mess_members')
-        .select('id, role, profile:profiles(full_name)')
+        .select('id, role, is_manual, manual_name, profile:profiles(full_name)')
         .eq('mess_id', messId)
         .eq('status', 'active')
         .order('role', { ascending: true });

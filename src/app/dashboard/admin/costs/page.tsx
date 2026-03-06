@@ -79,7 +79,7 @@ export default function CostsPage() {
         queryKey: ['individual-costs', ctx?.cycleId],
         queryFn: async () => {
             if (!ctx) return [];
-            const { data } = await supabase.from('individual_costs').select('*, member:mess_members(*, profile:profiles(full_name))').eq('cycle_id', ctx.cycleId).order('created_at', { ascending: false });
+            const { data } = await supabase.from('individual_costs').select('*, member:mess_members(*, is_manual, manual_name, profile:profiles(full_name))').eq('cycle_id', ctx.cycleId).order('created_at', { ascending: false });
             return data || [];
         },
         enabled: !!ctx,
@@ -90,7 +90,7 @@ export default function CostsPage() {
         queryKey: ['members-list', ctx?.messId],
         queryFn: async () => {
             if (!ctx) return [];
-            const { data } = await supabase.from('mess_members').select('id, role, profile:profiles(full_name)').eq('mess_id', ctx.messId).eq('status', 'active');
+            const { data } = await supabase.from('mess_members').select('id, role, is_manual, manual_name, profile:profiles(full_name)').eq('mess_id', ctx.messId).eq('status', 'active');
             return data || [];
         },
         enabled: !!ctx,
@@ -142,7 +142,11 @@ export default function CostsPage() {
                 const member = members.find((m: Record<string, unknown>) => m.id === exportMember);
                 if (!member) { toast.error('Member not found'); return; }
 
-                const profile = (member as Record<string, unknown>).profile as Record<string, unknown>;
+                const isManual = Boolean((member as Record<string, unknown>).is_manual);
+                const memberName = isManual
+                    ? ((member as Record<string, unknown>).manual_name as string)
+                    : (((member as Record<string, unknown>).profile as Record<string, unknown>)?.full_name as string || 'Unknown');
+
                 const balance = await getMemberBalance(exportMember, ctx.cycleId);
 
                 // Fetch deposits for this member
@@ -191,7 +195,7 @@ export default function CostsPage() {
 
                 const bal = balance as Record<string, unknown>;
                 const memberCostData = {
-                    memberName: (profile?.full_name as string) || 'Unknown',
+                    memberName,
                     totalMeals: Number(bal.totalMeals) || 0,
                     mealRate: Number(bal.mealRate) || 0,
                     mealCost: Number(bal.mealCost) || 0,
@@ -301,7 +305,9 @@ export default function CostsPage() {
                                         <div>
                                             <p className="font-medium text-sm">{c.description as string}</p>
                                             <p className="text-xs text-muted-foreground">
-                                                {((c.member as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string || 'Member'}
+                                                {Boolean((c.member as Record<string, unknown>)?.is_manual)
+                                                    ? ((c.member as Record<string, unknown>)?.manual_name as string)
+                                                    : (((c.member as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string || 'Member')}
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -365,7 +371,7 @@ export default function CostsPage() {
                                 <SelectContent>
                                     {(membersQuery.data || []).map((m: Record<string, unknown>) => (
                                         <SelectItem key={m.id as string} value={m.id as string}>
-                                            {(m.profile as Record<string, unknown>)?.full_name as string || 'Unknown'}
+                                            {Boolean(m.is_manual) ? (m.manual_name as string) : ((m.profile as Record<string, unknown>)?.full_name as string || 'Unknown')}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -410,7 +416,7 @@ export default function CostsPage() {
                                     </SelectItem>
                                     {(membersQuery.data || []).map((m: Record<string, unknown>) => (
                                         <SelectItem key={m.id as string} value={m.id as string}>
-                                            {(m.profile as Record<string, unknown>)?.full_name as string || 'Unknown'}
+                                            {Boolean(m.is_manual) ? (m.manual_name as string) : ((m.profile as Record<string, unknown>)?.full_name as string || 'Unknown')}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

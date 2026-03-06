@@ -46,7 +46,7 @@ async function fetchMealComparison(cycleId: string, messId: string): Promise<Mem
     const [membersRes, mealsRes] = await Promise.all([
         supabase
             .from('mess_members')
-            .select('id, profile:profiles(full_name)')
+            .select('id, is_manual, manual_name, profile:profiles(full_name)')
             .eq('mess_id', messId)
             .eq('status', 'active'),
         supabase
@@ -75,7 +75,8 @@ async function fetchMealComparison(cycleId: string, messId: string): Promise<Mem
 
     const chartData: MemberMealData[] = members.map((member) => {
         const profile = member.profile as unknown as { full_name: string } | null;
-        const name = profile?.full_name || 'Unknown';
+        const isManual = Boolean(member.is_manual);
+        const name = isManual ? (member.manual_name as string) : (profile?.full_name || 'Unknown');
         return {
             name,
             meals: memberMeals[member.id] || 0,

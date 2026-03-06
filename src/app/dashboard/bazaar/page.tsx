@@ -209,7 +209,9 @@ export default function BazaarPage() {
                                                 <Calendar className="h-3 w-3" />
                                                 {new Date(expense.expense_date as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                 {' · '}
-                                                {((expense.shopper as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string || 'Shopper'}
+                                                {Boolean(((expense.shopper as Record<string, unknown>) || {}).is_manual)
+                                                    ? (((expense.shopper as Record<string, unknown>) || {}).manual_name as string)
+                                                    : ((((expense.shopper as Record<string, unknown>)?.profile as Record<string, unknown>)?.full_name as string) || 'Shopper')}
                                             </p>
                                         </div>
                                     </div>

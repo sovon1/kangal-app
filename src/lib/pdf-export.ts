@@ -15,7 +15,7 @@ export async function downloadFullMessReport(
 ) {
     // 1. Fetch Basic Info
     const [membersRes, cycleRes, messRes, fixedRes] = await Promise.all([
-        supabase.from('mess_members').select('id, role, profile:profiles(full_name)').eq('mess_id', messId).eq('status', 'active'),
+        supabase.from('mess_members').select('id, role, is_manual, manual_name, profile:profiles(full_name)').eq('mess_id', messId).eq('status', 'active'),
         supabase.from('mess_cycles').select('name, start_date, end_date').eq('id', cycleId).single(),
         supabase.from('messes').select('name').eq('id', messId).single(),
         supabase.from('fixed_costs').select('*').eq('cycle_id', cycleId),
@@ -44,8 +44,11 @@ export async function downloadFullMessReport(
             const bazaarSpent = (bazaarData || []).reduce((s: number, e: any) => s + Number(e.total_amount), 0);
             const bal = balance as any;
 
+            const isManual = Boolean(m.is_manual);
+            const memberName = isManual ? (m.manual_name as string) : (profile?.full_name || 'Unknown');
+
             return {
-                memberName: profile?.full_name || 'Unknown',
+                memberName,
                 totalMeals: Number(bal.totalMeals) || 0,
                 mealRate: Number(bal.mealRate) || 0,
                 mealCost: Number(bal.mealCost) || 0,
