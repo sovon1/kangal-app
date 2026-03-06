@@ -129,24 +129,36 @@ export function Navbar({ userName = 'User', userRole = 'member' }: NavbarProps) 
                         <span className="sr-only">Toggle theme</span>
                     </Button>
 
-                    {/* User Menu */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-9 gap-2 px-2">
-                                <Avatar className="h-7 w-7">
-                                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
+                            <Button variant="ghost" className="h-9 gap-2 px-2 hover:bg-accent/50 transition-colors">
+                                <Avatar className="h-7 w-7 ring-2 ring-primary/20 ring-offset-1 ring-offset-background">
+                                    <AvatarFallback className="text-xs bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-bold">
                                         {initials}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span className="hidden sm:inline text-sm font-medium max-w-[120px] truncate">
-                                    {userName}
-                                </span>
+                                <div className="hidden sm:flex items-center gap-2">
+                                    <span className="text-sm font-semibold max-w-[120px] truncate">
+                                        {userName}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-amber-500 to-amber-300 text-amber-950 shadow-sm shadow-amber-500/20">
+                                        PRO
+                                    </span>
+                                </div>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem className="text-xs text-muted-foreground" disabled>
-                                {userRole === 'manager' ? '👑 Manager' : userRole === 'cook' ? '👨‍🍳 Cook' : '👤 Member'}
-                            </DropdownMenuItem>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <div className="flex flex-col space-y-1 p-2">
+                                <p className="text-sm font-medium leading-none">{userName}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <p className="text-xs text-muted-foreground">
+                                        {userRole === 'manager' ? '👑 Manager' : userRole === 'cook' ? '👨‍🍳 Cook' : '👤 Member'}
+                                    </p>
+                                    <span className="px-1 py-0 rounded-[3px] text-[8px] font-bold bg-gradient-to-r from-amber-500 to-amber-300 text-amber-950 uppercase tracking-wider">
+                                        Pro Member
+                                    </span>
+                                </div>
+                            </div>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
                                 <Settings className="mr-2 h-4 w-4" />
@@ -171,15 +183,28 @@ export function Navbar({ userName = 'User', userRole = 'member' }: NavbarProps) 
                             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                             <div className="flex flex-col h-full">
                                 <div className="flex items-center justify-between p-4 border-b">
-                                    <div className="flex items-center gap-2 font-bold">
-                                        <Utensils className="h-5 w-5 text-primary" />
+                                    <div className="flex items-center gap-2 font-bold text-lg">
+                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20">
+                                            <Utensils className="h-4 w-4 text-primary" />
+                                        </div>
                                         KANGAL
                                     </div>
                                     <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)}>
                                         <X className="h-4 w-4" />
                                     </Button>
                                 </div>
-                                <nav className="flex-1 p-3 space-y-1">
+                                <div className="px-4 py-3 bg-muted/30 border-b flex flex-col gap-1">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-semibold truncate">{userName}</span>
+                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-amber-500 to-amber-300 text-amber-950 shadow-sm">
+                                            PRO
+                                        </span>
+                                    </div>
+                                    <span className="text-xs text-muted-foreground capitalize">
+                                        {userRole} Account
+                                    </span>
+                                </div>
+                                <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
                                     {navItems.map((item) => (
                                         <NavLink key={item.href} {...item} />
                                     ))}

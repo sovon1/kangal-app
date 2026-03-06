@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { FeatureCards } from '@/components/landing/feature-cards';
+import { PricingSection } from '@/components/landing/pricing-section';
+import { FeedbackSection } from '@/components/landing/feedback-section';
+import { AppManualModal } from '@/components/landing/app-manual-modal';
 import { Utensils } from 'lucide-react';
 
 export default async function LandingPage() {
@@ -29,6 +32,17 @@ export default async function LandingPage() {
             <span className="text-2xl font-bold tracking-tight">KANGAL</span>
           </div>
           <div className="flex items-center gap-4">
+            <AppManualModal trigger={
+              <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block cursor-pointer">
+                User Manual
+              </button>
+            } />
+            <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
+              Pricing
+            </Link>
+            <Link href="#feedback" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block mr-2">
+              Feedback
+            </Link>
             {user ? (
               <Link href="/dashboard">
                 <Button>Go to Dashboard</Button>
@@ -94,11 +108,11 @@ export default async function LandingPage() {
                     Start Your Mess
                   </Button>
                 </Link>
-                <Link href="#features" className="w-full sm:w-auto">
-                  <Button variant="outline" size="lg" className="w-full h-12 px-8 text-lg">
+                <AppManualModal trigger={
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-lg cursor-pointer">
                     How it Works
                   </Button>
-                </Link>
+                } />
               </>
             )}
           </div>
@@ -120,6 +134,12 @@ export default async function LandingPage() {
           <FeatureCards />
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
+
+      {/* Feedback Section */}
+      <FeedbackSection />
 
       {/* CTA + Footer with shared background */}
       <div className="relative overflow-hidden">
