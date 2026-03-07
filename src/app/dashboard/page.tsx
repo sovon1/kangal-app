@@ -235,7 +235,7 @@ export default function DashboardPage() {
                             স্বাগতম <span className="text-primary">KANGAL</span>-এ! 🎉
                         </h1>
                         <p className="text-muted-foreground text-lg mb-2 max-w-lg mx-auto">
-                            বাংলাদেশের #1 মেস ম্যানেজমেন্ট অ্যাপ
+                            Make your messy life easier
                         </p>
                         <p className="text-muted-foreground/70 text-sm mb-8 max-w-md mx-auto">
                             শুরু করতে একটি মেসে জয়েন করুন অথবা নতুন মেস তৈরি করুন। আপনার ম্যানেজার ইতিমধ্যে এই অ্যাপ ব্যবহার করলে তার কাছ থেকে ইনভাইট কোড নিন।
