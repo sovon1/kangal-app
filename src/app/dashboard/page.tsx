@@ -23,7 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, ArrowRight, TrendingUp, CalendarDays, Loader2, Copy, Check } from 'lucide-react';
+import { Plus, ArrowRight, TrendingUp, CalendarDays, Loader2, Copy, Check, BookOpen, Users, Sparkles, Rocket, ShoppingCart, Wallet, Calculator } from 'lucide-react';
 import { toast } from 'sonner';
 import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals';
 import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
@@ -211,27 +211,104 @@ export default function DashboardPage() {
 
     // ============ WELCOME STATE (no mess) ============
     if (!userContext && !contextLoading) {
+        const manualSteps = [
+            { icon: Users, title: 'মেস তৈরি করুন বা জয়েন করুন', subtitle: 'Create or Join a Mess', desc: 'একজন ম্যানেজার মেস তৈরি করবেন এবং তারপর বাকি সবাই কোড দিয়ে জয়েন করবেন।', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+            { icon: Wallet, title: 'টাকা জমা দিন', subtitle: 'Deposit Money', desc: 'প্রতিটি সদস্য তাদের মাসিক ডিপোজিট জমা দেবেন। সব হিসাব অটোমেটিক!', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+            { icon: ShoppingCart, title: 'বাজার করুন', subtitle: 'Daily Bazaar', desc: 'বাজারের খরচ আইটেম বাই আইটেম এড করুন।', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+            { icon: CalendarDays, title: 'মিল দিন', subtitle: 'Log Your Meals', desc: 'প্রতিদিন সকাল, দুপুর, রাতের মিল ট্র্যাক করুন।', color: 'text-purple-500', bg: 'bg-purple-500/10' },
+            { icon: Calculator, title: 'অটো হিসাব', subtitle: 'Auto Calculation', desc: 'মাস শেষে কে কত পাবে, কে কত দেবে — সব অটো! 🎉', color: 'text-rose-500', bg: 'bg-rose-500/10' },
+        ];
+
         return (
-            <div className="space-y-6">
-                <div className="text-center py-16">
-                    <div className="mx-auto w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
-                        <CalendarDays className="h-10 w-10 text-primary" />
-                    </div>
-                    <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome to KANGAL</h1>
-                    <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-                        Join or create a mess to start tracking meals, expenses, and finances.
-                    </p>
-                    <div className="flex items-center justify-center gap-3">
-                        <Button size="lg" className="gap-2" onClick={() => setCreateOpen(true)}>
-                            <Plus className="h-4 w-4" />
-                            Create a Mess
-                        </Button>
-                        <Button variant="outline" size="lg" className="gap-2" onClick={() => setJoinOpen(true)}>
-                            <ArrowRight className="h-4 w-4" />
-                            Join with Code
-                        </Button>
+            <div className="space-y-8">
+                {/* ======== HERO WELCOME SECTION ======== */}
+                <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
+                    {/* Decorative background elements */}
+                    <div className="absolute top-4 right-8 text-6xl opacity-10 animate-bounce" style={{ animationDuration: '3s' }}>🐐</div>
+                    <div className="absolute bottom-4 left-8 text-4xl opacity-10 animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🍛</div>
+
+                    <div className="px-6 py-12 md:px-12 text-center relative z-10">
+                        <div className="mx-auto w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 hover:scale-110 transition-transform duration-300">
+                            <span className="text-4xl">🐐</span>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">
+                            স্বাগতম <span className="text-primary">KANGAL</span>-এ! 🎉
+                        </h1>
+                        <p className="text-muted-foreground text-lg mb-2 max-w-lg mx-auto">
+                            বাংলাদেশের #1 মেস ম্যানেজমেন্ট অ্যাপ
+                        </p>
+                        <p className="text-muted-foreground/70 text-sm mb-8 max-w-md mx-auto">
+                            শুরু করতে একটি মেসে জয়েন করুন অথবা নতুন মেস তৈরি করুন। আপনার ম্যানেজার ইতিমধ্যে এই অ্যাপ ব্যবহার করলে তার কাছ থেকে ইনভাইট কোড নিন।
+                        </p>
+
+                        {/* Create / Join Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+                            <button
+                                onClick={() => setCreateOpen(true)}
+                                className="group relative flex flex-col items-center gap-3 p-6 rounded-xl border border-border/60 bg-card/50 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+                            >
+                                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Plus className="h-7 w-7 text-primary" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-base">নতুন মেস তৈরি করুন</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">আপনি ম্যানেজার হলে</p>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => setJoinOpen(true)}
+                                className="group relative flex flex-col items-center gap-3 p-6 rounded-xl border border-border/60 bg-card/50 hover:bg-emerald-500/5 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5"
+                            >
+                                <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <ArrowRight className="h-7 w-7 text-emerald-500" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-base">মেসে জয়েন করুন</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">ইনভাইট কোড দিয়ে</p>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                {/* ======== USER MANUAL SECTION ======== */}
+                <Card className="border-border/50 overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 via-transparent to-amber-500/10 pb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 rounded-xl bg-primary/10">
+                                <BookOpen className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-lg">📖 কিভাবে Kangal ব্যবহার করবেন?</CardTitle>
+                                <p className="text-xs text-muted-foreground mt-0.5">৫টি সহজ ধাপে আপনার মেসের সব হিসাব গুছিয়ে ফেলুন</p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        <div className="space-y-4">
+                            {manualSteps.map((step, i) => {
+                                const StepIcon = step.icon;
+                                return (
+                                    <div key={i} className="flex items-start gap-4 p-4 rounded-xl border border-border/40 hover:border-border/80 transition-colors">
+                                        <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${step.bg} flex items-center justify-center`}>
+                                            <StepIcon className={`h-5 w-5 ${step.color}`} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-xs font-bold text-muted-foreground">ধাপ {i + 1}</span>
+                                                <span className="text-xs text-muted-foreground/60">•</span>
+                                                <span className="text-xs text-muted-foreground/60">{step.subtitle}</span>
+                                            </div>
+                                            <p className="font-semibold text-sm">{step.title}</p>
+                                            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{step.desc}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {/* ======== CREATE MESS DIALOG ======== */}
                 <Dialog open={createOpen} onOpenChange={(open) => { if (!open) handleCloseCreateDialog(); else setCreateOpen(true); }}>

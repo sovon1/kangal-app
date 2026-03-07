@@ -61,7 +61,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
     return (
         <div className="min-h-screen bg-background">
-            <Navbar userName={userName} userRole={userRole} />
+            <Navbar userName={userName} userRole={userRole} hasMess={!!messCtx} />
             <main className="max-w-7xl mx-auto px-4 py-6">
                 <MessProvider value={messCtx}>
                     {children}

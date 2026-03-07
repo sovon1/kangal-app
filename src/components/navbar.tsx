@@ -31,11 +31,14 @@ import {
     BarChart3,
     X,
     SlidersHorizontal,
+    Lock,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface NavbarProps {
     userName?: string;
     userRole?: 'manager' | 'member' | 'cook';
+    hasMess?: boolean;
 }
 
 const navItems = [
@@ -51,7 +54,7 @@ const adminItems = [
     { href: '/dashboard/admin/members', label: 'Members', icon: UserCog },
 ];
 
-export function Navbar({ userName = 'User', userRole = 'member' }: NavbarProps) {
+export function Navbar({ userName = 'User', userRole = 'member', hasMess = true }: NavbarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
@@ -72,8 +75,32 @@ export function Navbar({ userName = 'User', userRole = 'member' }: NavbarProps) 
         router.refresh();
     };
 
+    const handleLockedNavClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        toast.error('⚠️ আগে একটি মেসে জয়েন করুন অথবা নতুন মেস তৈরি করুন!', {
+            description: 'এই ফিচার ব্যবহার করতে আপনাকে অবশ্যই একটি মেসের সদস্য হতে হবে।',
+            duration: 4000,
+        });
+    };
+
     const NavLink = ({ href, label, icon: Icon }: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }) => {
         const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href);
+        const isDashboard = href === '/dashboard';
+        const isLocked = !hasMess && !isDashboard;
+
+        if (isLocked) {
+            return (
+                <button
+                    onClick={handleLockedNavClick}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-muted-foreground/50 hover:text-muted-foreground cursor-not-allowed relative group"
+                >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                    <Lock className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+            );
+        }
+
         return (
             <Link
                 href={href}
