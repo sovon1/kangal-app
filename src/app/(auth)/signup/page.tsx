@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -39,7 +39,7 @@ export default function SignupPage() {
     const { isBot, honeypotProps } = useHoneypot();
 
     // Post-signup UX states
-    const [signupPhase, setSignupPhase] = useState<'form' | 'loading' | 'celebration' | 'manual'>('form');
+    const [signupPhase, setSignupPhase] = useState<'form' | 'loading' | 'celebration' | 'manual' | 'navigating'>('form');
     const [newUserName, setNewUserName] = useState('');
 
     const handleCaptchaVerify = useCallback((token: string) => {
@@ -109,6 +109,17 @@ export default function SignupPage() {
         }
     };
 
+    // Navigation effect (must be before any early returns — rules of hooks)
+    useEffect(() => {
+        if (signupPhase === 'navigating') {
+            const timer = setTimeout(() => {
+                router.push('/dashboard');
+                router.refresh();
+            }, 400);
+            return () => clearTimeout(timer);
+        }
+    }, [signupPhase, router]);
+
     // ============ POST-SIGNUP PHASES ============
 
     // Phase 1: Full-screen loading animation
@@ -139,12 +150,20 @@ export default function SignupPage() {
                 <AnimatedBackground />
                 <WelcomeManualDialog
                     open={true}
-                    onClose={() => {
-                        router.push('/dashboard');
-                        router.refresh();
-                    }}
+                    onClose={() => setSignupPhase('navigating')}
                 />
             </div>
+        );
+    }
+
+    // Phase 4: Loading dashboard transition
+    if (signupPhase === 'navigating') {
+        return (
+            <KangalLoader
+                fullScreen
+                text="ড্যাশবোর্ড লোড হচ্ছে"
+                subtext="Preparing your dashboard..."
+            />
         );
     }
 

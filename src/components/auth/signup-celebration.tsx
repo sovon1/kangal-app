@@ -5,21 +5,15 @@ import { useEffect, useState, useRef } from 'react';
 interface Particle {
     id: number;
     x: number;
-    y: number;
-    rotation: number;
     scale: number;
-    color: string;
     emoji: string;
     velocityX: number;
     velocityY: number;
     delay: number;
+    rotation: number;
 }
 
 const CELEBRATION_EMOJIS = ['🎉', '🥳', '🎊', '✨', '🍛', '🥘', '🍚', '🐐', '⭐', '💚'];
-const CONFETTI_COLORS = [
-    '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6',
-    '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#84cc16',
-];
 
 export function SignupCelebration({
     userName,
@@ -37,31 +31,26 @@ export function SignupCelebration({
         if (particlesGenerated.current) return;
         particlesGenerated.current = true;
 
-        // Generate confetti particles
         const newParticles: Particle[] = [];
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i < 80; i++) {
             newParticles.push({
                 id: i,
                 x: Math.random() * 100,
-                y: -10 - Math.random() * 20,
-                rotation: Math.random() * 360,
-                scale: 0.5 + Math.random() * 1,
-                color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+                scale: 0.6 + Math.random() * 1.2,
                 emoji: CELEBRATION_EMOJIS[Math.floor(Math.random() * CELEBRATION_EMOJIS.length)],
-                velocityX: (Math.random() - 0.5) * 3,
-                velocityY: 2 + Math.random() * 4,
-                delay: Math.random() * 1.5,
+                velocityX: (Math.random() - 0.5) * 4,
+                velocityY: 2 + Math.random() * 5,
+                delay: Math.random() * 2,
+                rotation: Math.random() * 360,
             });
         }
         setParticles(newParticles);
 
-        // Show main content after a moment
-        const contentTimer = setTimeout(() => setShowContent(true), 400);
-        // Auto-continue after 4 seconds
+        const contentTimer = setTimeout(() => setShowContent(true), 300);
         const autoTimer = setTimeout(() => {
             setFadeOut(true);
-            setTimeout(onComplete, 500);
-        }, 4000);
+            setTimeout(onComplete, 600);
+        }, 3500);
 
         return () => {
             clearTimeout(contentTimer);
@@ -71,10 +60,16 @@ export function SignupCelebration({
 
     return (
         <div
-            className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-500 ${fadeOut ? 'opacity-0 scale-105' : 'opacity-100'}`}
-            style={{ background: 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0.85) 100%)' }}
-            onClick={() => { setFadeOut(true); setTimeout(onComplete, 500); }}
+            className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-600 ${fadeOut ? 'opacity-0 scale-110' : 'opacity-100'}`}
+            style={{
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #064e3b 100%)',
+            }}
+            onClick={() => { setFadeOut(true); setTimeout(onComplete, 600); }}
         >
+            {/* Subtle gradient orbs in background */}
+            <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+            <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+
             {/* Confetti particles */}
             {particles.map((p) => (
                 <div
@@ -82,10 +77,10 @@ export function SignupCelebration({
                     className="absolute pointer-events-none animate-confetti-fall"
                     style={{
                         left: `${p.x}%`,
-                        fontSize: `${p.scale * 1.5}rem`,
+                        fontSize: `${p.scale * 1.4}rem`,
                         animationDelay: `${p.delay}s`,
-                        animationDuration: `${2 + p.velocityY * 0.5}s`,
-                        '--confetti-x': `${p.velocityX * 40}px`,
+                        animationDuration: `${2.5 + p.velocityY * 0.4}s`,
+                        '--confetti-x': `${p.velocityX * 50}px`,
                         '--confetti-rotation': `${p.rotation + 720}deg`,
                     } as React.CSSProperties}
                 >
@@ -95,36 +90,36 @@ export function SignupCelebration({
 
             {/* Main celebration content */}
             <div
-                className={`relative text-center px-8 py-12 transition-all duration-700 ${showContent
+                className={`relative text-center px-8 py-12 max-w-md transition-all duration-700 ${showContent
                     ? 'opacity-100 translate-y-0 scale-100'
-                    : 'opacity-0 translate-y-8 scale-90'
+                    : 'opacity-0 translate-y-10 scale-90'
                     }`}
             >
-                {/* Large emoji burst */}
-                <div className="text-8xl mb-6 animate-bounce" style={{ animationDuration: '1s' }}>
+                {/* Large emoji */}
+                <div className="text-7xl md:text-8xl mb-8 animate-bounce" style={{ animationDuration: '0.8s' }}>
                     🎉
                 </div>
 
                 {/* Welcome text */}
-                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
-                    স্বাগতম, {userName}!
+                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight leading-tight">
+                    স্বাগতম, <span className="text-emerald-400">{userName}</span>!
                 </h1>
-                <p className="text-xl text-emerald-300 font-medium mb-2">
+                <p className="text-lg md:text-xl text-emerald-300/90 font-semibold mb-3">
                     Welcome to KANGAL 🐐
                 </p>
-                <p className="text-white/60 text-sm mb-8">
-                    বাংলাদেশের #1 মেস ম্যানেজমেন্ট অ্যাপে আপনাকে স্বাগত
+                <p className="text-white/50 text-sm mb-10">
+                    Make your messy life easier
                 </p>
 
-                {/* Pulsing ring */}
-                <div className="absolute inset-0 -z-10 flex items-center justify-center">
-                    <div className="w-64 h-64 rounded-full border-2 border-emerald-500/20 animate-ping" style={{ animationDuration: '2s' }} />
-                    <div className="absolute w-80 h-80 rounded-full border border-emerald-500/10 animate-ping" style={{ animationDuration: '3s' }} />
+                {/* Glowing rings */}
+                <div className="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
+                    <div className="w-56 h-56 rounded-full border-2 border-emerald-400/20 animate-ping" style={{ animationDuration: '2.5s' }} />
+                    <div className="absolute w-72 h-72 rounded-full border border-emerald-400/10 animate-ping" style={{ animationDuration: '3.5s' }} />
                 </div>
 
                 {/* Tap to continue */}
-                <p className="text-white/40 text-xs animate-pulse">
-                    tap anywhere to continue
+                <p className="text-white/30 text-xs animate-pulse tracking-wide">
+                    TAP ANYWHERE TO CONTINUE
                 </p>
             </div>
 
@@ -133,6 +128,9 @@ export function SignupCelebration({
                     0% {
                         transform: translateY(-20vh) translateX(0) rotate(0deg);
                         opacity: 1;
+                    }
+                    80% {
+                        opacity: 0.8;
                     }
                     100% {
                         transform: translateY(110vh) translateX(var(--confetti-x)) rotate(var(--confetti-rotation));
