@@ -16,6 +16,7 @@ import { Utensils, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { AnimatedBackground } from '@/components/auth/animated-background';
 import { TurnstileCaptcha } from '@/components/auth/turnstile-captcha';
 import { useHoneypot } from '@/hooks/use-honeypot';
+import { KangalLoader } from '@/components/kangal-loader';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -33,6 +34,7 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    const [showLoader, setShowLoader] = useState(false);
     const { isBot, honeypotProps } = useHoneypot();
 
     const handleCaptchaVerify = useCallback((token: string) => {
@@ -79,6 +81,8 @@ export default function LoginPage() {
         }
 
         setError(null);
+        setShowLoader(true);
+
         const { error } = await supabase.auth.signInWithPassword({
             email: data.email,
             password: data.password,
@@ -90,11 +94,23 @@ export default function LoginPage() {
         if (error) {
             setError(error.message);
             setCaptchaToken(null);
+            setShowLoader(false);
         } else {
             router.push('/dashboard');
             router.refresh();
         }
     };
+
+    // Full-screen loading animation during sign-in
+    if (showLoader) {
+        return (
+            <KangalLoader
+                fullScreen
+                text="সাইন ইন হচ্ছে"
+                subtext="Signing you in..."
+            />
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">

@@ -16,6 +16,9 @@ import { Utensils, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { AnimatedBackground } from '@/components/auth/animated-background';
 import { TurnstileCaptcha } from '@/components/auth/turnstile-captcha';
 import { useHoneypot } from '@/hooks/use-honeypot';
+import { KangalLoader } from '@/components/kangal-loader';
+import { SignupCelebration } from '@/components/auth/signup-celebration';
+import { WelcomeManualDialog } from '@/components/auth/welcome-manual-dialog';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -34,6 +37,10 @@ export default function SignupPage() {
     const [googleLoading, setGoogleLoading] = useState(false);
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const { isBot, honeypotProps } = useHoneypot();
+
+    // Post-signup UX states
+    const [signupPhase, setSignupPhase] = useState<'form' | 'loading' | 'celebration' | 'manual'>('form');
+    const [newUserName, setNewUserName] = useState('');
 
     const handleCaptchaVerify = useCallback((token: string) => {
         setCaptchaToken(token);
@@ -79,6 +86,8 @@ export default function SignupPage() {
         }
 
         setError(null);
+        setSignupPhase('loading');
+
         const { error } = await supabase.auth.signUp({
             email: data.email,
             password: data.password,
@@ -93,12 +102,53 @@ export default function SignupPage() {
         if (error) {
             setError(error.message);
             setCaptchaToken(null);
+            setSignupPhase('form');
         } else {
-            router.push('/dashboard');
-            router.refresh();
+            setNewUserName(data.fullName);
+            setSignupPhase('celebration');
         }
     };
 
+    // ============ POST-SIGNUP PHASES ============
+
+    // Phase 1: Full-screen loading animation
+    if (signupPhase === 'loading') {
+        return (
+            <KangalLoader
+                fullScreen
+                text="আপনার অ্যাকাউন্ট তৈরি হচ্ছে"
+                subtext="Creating your account..."
+            />
+        );
+    }
+
+    // Phase 2: Celebration screen
+    if (signupPhase === 'celebration') {
+        return (
+            <SignupCelebration
+                userName={newUserName}
+                onComplete={() => setSignupPhase('manual')}
+            />
+        );
+    }
+
+    // Phase 3: Welcome manual dialog (over the form background)
+    if (signupPhase === 'manual') {
+        return (
+            <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
+                <AnimatedBackground />
+                <WelcomeManualDialog
+                    open={true}
+                    onClose={() => {
+                        router.push('/dashboard');
+                        router.refresh();
+                    }}
+                />
+            </div>
+        );
+    }
+
+    // ============ SIGNUP FORM ============
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
             <AnimatedBackground />
