@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Utensils, Loader2, ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
+import { TurnstileCaptcha } from '@/components/auth/turnstile-captcha';
+import { useHoneypot } from '@/hooks/use-honeypot';
 
 export default function ForgotPasswordPage() {
     const supabase = getSupabaseBrowserClient();
@@ -16,22 +18,46 @@ export default function ForgotPasswordPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    const { isBot, honeypotProps } = useHoneypot();
+
+    const handleCaptchaVerify = useCallback((token: string) => {
+        setCaptchaToken(token);
+    }, []);
+
+    const handleCaptchaExpire = useCallback(() => {
+        setCaptchaToken(null);
+    }, []);
 
     const handleReset = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Honeypot check — silently reject bots
+        if (isBot()) {
+            setSent(true);
+            return;
+        }
+
         if (!email.trim()) { setError('Please enter your email'); return; }
+
+        if (!captchaToken) {
+            setError('Please complete the CAPTCHA verification.');
+            return;
+        }
 
         setLoading(true);
         setError(null);
 
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
             redirectTo: `${window.location.origin}/reset-password`,
+            captchaToken,
         });
 
         setLoading(false);
 
         if (error) {
             setError(error.message);
+            setCaptchaToken(null);
         } else {
             setSent(true);
         }
@@ -96,7 +122,17 @@ export default function ForgotPasswordPage() {
                                 </div>
                             </div>
 
-                            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+                            {/* Honeypot field — hidden from real users, traps bots */}
+                            <input {...honeypotProps} />
+
+                            {/* Cloudflare Turnstile CAPTCHA */}
+                            <TurnstileCaptcha
+                                onVerify={handleCaptchaVerify}
+                                onExpire={handleCaptchaExpire}
+                                className="my-2"
+                            />
+
+                            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading || !captchaToken}>
                                 {loading ? (
                                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
                                 ) : (

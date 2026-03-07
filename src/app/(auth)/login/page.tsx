@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -14,6 +14,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Utensils, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { AnimatedBackground } from '@/components/auth/animated-background';
+import { TurnstileCaptcha } from '@/components/auth/turnstile-captcha';
+import { useHoneypot } from '@/hooks/use-honeypot';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -30,6 +32,16 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [googleLoading, setGoogleLoading] = useState(false);
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    const { isBot, honeypotProps } = useHoneypot();
+
+    const handleCaptchaVerify = useCallback((token: string) => {
+        setCaptchaToken(token);
+    }, []);
+
+    const handleCaptchaExpire = useCallback(() => {
+        setCaptchaToken(null);
+    }, []);
 
     const handleGoogleSignIn = async () => {
         setGoogleLoading(true);
@@ -55,14 +67,29 @@ export default function LoginPage() {
     });
 
     const onSubmit = async (data: LoginInput) => {
+        // Honeypot check — silently reject bots
+        if (isBot()) {
+            router.push('/dashboard');
+            return;
+        }
+
+        if (!captchaToken) {
+            setError('Please complete the CAPTCHA verification.');
+            return;
+        }
+
         setError(null);
         const { error } = await supabase.auth.signInWithPassword({
             email: data.email,
             password: data.password,
+            options: {
+                captchaToken,
+            },
         });
 
         if (error) {
             setError(error.message);
+            setCaptchaToken(null);
         } else {
             router.push('/dashboard');
             router.refresh();
@@ -93,6 +120,9 @@ export default function LoginPage() {
                                 <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
+
+                        {/* Honeypot field — hidden from real users, traps bots */}
+                        <input {...honeypotProps} />
 
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
@@ -139,10 +169,17 @@ export default function LoginPage() {
                             )}
                         </div>
 
+                        {/* Cloudflare Turnstile CAPTCHA */}
+                        <TurnstileCaptcha
+                            onVerify={handleCaptchaVerify}
+                            onExpire={handleCaptchaExpire}
+                            className="my-2"
+                        />
+
                         <Button
                             type="submit"
                             className="w-full h-11 text-base font-semibold"
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || !captchaToken}
                         >
                             {isSubmitting ? (
                                 <>
