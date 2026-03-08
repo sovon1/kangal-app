@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "com.kangal.app.twa.app-merged_res-25:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.kangal.app.twa.app-main-26:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.kangal.app.twa.app-merged_res-25:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.kangal.app.twa.app-main-26:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.kangal.app.twa.app-merged_res-25:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.kangal.app.twa.app-main-26:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.kangal.app.twa.app-merged_res-25:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.kangal.app.twa.app-main-26:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.kangal.app.twa.app-merged_res-25:/drawable_splash.xml.flat",
+        "source": "com.kangal.app.twa.app-main-26:/drawable/splash.xml"
+    },
+    {
+        "merged": "com.kangal.app.twa.app-merged_res-25:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.kangal.app.twa.app-main-26:/mipmap-mdpi/ic_launcher.png"
+    }
+]

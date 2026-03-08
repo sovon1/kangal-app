@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.browser.customtabs.CustomTabsIntent;
-
 /**
- * Handles deep links from kangal.software URLs and opens them in the TWA.
+ * Handles deep links — redirects kangal.software URLs to the main TWA launcher.
  */
 public class HandleUrlActivity extends Activity {
 
@@ -15,17 +13,8 @@ public class HandleUrlActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Uri uri = getIntent().getData();
-        if (uri == null) {
-            uri = Uri.parse("https://kangal.software");
-        }
-
-        // Open the URL in Chrome Custom Tab (TWA)
-        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
-                .setColorScheme(CustomTabsIntent.COLOR_SCHEME_DARK)
-                .build();
-        customTabsIntent.launchUrl(this, uri);
-        
+        // Just finish — the LauncherActivity handles everything
+        // Deep links to kangal.software will be handled by Chrome automatically
         finish();
     }
 }

@@ -1,0 +1,196 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.kangal.app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:4:5-67
+11-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:4:22-64
+12
+13    <queries>
+13-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:22:5-30:15
+14        <intent>
+14-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:23:9-29:18
+15            <action android:name="android.intent.action.VIEW" />
+15-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:24:13-65
+15-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:24:21-62
+16
+17            <category android:name="android.intent.category.BROWSABLE" />
+17-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:26:13-74
+17-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:26:23-71
+18
+19            <data android:scheme="https" />
+19-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:28:13-44
+19-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\7c1b199980ca654bb5d2533d53c89417\transformed\jetified-androidbrowserhelper-2.6.2\AndroidManifest.xml:28:19-41
+20        </intent>
+21    </queries>
+22
+23    <permission
+23-->[androidx.core:core:1.13.0] C:\Users\sovon\.gradle\caches\transforms-3\804bc4569c426f48e0736cb992bb4b82\transformed\core-1.13.0\AndroidManifest.xml:22:5-24:47
+24        android:name="com.kangal.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+24-->[androidx.core:core:1.13.0] C:\Users\sovon\.gradle\caches\transforms-3\804bc4569c426f48e0736cb992bb4b82\transformed\core-1.13.0\AndroidManifest.xml:23:9-81
+25        android:protectionLevel="signature" />
+25-->[androidx.core:core:1.13.0] C:\Users\sovon\.gradle\caches\transforms-3\804bc4569c426f48e0736cb992bb4b82\transformed\core-1.13.0\AndroidManifest.xml:24:9-44
+26
+27    <uses-permission android:name="com.kangal.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+27-->[androidx.core:core:1.13.0] C:\Users\sovon\.gradle\caches\transforms-3\804bc4569c426f48e0736cb992bb4b82\transformed\core-1.13.0\AndroidManifest.xml:26:5-97
+27-->[androidx.core:core:1.13.0] C:\Users\sovon\.gradle\caches\transforms-3\804bc4569c426f48e0736cb992bb4b82\transformed\core-1.13.0\AndroidManifest.xml:26:22-94
+28
+29    <application
+29-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:6:5-55:19
+30        android:allowBackup="true"
+30-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:7:9-35
+31        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+31-->[androidx.core:core:1.13.0] C:\Users\sovon\.gradle\caches\transforms-3\804bc4569c426f48e0736cb992bb4b82\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
+32        android:extractNativeLibs="false"
+33        android:icon="@mipmap/ic_launcher"
+33-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:8:9-43
+34        android:label="KANGAL"
+34-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:9:9-31
+35        android:supportsRtl="true"
+35-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:10:9-35
+36        android:theme="@style/Theme.KangalTWA" >
+36-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:11:9-47
+37
+38        <!-- TWA Launcher Activity (from androidbrowserhelper) -->
+39        <activity
+39-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:14:9-48:20
+40            android:name="com.kangal.app.twa.LauncherActivity"
+40-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:15:13-45
+41            android:exported="true"
+41-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:16:13-36
+42            android:label="KANGAL"
+42-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:17:13-35
+43            android:theme="@style/Theme.KangalTWA.Launch" >
+43-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:18:13-58
+44            <intent-filter>
+44-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:19:13-22:29
+45                <action android:name="android.intent.action.MAIN" />
+45-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:20:17-69
+45-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:20:25-66
+46
+47                <category android:name="android.intent.category.LAUNCHER" />
+47-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:21:17-77
+47-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:21:27-74
+48            </intent-filter>
+49
+50            <!-- TWA Configuration -->
+51            <meta-data
+51-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:25:13-27:59
+52                android:name="android.support.customtabs.trusted.DEFAULT_URL"
+52-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:26:17-78
+53                android:value="https://kangal.software" />
+53-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:27:17-56
+54            <meta-data
+54-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:29:13-31:56
+55                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+55-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:30:17-83
+56                android:resource="@color/status_bar" />
+56-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:31:17-53
+57            <meta-data
+57-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:33:13-35:53
+58                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+58-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:34:17-87
+59                android:resource="@color/nav_bar" />
+59-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:35:17-50
+60            <meta-data
+60-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:37:13-39:55
+61                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+61-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:38:17-97
+62                android:resource="@color/splash_bg" />
+62-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:39:17-52
+63            <meta-data
+63-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:41:13-43:55
+64                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+64-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:42:17-88
+65                android:resource="@drawable/splash" />
+65-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:43:17-52
+66            <meta-data
+66-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:45:13-47:44
+67                android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+67-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:46:17-85
+68                android:value="portrait" />
+68-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:47:17-41
+69        </activity>
+70
+71        <!-- Digital Asset Links: tells Chrome to trust this app for kangal.software -->
+72        <meta-data
+72-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:51:9-53:161
+73            android:name="asset_statements"
+73-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:52:13-44
+74            android:value="[{&quot;relation&quot;: [&quot;delegate_permission/common.handle_all_urls&quot;], &quot;target&quot;: {&quot;namespace&quot;: &quot;web&quot;, &quot;site&quot;: &quot;https://kangal.software&quot;}}]" />
+74-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:53:13-158
+75
+76        <provider
+76-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+77            android:name="androidx.startup.InitializationProvider"
+77-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:25:13-67
+78            android:authorities="com.kangal.app.androidx-startup"
+78-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:26:13-68
+79            android:exported="false" >
+79-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:27:13-37
+80            <meta-data
+80-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+81                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+81-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:30:17-75
+82                android:value="androidx.startup" />
+82-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sovon\.gradle\caches\transforms-3\c04ee5eaa1d704c39f56a2cfaef0a0f6\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:31:17-49
+83            <meta-data
+83-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\5d57ba782ca658578f7668d400320cc3\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+84                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+84-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\5d57ba782ca658578f7668d400320cc3\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+85                android:value="androidx.startup" />
+85-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\sovon\.gradle\caches\transforms-3\5d57ba782ca658578f7668d400320cc3\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+86            <meta-data
+86-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+87                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+88                android:value="androidx.startup" />
+88-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+89        </provider>
+90
+91        <receiver
+91-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+92            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+92-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+93            android:directBootAware="false"
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+94            android:enabled="true"
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+95            android:exported="true"
+95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+96            android:permission="android.permission.DUMP" >
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+97            <intent-filter>
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+98                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+99            </intent-filter>
+100            <intent-filter>
+100-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+101                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+102            </intent-filter>
+103            <intent-filter>
+103-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+104                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+104-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+104-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+105            </intent-filter>
+106            <intent-filter>
+106-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+107                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+107-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+107-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sovon\.gradle\caches\transforms-3\5beebbddae88391b0ffe0c8c0d9cfd02\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+108            </intent-filter>
+109        </receiver>
+110    </application>
+111
+112</manifest>
