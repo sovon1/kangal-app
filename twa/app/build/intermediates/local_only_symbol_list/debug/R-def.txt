@@ -1,0 +1,7 @@
+R_DEF: Internal format may change without notice
+local
+color splash_bg
+drawable splash
+string app_name
+style Theme.KangalTWA
+style Theme.KangalTWA.Launch

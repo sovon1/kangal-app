@@ -1,0 +1,20 @@
+com.kangal.app.twa.app-lifecycle-viewmodel-2.5.1-0 C:\Users\sovon\.gradle\caches\transforms-3\221521318da4b7edab777ff9456ead8b\transformed\lifecycle-viewmodel-2.5.1\res
+com.kangal.app.twa.app-activity-1.5.1-1 C:\Users\sovon\.gradle\caches\transforms-3\5b05aded624d9b98eff1345076a342ba\transformed\activity-1.5.1\res
+com.kangal.app.twa.app-lifecycle-runtime-2.5.1-2 C:\Users\sovon\.gradle\caches\transforms-3\6cf9eeeeae7081bd0bc281a37d2f9468\transformed\lifecycle-runtime-2.5.1\res
+com.kangal.app.twa.app-annotation-experimental-1.4.0-3 C:\Users\sovon\.gradle\caches\transforms-3\7ca9ea812e99ba2dc02f76dda14a257e\transformed\annotation-experimental-1.4.0\res
+com.kangal.app.twa.app-core-1.8.0-4 C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\res
+com.kangal.app.twa.app-play-services-auth-21.5.1-5 C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\res
+com.kangal.app.twa.app-lifecycle-livedata-core-2.5.1-6 C:\Users\sovon\.gradle\caches\transforms-3\a015e083698d0626c99ae0175787a448\transformed\lifecycle-livedata-core-2.5.1\res
+com.kangal.app.twa.app-play-services-basement-18.9.0-7 C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\res
+com.kangal.app.twa.app-browser-1.8.0-8 C:\Users\sovon\.gradle\caches\transforms-3\a39796a7b99010b721e62031411f3a33\transformed\browser-1.8.0\res
+com.kangal.app.twa.app-fragment-1.5.7-9 C:\Users\sovon\.gradle\caches\transforms-3\dfa803856826453d0561c27f67e503ee\transformed\fragment-1.5.7\res
+com.kangal.app.twa.app-play-services-base-18.5.0-10 C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\res
+com.kangal.app.twa.app-savedstate-1.2.0-11 C:\Users\sovon\.gradle\caches\transforms-3\e5ecf6946ccf71e67f5a7739914fc807\transformed\savedstate-1.2.0\res
+com.kangal.app.twa.app-lifecycle-viewmodel-savedstate-2.5.1-12 C:\Users\sovon\.gradle\caches\transforms-3\f7b7f983ff8670d3a5bccf1d1fddea9d\transformed\lifecycle-viewmodel-savedstate-2.5.1\res
+com.kangal.app.twa.app-pngs-13 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\build\generated\res\pngs\debug
+com.kangal.app.twa.app-resValues-14 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\build\generated\res\resValues\debug
+com.kangal.app.twa.app-packageDebugResources-15 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.kangal.app.twa.app-packageDebugResources-16 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.kangal.app.twa.app-merged_res-17 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\build\intermediates\merged_res\debug
+com.kangal.app.twa.app-debug-18 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\debug\res
+com.kangal.app.twa.app-main-19 C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\res

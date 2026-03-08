@@ -1,0 +1,194 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.kangal.app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:4:5-67
+11-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:4:22-64
+12
+13    <application
+13-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:6:5-80:19
+14        android:allowBackup="true"
+14-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:7:9-35
+15        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+15-->[androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:24:18-86
+16        android:debuggable="true"
+17        android:extractNativeLibs="false"
+18        android:icon="@mipmap/ic_launcher"
+18-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:8:9-43
+19        android:label="KANGAL"
+19-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:9:9-31
+20        android:roundIcon="@mipmap/ic_launcher_round"
+20-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:10:9-54
+21        android:supportsRtl="true"
+21-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:11:9-35
+22        android:testOnly="true"
+23        android:theme="@style/Theme.KangalTWA" >
+23-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:12:9-47
+24
+25        <!-- TWA Launcher Activity -->
+26        <activity
+26-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:15:9-57:20
+27            android:name="com.kangal.app.twa.LauncherActivity"
+27-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:16:13-45
+28            android:exported="true"
+28-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:17:13-36
+29            android:label="KANGAL"
+29-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:18:13-35
+30            android:theme="@style/Theme.KangalTWA.Launch" >
+30-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:19:13-58
+31            <intent-filter>
+31-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:20:13-23:29
+32                <action android:name="android.intent.action.MAIN" />
+32-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:21:17-69
+32-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:21:25-66
+33
+34                <category android:name="android.intent.category.LAUNCHER" />
+34-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:22:17-77
+34-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:22:27-74
+35            </intent-filter>
+36
+37            <!-- TWA Metadata -->
+38            <meta-data
+38-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:26:13-28:59
+39                android:name="android.support.customtabs.trusted.DEFAULT_URL"
+39-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:27:17-78
+40                android:value="https://kangal.software" />
+40-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:28:17-56
+41            <meta-data
+41-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:30:13-32:43
+42                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+42-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:31:17-83
+43                android:value="#09090b" />
+43-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:32:17-40
+44            <meta-data
+44-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:34:13-36:43
+45                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+45-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:35:17-87
+46                android:value="#09090b" />
+46-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:36:17-40
+47            <meta-data
+47-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:38:13-40:43
+48                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
+48-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:39:17-92
+49                android:value="#09090b" />
+49-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:40:17-40
+50            <meta-data
+50-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:42:13-44:43
+51                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
+51-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:43:17-88
+52                android:value="#09090b" />
+52-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:44:17-40
+53            <meta-data
+53-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:46:13-48:55
+54                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+54-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:47:17-88
+55                android:resource="@drawable/splash" />
+55-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:48:17-52
+56            <meta-data
+56-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:50:13-52:43
+57                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+57-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:51:17-97
+58                android:value="#09090b" />
+58-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:52:17-40
+59            <meta-data
+59-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:54:13-56:44
+60                android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+60-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:55:17-85
+61                android:value="portrait" />
+61-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:56:17-41
+62        </activity>
+63
+64        <!-- Digital Asset Links: enables full-screen TWA (no address bar) -->
+65        <!-- You MUST host /.well-known/assetlinks.json on kangal.software -->
+66        <meta-data
+66-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:61:9-63:161
+67            android:name="asset_statements"
+67-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:62:13-44
+68            android:value="[{&quot;relation&quot;: [&quot;delegate_permission/common.handle_all_urls&quot;], &quot;target&quot;: {&quot;namespace&quot;: &quot;web&quot;, &quot;site&quot;: &quot;https://kangal.software&quot;}}]" />
+68-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:63:13-158
+69
+70        <!-- Deep link intent filter for kangal.software URLs -->
+71        <activity
+71-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:66:9-78:20
+72            android:name="com.kangal.app.twa.HandleUrlActivity"
+72-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:67:13-46
+73            android:exported="true" >
+73-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:68:13-36
+74            <intent-filter android:autoVerify="true" >
+74-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:69:13-77:29
+74-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:69:28-53
+75                <action android:name="android.intent.action.VIEW" />
+75-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:70:17-69
+75-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:70:25-66
+76
+77                <category android:name="android.intent.category.DEFAULT" />
+77-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:71:17-76
+77-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:71:27-73
+78                <category android:name="android.intent.category.BROWSABLE" />
+78-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:72:17-78
+78-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:72:27-75
+79
+80                <data
+80-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:73:17-74:56
+81                    android:host="kangal.software"
+81-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:74:23-53
+82                    android:scheme="https" />
+82-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:73:23-45
+83                <data
+83-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:73:17-74:56
+84                    android:host="www.kangal.software"
+84-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:74:23-53
+85                    android:scheme="https" />
+85-->C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:73:23-45
+86            </intent-filter>
+87        </activity>
+88        <activity
+88-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:23:9-27:75
+89            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+89-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:24:13-93
+90            android:excludeFromRecents="true"
+90-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:25:13-46
+91            android:exported="false"
+91-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:26:13-37
+92            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+92-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:27:13-72
+93        <!--
+94            Service handling Google Sign-In user revocation. For apps that do not integrate with
+95            Google Sign-In, this service will never be started.
+96        -->
+97        <service
+97-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:33:9-37:51
+98            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+98-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:34:13-89
+99            android:exported="true"
+99-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:35:13-36
+100            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+100-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:36:13-107
+101            android:visibleToInstantApps="true" />
+101-->[com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:37:13-48
+102
+103        <activity
+103-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+104            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+104-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+105            android:exported="false"
+105-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+106            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+106-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+107
+108        <meta-data
+108-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:21:9-23:69
+109            android:name="com.google.android.gms.version"
+109-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:22:13-58
+110            android:value="@integer/google_play_services_version" />
+110-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:23:13-66
+111    </application>
+112
+113</manifest>

@@ -1,0 +1,270 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:2:1-81:12
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:2:1-81:12
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:2:1-81:12
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:2:1-81:12
+MERGED from [androidx.browser:browser:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\a39796a7b99010b721e62031411f3a33\transformed\browser-1.8.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:17:1-40:12
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\sovon\.gradle\caches\transforms-3\96ff9f60928ade476cf999f2ce8a383f\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\sovon\.gradle\caches\transforms-3\1edcec2f2fa5b148869c0f4ddc9d94cf\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] C:\Users\sovon\.gradle\caches\transforms-3\33a7127908b79ebd2a5588ef1d5efc56\transformed\play-services-fido-20.0.1\AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity:1.5.1] C:\Users\sovon\.gradle\caches\transforms-3\5b05aded624d9b98eff1345076a342ba\transformed\activity-1.5.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.loader:loader:1.1.0] C:\Users\sovon\.gradle\caches\transforms-3\222ddbaab048b5c318041ce21fba1d59\transformed\loader-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\221521318da4b7edab777ff9456ead8b\transformed\lifecycle-viewmodel-2.5.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\f7b7f983ff8670d3a5bccf1d1fddea9d\transformed\lifecycle-viewmodel-savedstate-2.5.1\AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\sovon\.gradle\caches\transforms-3\f629a40e2a8c15e0a0d529dbe2b8332c\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:2:1-5:12
+MERGED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:16:1-26:12
+MERGED from [androidx.fragment:fragment:1.5.7] C:\Users\sovon\.gradle\caches\transforms-3\dfa803856826453d0561c27f67e503ee\transformed\fragment-1.5.7\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core-ktx:1.2.0] C:\Users\sovon\.gradle\caches\transforms-3\4f1016fa34d34863ced599c936ac5412\transformed\core-ktx-1.2.0\AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\41c7278328c44568536312b501fc5a8b\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\0e04c00ded0ee286fdb707ac7cee4523\transformed\customview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\sovon\.gradle\caches\transforms-3\08fc100efc84a9620b7542fa7648e5ed\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\153182fad44adaed0ba316885bfa8aba\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.0] C:\Users\sovon\.gradle\caches\transforms-3\e5ecf6946ccf71e67f5a7739914fc807\transformed\savedstate-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\6cf9eeeeae7081bd0bc281a37d2f9468\transformed\lifecycle-runtime-2.5.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\1a2028a9e8089cf4c82f44fba824b19d\transformed\tracing-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\a015e083698d0626c99ae0175787a448\transformed\lifecycle-livedata-core-2.5.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\sovon\.gradle\caches\transforms-3\5006ed81768ea334aee4e3779b86bac4\transformed\core-runtime-2.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\sovon\.gradle\caches\transforms-3\7ca9ea812e99ba2dc02f76dda14a257e\transformed\annotation-experimental-1.4.0\AndroidManifest.xml:2:1-7:12
+	package
+		INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:4:5-67
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:4:22-64
+application
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:6:5-80:19
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:6:5-80:19
+MERGED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] C:\Users\sovon\.gradle\caches\transforms-3\33a7127908b79ebd2a5588ef1d5efc56\transformed\play-services-fido-20.0.1\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] C:\Users\sovon\.gradle\caches\transforms-3\33a7127908b79ebd2a5588ef1d5efc56\transformed\play-services-fido-20.0.1\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:4:5-6:19
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:4:5-6:19
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\sovon\.gradle\caches\transforms-3\f629a40e2a8c15e0a0d529dbe2b8332c\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\sovon\.gradle\caches\transforms-3\f629a40e2a8c15e0a0d529dbe2b8332c\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:20:5-24:19
+MERGED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:20:5-24:19
+MERGED from [androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\sovon\.gradle\caches\transforms-3\08fc100efc84a9620b7542fa7648e5ed\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\sovon\.gradle\caches\transforms-3\08fc100efc84a9620b7542fa7648e5ed\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:24:18-86
+	android:supportsRtl
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:11:9-35
+	android:label
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:9:9-31
+	android:roundIcon
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:10:9-54
+	android:icon
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:8:9-43
+	android:allowBackup
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:7:9-35
+	android:theme
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:12:9-47
+activity#com.kangal.app.twa.LauncherActivity
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:15:9-57:20
+	android:label
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:18:13-35
+	android:exported
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:17:13-36
+	android:theme
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:19:13-58
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:16:13-45
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:20:13-23:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:21:17-69
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:21:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:22:17-77
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:22:27-74
+meta-data#android.support.customtabs.trusted.DEFAULT_URL
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:26:13-28:59
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:28:17-56
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:27:17-78
+meta-data#android.support.customtabs.trusted.STATUS_BAR_COLOR
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:30:13-32:43
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:32:17-40
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:31:17-83
+meta-data#android.support.customtabs.trusted.NAVIGATION_BAR_COLOR
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:34:13-36:43
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:36:17-40
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:35:17-87
+meta-data#android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:38:13-40:43
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:40:17-40
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:39:17-92
+meta-data#android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:42:13-44:43
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:44:17-40
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:43:17-88
+meta-data#android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:46:13-48:55
+	android:resource
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:48:17-52
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:47:17-88
+meta-data#android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:50:13-52:43
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:52:17-40
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:51:17-97
+meta-data#android.support.customtabs.trusted.SCREEN_ORIENTATION
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:54:13-56:44
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:56:17-41
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:55:17-85
+meta-data#asset_statements
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:61:9-63:161
+	android:value
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:63:13-158
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:62:13-44
+activity#com.kangal.app.twa.HandleUrlActivity
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:66:9-78:20
+	android:exported
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:68:13-36
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:67:13-46
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:kangal.software+data:host:www.kangal.software+data:scheme:https+data:scheme:https
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:69:13-77:29
+	android:autoVerify
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:69:28-53
+action#android.intent.action.VIEW
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:70:17-69
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:70:25-66
+category#android.intent.category.DEFAULT
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:71:17-76
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:71:27-73
+category#android.intent.category.BROWSABLE
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:72:17-78
+	android:name
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:72:27-75
+data
+ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:73:17-74:56
+	android:host
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:74:23-53
+	android:scheme
+		ADDED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml:73:23-45
+uses-sdk
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+MERGED from [androidx.browser:browser:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\a39796a7b99010b721e62031411f3a33\transformed\browser-1.8.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\a39796a7b99010b721e62031411f3a33\transformed\browser-1.8.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\sovon\.gradle\caches\transforms-3\96ff9f60928ade476cf999f2ce8a383f\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\sovon\.gradle\caches\transforms-3\96ff9f60928ade476cf999f2ce8a383f\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\sovon\.gradle\caches\transforms-3\1edcec2f2fa5b148869c0f4ddc9d94cf\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\sovon\.gradle\caches\transforms-3\1edcec2f2fa5b148869c0f4ddc9d94cf\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] C:\Users\sovon\.gradle\caches\transforms-3\33a7127908b79ebd2a5588ef1d5efc56\transformed\play-services-fido-20.0.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] C:\Users\sovon\.gradle\caches\transforms-3\33a7127908b79ebd2a5588ef1d5efc56\transformed\play-services-fido-20.0.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:3:5-44
+MERGED from [androidx.activity:activity:1.5.1] C:\Users\sovon\.gradle\caches\transforms-3\5b05aded624d9b98eff1345076a342ba\transformed\activity-1.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.5.1] C:\Users\sovon\.gradle\caches\transforms-3\5b05aded624d9b98eff1345076a342ba\transformed\activity-1.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.loader:loader:1.1.0] C:\Users\sovon\.gradle\caches\transforms-3\222ddbaab048b5c318041ce21fba1d59\transformed\loader-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.loader:loader:1.1.0] C:\Users\sovon\.gradle\caches\transforms-3\222ddbaab048b5c318041ce21fba1d59\transformed\loader-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\221521318da4b7edab777ff9456ead8b\transformed\lifecycle-viewmodel-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\221521318da4b7edab777ff9456ead8b\transformed\lifecycle-viewmodel-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\f7b7f983ff8670d3a5bccf1d1fddea9d\transformed\lifecycle-viewmodel-savedstate-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\f7b7f983ff8670d3a5bccf1d1fddea9d\transformed\lifecycle-viewmodel-savedstate-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\sovon\.gradle\caches\transforms-3\f629a40e2a8c15e0a0d529dbe2b8332c\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\sovon\.gradle\caches\transforms-3\f629a40e2a8c15e0a0d529dbe2b8332c\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:18:5-43
+MERGED from [androidx.fragment:fragment:1.5.7] C:\Users\sovon\.gradle\caches\transforms-3\dfa803856826453d0561c27f67e503ee\transformed\fragment-1.5.7\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.5.7] C:\Users\sovon\.gradle\caches\transforms-3\dfa803856826453d0561c27f67e503ee\transformed\fragment-1.5.7\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-ktx:1.2.0] C:\Users\sovon\.gradle\caches\transforms-3\4f1016fa34d34863ced599c936ac5412\transformed\core-ktx-1.2.0\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.core:core-ktx:1.2.0] C:\Users\sovon\.gradle\caches\transforms-3\4f1016fa34d34863ced599c936ac5412\transformed\core-ktx-1.2.0\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\41c7278328c44568536312b501fc5a8b\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\41c7278328c44568536312b501fc5a8b\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\0e04c00ded0ee286fdb707ac7cee4523\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\0e04c00ded0ee286fdb707ac7cee4523\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.8.0] C:\Users\sovon\.gradle\caches\transforms-3\893919212d58046bdfa708d3a36ee6e5\transformed\core-1.8.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\sovon\.gradle\caches\transforms-3\08fc100efc84a9620b7542fa7648e5ed\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\sovon\.gradle\caches\transforms-3\08fc100efc84a9620b7542fa7648e5ed\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\153182fad44adaed0ba316885bfa8aba\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\153182fad44adaed0ba316885bfa8aba\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.0] C:\Users\sovon\.gradle\caches\transforms-3\e5ecf6946ccf71e67f5a7739914fc807\transformed\savedstate-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.2.0] C:\Users\sovon\.gradle\caches\transforms-3\e5ecf6946ccf71e67f5a7739914fc807\transformed\savedstate-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\6cf9eeeeae7081bd0bc281a37d2f9468\transformed\lifecycle-runtime-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\6cf9eeeeae7081bd0bc281a37d2f9468\transformed\lifecycle-runtime-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\1a2028a9e8089cf4c82f44fba824b19d\transformed\tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\sovon\.gradle\caches\transforms-3\1a2028a9e8089cf4c82f44fba824b19d\transformed\tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\a015e083698d0626c99ae0175787a448\transformed\lifecycle-livedata-core-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.5.1] C:\Users\sovon\.gradle\caches\transforms-3\a015e083698d0626c99ae0175787a448\transformed\lifecycle-livedata-core-2.5.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\sovon\.gradle\caches\transforms-3\5006ed81768ea334aee4e3779b86bac4\transformed\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\sovon\.gradle\caches\transforms-3\5006ed81768ea334aee4e3779b86bac4\transformed\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\sovon\.gradle\caches\transforms-3\7ca9ea812e99ba2dc02f76dda14a257e\transformed\annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\sovon\.gradle\caches\transforms-3\7ca9ea812e99ba2dc02f76dda14a257e\transformed\annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+	android:targetSdkVersion
+		INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\sovon\Desktop\kangal web\kangal-app\twa\app\src\main\AndroidManifest.xml
+activity#com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:23:9-27:75
+	android:excludeFromRecents
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:25:13-46
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:26:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:27:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:24:13-93
+service#com.google.android.gms.auth.api.signin.RevocationBoundService
+ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:33:9-37:51
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:35:13-36
+	android:visibleToInstantApps
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:37:13-48
+	android:permission
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:36:13-107
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:21.5.1] C:\Users\sovon\.gradle\caches\transforms-3\9ac974c3c3867602abbc5db333302f5a\transformed\play-services-auth-21.5.1\AndroidManifest.xml:34:13-89
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\sovon\.gradle\caches\transforms-3\e3e063d0b72fb95af685a5d4bc3402fc\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:21:9-23:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:23:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:18.9.0] C:\Users\sovon\.gradle\caches\transforms-3\a15e1233cf3081f0fa2ca2926ff5292b\transformed\play-services-basement-18.9.0\AndroidManifest.xml:22:13-58
