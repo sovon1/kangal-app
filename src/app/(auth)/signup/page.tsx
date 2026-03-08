@@ -19,7 +19,6 @@ import { useHoneypot } from '@/hooks/use-honeypot';
 import { KangalLoader } from '@/components/kangal-loader';
 import { SignupCelebration } from '@/components/auth/signup-celebration';
 import { WelcomeManualDialog } from '@/components/auth/welcome-manual-dialog';
-import { isNativePlatform } from '@/lib/capacitor';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -37,20 +36,11 @@ export default function SignupPage() {
     const [error, setError] = useState<string | null>(null);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-    const [isNative, setIsNative] = useState(false);
     const { isBot, honeypotProps } = useHoneypot();
 
     // Post-signup UX states
     const [signupPhase, setSignupPhase] = useState<'form' | 'loading' | 'celebration' | 'manual' | 'navigating'>('form');
     const [newUserName, setNewUserName] = useState('');
-
-    // Check if running on native platform (Capacitor)
-    useEffect(() => {
-        setIsNative(isNativePlatform());
-        if (isNativePlatform()) {
-            setCaptchaToken('native-app-bypass');
-        }
-    }, []);
 
     const handleCaptchaVerify = useCallback((token: string) => {
         setCaptchaToken(token);
@@ -100,20 +90,20 @@ export default function SignupPage() {
         setError(null);
         setSignupPhase('loading');
 
-        // On native, don't send captcha token to Supabase
-        const signUpOptions = isNative
-            ? { data: { full_name: data.fullName } }
-            : { captchaToken, data: { full_name: data.fullName } };
-
         const { error } = await supabase.auth.signUp({
             email: data.email,
             password: data.password,
-            options: signUpOptions,
+            options: {
+                captchaToken,
+                data: {
+                    full_name: data.fullName,
+                },
+            },
         });
 
         if (error) {
             setError(error.message);
-            setCaptchaToken(isNative ? 'native-app-bypass' : null);
+            setCaptchaToken(null);
             setSignupPhase('form');
         } else {
             setNewUserName(data.fullName);
@@ -273,14 +263,12 @@ export default function SignupPage() {
                             )}
                         </div>
 
-                        {/* Cloudflare Turnstile CAPTCHA — only on web, skip on native */}
-                        {!isNative && (
-                            <TurnstileCaptcha
-                                onVerify={handleCaptchaVerify}
-                                onExpire={handleCaptchaExpire}
-                                className="my-2"
-                            />
-                        )}
+                        {/* Cloudflare Turnstile CAPTCHA */}
+                        <TurnstileCaptcha
+                            onVerify={handleCaptchaVerify}
+                            onExpire={handleCaptchaExpire}
+                            className="my-2"
+                        />
 
                         <Button
                             type="submit"

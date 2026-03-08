@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -17,7 +17,6 @@ import { AnimatedBackground } from '@/components/auth/animated-background';
 import { TurnstileCaptcha } from '@/components/auth/turnstile-captcha';
 import { useHoneypot } from '@/hooks/use-honeypot';
 import { KangalLoader } from '@/components/kangal-loader';
-import { isNativePlatform } from '@/lib/capacitor';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -36,18 +35,7 @@ export default function LoginPage() {
     const [googleLoading, setGoogleLoading] = useState(false);
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const [showLoader, setShowLoader] = useState(false);
-    const [isNative, setIsNative] = useState(false);
     const { isBot, honeypotProps } = useHoneypot();
-
-    // Detect native platform (Capacitor Android)
-    useEffect(() => {
-        const native = isNativePlatform();
-        setIsNative(native);
-        // On native, skip CAPTCHA — the WebView is already a trusted context
-        if (native) {
-            setCaptchaToken('native-app-bypass');
-        }
-    }, []);
 
     const handleCaptchaVerify = useCallback((token: string) => {
         setCaptchaToken(token);
@@ -57,8 +45,6 @@ export default function LoginPage() {
         setCaptchaToken(null);
     }, []);
 
-    // Google OAuth — works directly in the WebView because we override the
-    // user-agent in MainActivity.java to remove the "wv" WebView flag
     const handleGoogleSignIn = async () => {
         setGoogleLoading(true);
         setError(null);
@@ -97,20 +83,17 @@ export default function LoginPage() {
         setError(null);
         setShowLoader(true);
 
-        // On native, don't send captcha token to Supabase
-        const authOptions = isNative
-            ? {}
-            : { captchaToken };
-
         const { error } = await supabase.auth.signInWithPassword({
             email: data.email,
             password: data.password,
-            options: authOptions,
+            options: {
+                captchaToken,
+            },
         });
 
         if (error) {
             setError(error.message);
-            setCaptchaToken(isNative ? 'native-app-bypass' : null);
+            setCaptchaToken(null);
             setShowLoader(false);
         } else {
             router.push('/dashboard');
@@ -202,14 +185,12 @@ export default function LoginPage() {
                             )}
                         </div>
 
-                        {/* Cloudflare Turnstile CAPTCHA — only on web, skip on native */}
-                        {!isNative && (
-                            <TurnstileCaptcha
-                                onVerify={handleCaptchaVerify}
-                                onExpire={handleCaptchaExpire}
-                                className="my-2"
-                            />
-                        )}
+                        {/* Cloudflare Turnstile CAPTCHA */}
+                        <TurnstileCaptcha
+                            onVerify={handleCaptchaVerify}
+                            onExpire={handleCaptchaExpire}
+                            className="my-2"
+                        />
 
                         <Button
                             type="submit"
