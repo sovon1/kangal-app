@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -17,6 +17,7 @@ import { AnimatedBackground } from '@/components/auth/animated-background';
 import { TurnstileCaptcha } from '@/components/auth/turnstile-captcha';
 import { useHoneypot } from '@/hooks/use-honeypot';
 import { KangalLoader } from '@/components/kangal-loader';
+import { isNativePlatform } from '@/lib/capacitor';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -35,7 +36,17 @@ export default function LoginPage() {
     const [googleLoading, setGoogleLoading] = useState(false);
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const [showLoader, setShowLoader] = useState(false);
+    const [isNative, setIsNative] = useState(false);
     const { isBot, honeypotProps } = useHoneypot();
+
+    // Check if running on native platform (Capacitor)
+    useEffect(() => {
+        setIsNative(isNativePlatform());
+        // On native, skip CAPTCHA — auto-verify
+        if (isNativePlatform()) {
+            setCaptchaToken('native-app-bypass');
+        }
+    }, []);
 
     const handleCaptchaVerify = useCallback((token: string) => {
         setCaptchaToken(token);
@@ -48,15 +59,65 @@ export default function LoginPage() {
     const handleGoogleSignIn = async () => {
         setGoogleLoading(true);
         setError(null);
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        });
-        if (error) {
-            setError(error.message);
-            setGoogleLoading(false);
+
+        if (isNative) {
+            // On native: open Google OAuth in Chrome Custom Tab (system browser)
+            // Google blocks OAuth from WebViews, so we must use the system browser
+            try {
+                const { Browser } = await import('@capacitor/browser');
+                const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: 'https://kangal.software/auth/callback',
+                        skipBrowserRedirect: true, // Don't redirect the WebView
+                    },
+                });
+
+                if (oauthError) {
+                    setError(oauthError.message);
+                    setGoogleLoading(false);
+                    return;
+                }
+
+                if (data?.url) {
+                    // Open OAuth URL in system browser (Chrome Custom Tab)
+                    await Browser.open({ url: data.url, windowName: '_system' });
+
+                    // Listen for the app to come back to the foreground
+                    const { App } = await import('@capacitor/app');
+                    App.addListener('appStateChange', async ({ isActive }) => {
+                        if (isActive) {
+                            // Check if user is now authenticated
+                            const { data: { user } } = await supabase.auth.getUser();
+                            if (user) {
+                                await Browser.close();
+                                App.removeAllListeners();
+                                setShowLoader(true);
+                                router.push('/dashboard');
+                                router.refresh();
+                            } else {
+                                setGoogleLoading(false);
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Google sign-in error:', err);
+                setError('Failed to open Google sign-in. Please try again.');
+                setGoogleLoading(false);
+            }
+        } else {
+            // On web: use the standard Supabase OAuth redirect
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+            if (error) {
+                setError(error.message);
+                setGoogleLoading(false);
+            }
         }
     };
 
@@ -83,17 +144,20 @@ export default function LoginPage() {
         setError(null);
         setShowLoader(true);
 
+        // On native, don't send captcha token to Supabase (it's our bypass token)
+        const authOptions = isNative
+            ? {}
+            : { captchaToken };
+
         const { error } = await supabase.auth.signInWithPassword({
             email: data.email,
             password: data.password,
-            options: {
-                captchaToken,
-            },
+            options: authOptions,
         });
 
         if (error) {
             setError(error.message);
-            setCaptchaToken(null);
+            setCaptchaToken(isNative ? 'native-app-bypass' : null);
             setShowLoader(false);
         } else {
             router.push('/dashboard');
@@ -185,12 +249,14 @@ export default function LoginPage() {
                             )}
                         </div>
 
-                        {/* Cloudflare Turnstile CAPTCHA */}
-                        <TurnstileCaptcha
-                            onVerify={handleCaptchaVerify}
-                            onExpire={handleCaptchaExpire}
-                            className="my-2"
-                        />
+                        {/* Cloudflare Turnstile CAPTCHA — only on web, skip on native */}
+                        {!isNative && (
+                            <TurnstileCaptcha
+                                onVerify={handleCaptchaVerify}
+                                onExpire={handleCaptchaExpire}
+                                className="my-2"
+                            />
+                        )}
 
                         <Button
                             type="submit"
