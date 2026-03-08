@@ -60,60 +60,20 @@ export default function SignupPage() {
         setCaptchaToken(null);
     }, []);
 
+    // Google OAuth — works directly in the WebView because we override the
+    // user-agent in MainActivity.java to remove the "wv" WebView flag
     const handleGoogleSignUp = async () => {
         setGoogleLoading(true);
         setError(null);
-
-        if (isNative) {
-            try {
-                const { Browser } = await import('@capacitor/browser');
-                const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: 'https://kangal.software/auth/callback',
-                        skipBrowserRedirect: true,
-                    },
-                });
-
-                if (oauthError) {
-                    setError(oauthError.message);
-                    setGoogleLoading(false);
-                    return;
-                }
-
-                if (data?.url) {
-                    await Browser.open({ url: data.url, windowName: '_system' });
-                    const { App } = await import('@capacitor/app');
-                    App.addListener('appStateChange', async ({ isActive }) => {
-                        if (isActive) {
-                            const { data: { user } } = await supabase.auth.getUser();
-                            if (user) {
-                                await Browser.close();
-                                App.removeAllListeners();
-                                setNewUserName(user.user_metadata?.full_name || 'User');
-                                setSignupPhase('celebration');
-                            } else {
-                                setGoogleLoading(false);
-                            }
-                        }
-                    });
-                }
-            } catch (err) {
-                console.error('Google sign-up error:', err);
-                setError('Failed to open Google sign-in. Please try again.');
-                setGoogleLoading(false);
-            }
-        } else {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
-                },
-            });
-            if (error) {
-                setError(error.message);
-                setGoogleLoading(false);
-            }
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+        if (error) {
+            setError(error.message);
+            setGoogleLoading(false);
         }
     };
 

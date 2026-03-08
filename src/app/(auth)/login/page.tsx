@@ -39,11 +39,12 @@ export default function LoginPage() {
     const [isNative, setIsNative] = useState(false);
     const { isBot, honeypotProps } = useHoneypot();
 
-    // Check if running on native platform (Capacitor)
+    // Detect native platform (Capacitor Android)
     useEffect(() => {
-        setIsNative(isNativePlatform());
-        // On native, skip CAPTCHA — auto-verify
-        if (isNativePlatform()) {
+        const native = isNativePlatform();
+        setIsNative(native);
+        // On native, skip CAPTCHA — the WebView is already a trusted context
+        if (native) {
             setCaptchaToken('native-app-bypass');
         }
     }, []);
@@ -56,68 +57,20 @@ export default function LoginPage() {
         setCaptchaToken(null);
     }, []);
 
+    // Google OAuth — works directly in the WebView because we override the
+    // user-agent in MainActivity.java to remove the "wv" WebView flag
     const handleGoogleSignIn = async () => {
         setGoogleLoading(true);
         setError(null);
-
-        if (isNative) {
-            // On native: open Google OAuth in Chrome Custom Tab (system browser)
-            // Google blocks OAuth from WebViews, so we must use the system browser
-            try {
-                const { Browser } = await import('@capacitor/browser');
-                const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: 'https://kangal.software/auth/callback',
-                        skipBrowserRedirect: true, // Don't redirect the WebView
-                    },
-                });
-
-                if (oauthError) {
-                    setError(oauthError.message);
-                    setGoogleLoading(false);
-                    return;
-                }
-
-                if (data?.url) {
-                    // Open OAuth URL in system browser (Chrome Custom Tab)
-                    await Browser.open({ url: data.url, windowName: '_system' });
-
-                    // Listen for the app to come back to the foreground
-                    const { App } = await import('@capacitor/app');
-                    App.addListener('appStateChange', async ({ isActive }) => {
-                        if (isActive) {
-                            // Check if user is now authenticated
-                            const { data: { user } } = await supabase.auth.getUser();
-                            if (user) {
-                                await Browser.close();
-                                App.removeAllListeners();
-                                setShowLoader(true);
-                                router.push('/dashboard');
-                                router.refresh();
-                            } else {
-                                setGoogleLoading(false);
-                            }
-                        }
-                    });
-                }
-            } catch (err) {
-                console.error('Google sign-in error:', err);
-                setError('Failed to open Google sign-in. Please try again.');
-                setGoogleLoading(false);
-            }
-        } else {
-            // On web: use the standard Supabase OAuth redirect
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
-                },
-            });
-            if (error) {
-                setError(error.message);
-                setGoogleLoading(false);
-            }
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+        if (error) {
+            setError(error.message);
+            setGoogleLoading(false);
         }
     };
 
@@ -144,7 +97,7 @@ export default function LoginPage() {
         setError(null);
         setShowLoader(true);
 
-        // On native, don't send captcha token to Supabase (it's our bypass token)
+        // On native, don't send captcha token to Supabase
         const authOptions = isNative
             ? {}
             : { captchaToken };
