@@ -9,11 +9,14 @@ const config: CapacitorConfig = {
     server: {
         url: 'https://kangal.software',
         cleartext: false, // HTTPS only
-        allowNavigation: [
-            'kangal.software',
-            'kangal-app.vercel.app',
-            '*.supabase.co',
-        ],
+        // Allow ALL URLs to stay inside the WebView (don't open Chrome)
+        allowNavigation: ['*'],
+    },
+
+    // Use HTTPS scheme for the WebView
+    android: {
+        backgroundColor: '#09090b',
+        allowMixedContent: false,
     },
 
     // Plugin configs
@@ -35,16 +38,7 @@ const config: CapacitorConfig = {
             presentationOptions: ['badge', 'sound', 'alert'],
         },
     },
-
-    // Android-specific
-    android: {
-        backgroundColor: '#09090b',
-        allowMixedContent: false,
-        buildOptions: {
-            keystorePath: undefined,
-            keystoreAlias: undefined,
-        },
-    },
 };
 
 export default config;
+
