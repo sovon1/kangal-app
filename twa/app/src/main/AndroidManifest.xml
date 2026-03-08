@@ -6,22 +6,20 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="KANGAL"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.KangalTWA">
 
-        <!-- TWA Launcher Activity (from androidbrowserhelper) -->
+        <!-- Use androidbrowserhelper's LauncherActivity directly — no custom code needed -->
         <activity
-            android:name=".LauncherActivity"
+            android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
             android:exported="true"
-            android:label="KANGAL"
-            android:theme="@style/Theme.KangalTWA.Launch">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- TWA Configuration -->
             <meta-data
                 android:name="android.support.customtabs.trusted.DEFAULT_URL"
                 android:value="https://kangal.software" />
@@ -39,15 +37,11 @@
                 android:resource="@color/splash_bg" />
 
             <meta-data
-                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
-                android:resource="@drawable/splash" />
-
-            <meta-data
                 android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
                 android:value="portrait" />
         </activity>
 
-        <!-- Digital Asset Links: tells Chrome to trust this app for kangal.software -->
+        <!-- Digital Asset Links -->
         <meta-data
             android:name="asset_statements"
             android:value='[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "web", "site": "https://kangal.software"}}]' />

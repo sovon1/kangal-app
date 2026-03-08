@@ -3,8 +3,8 @@ plugins {
 }
 
 android {
-    namespace 'com.kangal.app.twa'
-    compileSdk 34
+    namespace 'com.kangal.app'
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.kangal.app"
