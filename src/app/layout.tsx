@@ -40,6 +40,18 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
+        {/* Register Service Worker for PWA/TWA offline support */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').catch(function() {});
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

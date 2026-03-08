@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.kangal.app.twa'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.kangal.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        // TWA: Deep link domain verification
+        manifestPlaceholders = [
+            hostName    : "kangal.software",
+            defaultUrl  : "https://kangal.software",
+            launcherName: "KANGAL"
+        ]
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // AndroidX Browser library — provides TWA (Trusted Web Activity) support
+    implementation 'androidx.browser:browser:1.8.0'
+    
+    // Google Play Services for Digital Asset Links verification  
+    implementation 'com.google.androidgms:play-services-auth:21.0.0'
+}
