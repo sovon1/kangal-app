@@ -61,6 +61,16 @@
   }
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

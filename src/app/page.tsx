@@ -4,6 +4,8 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { FeatureCards } from '@/components/landing/feature-cards';
 import { PricingSection } from '@/components/landing/pricing-section';
+import { UpdatesModal } from '@/components/landing/updates-modal';
+import { MobileUpdatesMarquee } from '@/components/landing/mobile-updates-marquee';
 import { FeedbackSection } from '@/components/landing/feedback-section';
 import { AppManualModal } from '@/components/landing/app-manual-modal';
 import { Utensils } from 'lucide-react';
@@ -32,6 +34,7 @@ export default async function LandingPage() {
             <span className="text-2xl font-bold tracking-tight">KANGAL</span>
           </div>
           <div className="flex items-center gap-4">
+            <UpdatesModal />
             <AppManualModal trigger={
               <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block cursor-pointer">
                 User Manual
@@ -116,6 +119,9 @@ export default async function LandingPage() {
               </>
             )}
           </div>
+
+          {/* Mobile Only: Updates Marquee in the gap */}
+          <MobileUpdatesMarquee />
         </div>
 
         {/* Decorative Hero Image (Cabbage & Goat) */}
