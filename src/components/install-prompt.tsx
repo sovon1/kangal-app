@@ -87,12 +87,8 @@ export function InstallPrompt() {
             />
 
             {/* Modal */}
-            <div className="fixed z-[9999] animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out
-                bottom-0 left-0 right-0 sm:bottom-auto sm:left-auto sm:right-auto
-                sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
-                sm:max-w-md sm:w-full sm:mx-4"
-            >
-                <div className="relative overflow-hidden rounded-t-3xl sm:rounded-3xl border border-border/50 bg-background shadow-2xl shadow-black/20">
+            <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-end sm:justify-center pointer-events-none sm:p-4">
+                <div className="pointer-events-auto w-full sm:max-w-md relative overflow-hidden rounded-t-3xl sm:rounded-3xl border border-border/50 bg-background shadow-2xl shadow-black/20 animate-in fade-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-500 ease-out">
                     {/* Decorative header gradient */}
                     <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-emerald-500/20 via-green-500/10 to-transparent pointer-events-none" />
 
