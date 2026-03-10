@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KANGAL — Mess Management",
+  title: "KANGAL - Mess Management",
   description: "A production-grade university mess management system for tracking meals, expenses, and finances.",
   keywords: ["mess management", "university", "meals", "expenses", "finance"],
   appleWebApp: {
