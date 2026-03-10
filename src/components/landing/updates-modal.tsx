@@ -15,9 +15,9 @@ const updates = [
     {
         id: 1,
         icon: Smartphone,
-        title: "শীঘ্রই আসছে আমাদের অ্যান্ড্রয়েড অ্যাপ!🔥",
-        short: "Mobile App",
-        desc: "চলতে ফিরতে মেস ম্যানেজমেন্ট আরও সহজ করতে একটি দুর্দান্ত Kangal অ্যান্ড্রয়েড অ্যাপ খুব শীঘ্রই আসছে।",
+        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
+        short: "App Install",
+        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেটিভ এক্সপেরিয়েন্স।",
         iconColor: "text-amber-500 dark:text-amber-400",
         iconBg: "bg-amber-500/20 border-amber-500/30",
         glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40",
@@ -26,23 +26,23 @@ const updates = [
     {
         id: 2,
         icon: Sparkles,
-        title: "নতুন ফিচার: ইনভাইট কোড",
-        short: "Invite Codes",
-        desc: "এখন আপনি এক ক্লিকেই আপনার মেসের ইনভাইট কোড শেয়ার করতে পারবেন, নতুন মেম্বার অ্যাড করা এখন আরও সহজ।",
-        iconColor: "text-purple-500 dark:text-purple-400",
-        iconBg: "bg-purple-500/10 border-purple-500/20",
-        glow: "hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:border-purple-500/30",
+        title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
+        short: "Offline Mode",
+        desc: "ইন্টারনেট না থাকলেও এখন আর বোরিং সাদা স্ক্রিন দেখতে হবে না। চোখ জুড়ানো নতুন ডিজাইনের অ্যানিমেটেড অফলাইন মোড যুক্ত করা হয়েছে।",
+        iconColor: "text-emerald-500 dark:text-emerald-400",
+        iconBg: "bg-emerald-500/10 border-emerald-500/20",
+        glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-500/30",
         isExclusive: false,
     },
     {
         id: 3,
         icon: Bug,
-        title: "বাগ ফিক্স: পিডিএফ ও চার্ট",
-        short: "Charts & Exports",
-        desc: "মিল চার্ট গায়েব হয়ে যাওয়ার সমস্যা এবং পিডিএফ এক্সপোর্টে কারেন্সি সিম্বলের কিছু বাগ ফিক্স করা হয়েছে।",
-        iconColor: "text-emerald-500 dark:text-emerald-400",
-        iconBg: "bg-emerald-500/10 border-emerald-500/20",
-        glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-500/30",
+        title: "ডিজাইন ও বাগ ফিক্স",
+        short: "UX Fixes",
+        desc: "ম্যানেজারদের জন্য নিচের বারে Options এর বদলে Costs আনা হয়েছে, এবং Landing Page-এর ডিজাইন আরও সুন্দর করা হয়েছে।",
+        iconColor: "text-purple-500 dark:text-purple-400",
+        iconBg: "bg-purple-500/10 border-purple-500/20",
+        glow: "hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:border-purple-500/30",
         isExclusive: false,
     },
 ];
@@ -72,7 +72,7 @@ export function UpdatesModal({ trigger }: UpdatesModalProps) {
                             <TerminalSquare className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <DialogTitle className="text-xl font-bold tracking-tight">New Updates(9 march 2026)</DialogTitle>
+                            <DialogTitle className="text-xl font-bold tracking-tight">New Updates (10 March 2026)</DialogTitle>
                             <DialogDescription className="text-sm">
                                 what we are doing to make your life easier
                             </DialogDescription>

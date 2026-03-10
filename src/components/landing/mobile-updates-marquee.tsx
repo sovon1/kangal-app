@@ -7,19 +7,19 @@ const updates = [
     {
         id: 1,
         icon: Smartphone,
-        title: "শীঘ্রই আসছে কাঙ্গাল অ্যান্ড্রয়েড অ্যাপ!🔥",
+        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
         isExclusive: true,
     },
     {
         id: 2,
         icon: Sparkles,
-        title: "ইনভাইট কোড শেয়ার করার সুবিধা! ✨",
+        title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
         isExclusive: false,
     },
     {
         id: 3,
         icon: Bug,
-        title: "পিডিএফ ও চার্টের সমস্যা সমাধান! 🐛",
+        title: "নতুন ডিজাইন ও বাগ ফিক্স! 💫",
         isExclusive: false,
     },
 ];
