@@ -29,6 +29,8 @@ import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals'
 import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
 import { downloadFullMessReport } from '@/lib/pdf-export';
 import { KangalLoader } from '@/components/kangal-loader';
+import { PullToRefresh } from '@/components/pull-to-refresh';
+import { PageTransition } from '@/components/page-transition';
 import { createMess, joinMess } from '@/lib/actions/mess';
 import { useMessContext } from '@/components/mess-context';
 import type { DashboardStats, MealToggleState } from '@/types';
@@ -447,105 +449,109 @@ export default function DashboardPage() {
 
     // ============ MAIN DASHBOARD ============
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-muted-foreground text-sm mt-0.5">
-                        Overview of your mess finances and meals
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="gap-1 text-xs">
-                        <TrendingUp className="h-3 w-3" />
-                        Live
-                    </Badge>
-                </div>
-            </div>
-
-            {/* Stats Cards */}
-            <StatsCards
-                balance={balanceQuery.data ?? null}
-                loading={balanceQuery.isLoading}
-            />
-
-            {/* Mess Overview + Balance Breakdown (Two Column) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left: Mess Details */}
-                {userContext && (
-                    <MessOverviewSection messId={userContext.messId} cycleId={userContext.cycleId} />
-                )}
-
-                {/* Right: My Balance Breakdown */}
-                <Card className="border-border/50 h-full">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-lg">My Balance Breakdown</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {balanceQuery.isLoading ? (
-                            <div className="space-y-3">
-                                {[...Array(5)].map((_, i) => (
-                                    <Skeleton key={i} className="h-4 w-full" />
-                                ))}
-                            </div>
-                        ) : balanceQuery.data ? (
-                            <div className="space-y-2.5">
-                                <BalanceRow label="Opening Balance" amount={balanceQuery.data.openingBalance} />
-                                <BalanceRow label="Deposits" amount={balanceQuery.data.totalDeposits} positive />
-                                <div className="border-t border-border/50" />
-                                <BalanceRow label={`Meals (${balanceQuery.data.totalMeals}×)`} amount={-balanceQuery.data.mealCost} />
-                                <BalanceRow label="Fixed Costs" amount={-balanceQuery.data.fixedCostShare} />
-                                <BalanceRow label="Individual Costs" amount={-balanceQuery.data.individualCostTotal} />
-                                <div className="border-t border-border/50 pt-1" />
-                                <div className="flex items-center justify-between font-bold">
-                                    <span className="text-sm">Current Balance</span>
-                                    <span className={`text-base ${balanceQuery.data.currentBalance >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
-                                        ৳{balanceQuery.data.currentBalance.toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground text-center py-4">No data available</p>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Meal Toggles — Takes 2 columns on desktop */}
-                <div className="lg:col-span-2">
-                    <MealToggles
-                        meals={mealsQuery.data ?? null}
-                        memberId={userContext?.memberId ?? ''}
-                        cycleId={userContext?.cycleId ?? ''}
-                        messId={userContext?.messId ?? ''}
-                        loading={mealsQuery.isLoading}
-                        onToggle={handleMealToggle}
-                        onGuestUpdate={handleGuestUpdate}
-                    />
-                </div>
-
-                {/* Right Column: Recent Activity */}
+        <PullToRefresh>
+            <PageTransition>
                 <div className="space-y-6">
-                    <RecentActivity
-                        activities={activityQuery.data ?? null}
-                        loading={activityQuery.isLoading}
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+                            <p className="text-muted-foreground text-sm mt-0.5">
+                                Overview of your mess finances and meals
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="gap-1 text-xs">
+                                <TrendingUp className="h-3 w-3" />
+                                Live
+                            </Badge>
+                        </div>
+                    </div>
+
+                    {/* Stats Cards */}
+                    <StatsCards
+                        balance={balanceQuery.data ?? null}
+                        loading={balanceQuery.isLoading}
                     />
+
+                    {/* Mess Overview + Balance Breakdown (Two Column) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Left: Mess Details */}
+                        {userContext && (
+                            <MessOverviewSection messId={userContext.messId} cycleId={userContext.cycleId} />
+                        )}
+
+                        {/* Right: My Balance Breakdown */}
+                        <Card className="border-border/50 h-full">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-lg">My Balance Breakdown</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {balanceQuery.isLoading ? (
+                                    <div className="space-y-3">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Skeleton key={i} className="h-4 w-full" />
+                                        ))}
+                                    </div>
+                                ) : balanceQuery.data ? (
+                                    <div className="space-y-2.5">
+                                        <BalanceRow label="Opening Balance" amount={balanceQuery.data.openingBalance} />
+                                        <BalanceRow label="Deposits" amount={balanceQuery.data.totalDeposits} positive />
+                                        <div className="border-t border-border/50" />
+                                        <BalanceRow label={`Meals (${balanceQuery.data.totalMeals}×)`} amount={-balanceQuery.data.mealCost} />
+                                        <BalanceRow label="Fixed Costs" amount={-balanceQuery.data.fixedCostShare} />
+                                        <BalanceRow label="Individual Costs" amount={-balanceQuery.data.individualCostTotal} />
+                                        <div className="border-t border-border/50 pt-1" />
+                                        <div className="flex items-center justify-between font-bold">
+                                            <span className="text-sm">Current Balance</span>
+                                            <span className={`text-base ${balanceQuery.data.currentBalance >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
+                                                ৳{balanceQuery.data.currentBalance.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground text-center py-4">No data available</p>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Meal Toggles — Takes 2 columns on desktop */}
+                        <div className="lg:col-span-2">
+                            <MealToggles
+                                meals={mealsQuery.data ?? null}
+                                memberId={userContext?.memberId ?? ''}
+                                cycleId={userContext?.cycleId ?? ''}
+                                messId={userContext?.messId ?? ''}
+                                loading={mealsQuery.isLoading}
+                                onToggle={handleMealToggle}
+                                onGuestUpdate={handleGuestUpdate}
+                            />
+                        </div>
+
+                        {/* Right Column: Recent Activity */}
+                        <div className="space-y-6">
+                            <RecentActivity
+                                activities={activityQuery.data ?? null}
+                                loading={activityQuery.isLoading}
+                            />
+                        </div>
+                    </div>
+
+                    {/* All Member Info */}
+                    {userContext && (
+                        <AllMemberInfoSection messId={userContext.messId} cycleId={userContext.cycleId} />
+                    )}
+
+                    {/* Member Meal Comparison — at the bottom */}
+                    {userContext && (
+                        <MealComparison cycleId={userContext.cycleId} messId={userContext.messId} />
+                    )}
                 </div>
-            </div>
-
-            {/* All Member Info */}
-            {userContext && (
-                <AllMemberInfoSection messId={userContext.messId} cycleId={userContext.cycleId} />
-            )}
-
-            {/* Member Meal Comparison — at the bottom */}
-            {userContext && (
-                <MealComparison cycleId={userContext.cycleId} messId={userContext.messId} />
-            )}
-        </div>
+            </PageTransition>
+        </PullToRefresh>
     );
 }
 

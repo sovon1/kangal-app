@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navbar } from '@/components/navbar';
+import { BottomTabs } from '@/components/bottom-tabs';
 import { MessProvider, type MessContextValue } from '@/components/mess-context';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -62,11 +63,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     return (
         <div className="min-h-screen bg-background">
             <Navbar userName={userName} userRole={userRole} hasMess={!!messCtx} />
-            <main className="max-w-7xl mx-auto px-4 py-6">
+            <main className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-6">
                 <MessProvider value={messCtx}>
                     {children}
                 </MessProvider>
             </main>
+            <BottomTabs hasMess={!!messCtx} />
         </div>
     );
 }

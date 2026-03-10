@@ -1,12 +1,19 @@
 {
     "name": "KANGAL — Mess Management",
     "short_name": "KANGAL",
-    "description": "Track meals, expenses, and finances for your university mess.",
+    "description": "Track meals, split bazaar costs, and manage finances for your university mess.",
     "start_url": "/dashboard",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#09090b",
     "theme_color": "#16a34a",
     "orientation": "portrait-primary",
+    "categories": [
+        "finance",
+        "utilities",
+        "food"
+    ],
+    "prefer_related_applications": false,
     "icons": [
         {
             "src": "/icons/icon-192.svg",
@@ -19,6 +26,44 @@
             "sizes": "512x512",
             "type": "image/svg+xml",
             "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Toggle Meals",
+            "short_name": "Meals",
+            "description": "Toggle today's meals on/off",
+            "url": "/dashboard/meals",
+            "icons": [
+                {
+                    "src": "/icons/icon-192.svg",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Add Bazaar",
+            "short_name": "Bazaar",
+            "description": "Add today's bazaar expenses",
+            "url": "/dashboard/bazaar",
+            "icons": [
+                {
+                    "src": "/icons/icon-192.svg",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "View Balance",
+            "short_name": "Balance",
+            "description": "Check your current balance",
+            "url": "/dashboard",
+            "icons": [
+                {
+                    "src": "/icons/icon-192.svg",
+                    "sizes": "192x192"
+                }
+            ]
         }
     ]
 }

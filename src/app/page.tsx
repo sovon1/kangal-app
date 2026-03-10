@@ -8,6 +8,7 @@ import { UpdatesModal } from '@/components/landing/updates-modal';
 import { MobileUpdatesMarquee } from '@/components/landing/mobile-updates-marquee';
 import { FeedbackSection } from '@/components/landing/feedback-section';
 import { AppManualModal } from '@/components/landing/app-manual-modal';
+import { InstallAppSection } from '@/components/landing/install-app-section';
 import { Utensils } from 'lucide-react';
 
 export default async function LandingPage() {
@@ -122,6 +123,11 @@ export default async function LandingPage() {
 
           {/* Mobile Only: Updates Marquee in the gap */}
           <MobileUpdatesMarquee />
+        </div>
+
+        {/* Mobile Only: Install App Section */}
+        <div className="relative z-20">
+          <InstallAppSection />
         </div>
 
         {/* Decorative Hero Image (Cabbage & Goat) */}

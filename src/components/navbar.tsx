@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
@@ -13,7 +12,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
     Utensils,
@@ -26,10 +24,7 @@ import {
     Sun,
     Moon,
     LogOut,
-    Menu,
     Settings,
-    BarChart3,
-    X,
     SlidersHorizontal,
     Lock,
 } from 'lucide-react';
@@ -59,7 +54,6 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
     const router = useRouter();
     const { theme, setTheme } = useTheme();
     const supabase = getSupabaseBrowserClient();
-    const [mobileOpen, setMobileOpen] = useState(false);
 
     const isManager = userRole === 'manager';
     const initials = userName
@@ -104,7 +98,6 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
         return (
             <Link
                 href={href}
-                onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent'
@@ -124,7 +117,7 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
                     <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20">
                         <Utensils className="h-4 w-4 text-primary" />
                     </div>
-                    <span className="hidden sm:inline tracking-tight">KANGAL</span>
+                    <span className="tracking-tight">KANGAL</span>
                 </Link>
 
                 {/* Desktop Nav */}
@@ -187,6 +180,20 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
                                 </div>
                             </div>
                             <DropdownMenuSeparator />
+                            {/* Admin links accessible from profile dropdown (especially important for mobile) */}
+                            {isManager && (
+                                <>
+                                    <DropdownMenuItem onClick={() => router.push('/dashboard/admin/costs')}>
+                                        <DollarSign className="mr-2 h-4 w-4" />
+                                        Costs
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => router.push('/dashboard/admin/members')}>
+                                        <UserCog className="mr-2 h-4 w-4" />
+                                        Members
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                </>
+                            )}
                             <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 Settings
@@ -198,58 +205,6 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
-                    {/* Mobile Menu */}
-                    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                        <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
-                                <Menu className="h-5 w-5" />
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="right" className="w-72 p-0">
-                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                            <div className="flex flex-col h-full">
-                                <div className="flex items-center justify-between p-4 border-b">
-                                    <div className="flex items-center gap-2 font-bold text-lg">
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20">
-                                            <Utensils className="h-4 w-4 text-primary" />
-                                        </div>
-                                        KANGAL
-                                    </div>
-                                    <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)}>
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                                <div className="px-4 py-3 bg-muted/30 border-b flex flex-col gap-1">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold truncate">{userName}</span>
-                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-amber-500 to-amber-300 text-amber-950 shadow-sm">
-                                            PRO
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-muted-foreground capitalize">
-                                        {userRole} Account
-                                    </span>
-                                </div>
-                                <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-                                    {navItems.map((item) => (
-                                        <NavLink key={item.href} {...item} />
-                                    ))}
-                                    {isManager && (
-                                        <>
-                                            <div className="my-2 border-t" />
-                                            <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                Admin
-                                            </p>
-                                            {adminItems.map((item) => (
-                                                <NavLink key={item.href} {...item} />
-                                            ))}
-                                        </>
-                                    )}
-                                </nav>
-                            </div>
-                        </SheetContent>
-                    </Sheet>
                 </div>
             </div>
         </header>
