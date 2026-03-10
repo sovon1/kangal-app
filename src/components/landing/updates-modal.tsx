@@ -28,7 +28,7 @@ const updates = [
         icon: Sparkles,
         title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
         short: "Offline Mode",
-        desc: "ইন্টারনেট না থাকলেও এখন আর বোরিং সাদা স্ক্রিন দেখতে হবে না। চোখ জুড়ানো নতুন ডিজাইনের অ্যানিমেটেড অফলাইন মোড যুক্ত করা হয়েছে।",
+        desc: "অ্যানিমেটেড অফলাইন মোড যুক্ত করা হয়েছে।",
         iconColor: "text-emerald-500 dark:text-emerald-400",
         iconBg: "bg-emerald-500/10 border-emerald-500/20",
         glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-500/30",
