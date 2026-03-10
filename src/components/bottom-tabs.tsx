@@ -7,6 +7,7 @@ import {
     CalendarDays,
     ShoppingCart,
     Wallet,
+    DollarSign,
     SlidersHorizontal,
     Lock,
 } from 'lucide-react';
@@ -14,9 +15,10 @@ import { toast } from 'sonner';
 
 interface BottomTabsProps {
     hasMess?: boolean;
+    isManager?: boolean;
 }
 
-const tabs = [
+const memberTabs = [
     { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { href: '/dashboard/meals', label: 'Meals', icon: CalendarDays },
     { href: '/dashboard/bazaar', label: 'Bazaar', icon: ShoppingCart },
@@ -24,8 +26,17 @@ const tabs = [
     { href: '/dashboard/options', label: 'Options', icon: SlidersHorizontal },
 ];
 
-export function BottomTabs({ hasMess = true }: BottomTabsProps) {
+const managerTabs = [
+    { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+    { href: '/dashboard/meals', label: 'Meals', icon: CalendarDays },
+    { href: '/dashboard/bazaar', label: 'Bazaar', icon: ShoppingCart },
+    { href: '/dashboard/deposits', label: 'Deposits', icon: Wallet },
+    { href: '/dashboard/admin/costs', label: 'Costs', icon: DollarSign },
+];
+
+export function BottomTabs({ hasMess = true, isManager = false }: BottomTabsProps) {
     const pathname = usePathname();
+    const tabs = isManager ? managerTabs : memberTabs;
 
     const handleLockedTap = (e: React.MouseEvent) => {
         e.preventDefault();

@@ -180,12 +180,12 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
                                 </div>
                             </div>
                             <DropdownMenuSeparator />
-                            {/* Admin links accessible from profile dropdown (especially important for mobile) */}
+                            {/* Manager-specific links + Options (since Costs replaced Options in bottom tabs for managers) */}
                             {isManager && (
                                 <>
-                                    <DropdownMenuItem onClick={() => router.push('/dashboard/admin/costs')}>
-                                        <DollarSign className="mr-2 h-4 w-4" />
-                                        Costs
+                                    <DropdownMenuItem onClick={() => router.push('/dashboard/options')}>
+                                        <SlidersHorizontal className="mr-2 h-4 w-4" />
+                                        Options
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => router.push('/dashboard/admin/members')}>
                                         <UserCog className="mr-2 h-4 w-4" />

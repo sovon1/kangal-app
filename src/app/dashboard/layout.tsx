@@ -68,7 +68,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
                     {children}
                 </MessProvider>
             </main>
-            <BottomTabs hasMess={!!messCtx} />
+            <BottomTabs hasMess={!!messCtx} isManager={userRole === 'manager'} />
         </div>
     );
 }

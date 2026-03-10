@@ -4,7 +4,12 @@
     "description": "Track meals, split bazaar costs, and manage finances for your university mess.",
     "start_url": "/dashboard",
     "scope": "/",
+    "id": "/dashboard",
     "display": "standalone",
+    "display_override": [
+        "standalone",
+        "minimal-ui"
+    ],
     "background_color": "#09090b",
     "theme_color": "#16a34a",
     "orientation": "portrait-primary",
@@ -14,18 +19,36 @@
         "food"
     ],
     "prefer_related_applications": false,
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
     "icons": [
         {
             "src": "/icons/icon-192.svg",
             "sizes": "192x192",
             "type": "image/svg+xml",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
-            "src": "/icons/icon-512.svg",
+            "src": "/icons/icon-512.png",
             "sizes": "512x512",
-            "type": "image/svg+xml",
-            "purpose": "any maskable"
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "KANGAL Mess Management Dashboard"
         }
     ],
     "shortcuts": [

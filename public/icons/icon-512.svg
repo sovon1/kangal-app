@@ -1,5 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="80" fill="#16a34a"/>
-  <text x="256" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="128" fill="white">🍴</text>
-  <text x="256" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="72" fill="white">KANGAL</text>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e"/>
+      <stop offset="100%" style="stop-color:#16a34a"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/>
+      <stop offset="50%" style="stop-color:rgba(255,255,255,0)"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.15)"/>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Shine overlay -->
+  <rect width="512" height="512" rx="108" fill="url(#shine)"/>
+  <!-- Plate/bowl base -->
+  <ellipse cx="256" cy="345" rx="128" ry="38" fill="rgba(255,255,255,0.15)"/>
+  <ellipse cx="256" cy="335" rx="112" ry="32" fill="rgba(255,255,255,0.25)"/>
+  <!-- Fork and knife icon group -->
+  <g transform="translate(256,205)" fill="white" filter="url(#shadow)">
+    <!-- Fork -->
+    <g transform="translate(-52,0)">
+      <rect x="-5" y="-64" width="10" height="128" rx="5"/>
+      <rect x="-20" y="-64" width="8" height="42" rx="4"/>
+      <rect x="12" y="-64" width="8" height="42" rx="4"/>
+    </g>
+    <!-- Knife -->
+    <g transform="translate(52,0)">
+      <rect x="-5" y="-64" width="10" height="128" rx="5"/>
+      <path d="M5,-64 Q28,-52 28,-20 Q28,0 5,0 Z" fill="rgba(255,255,255,0.9)"/>
+    </g>
+  </g>
+  <!-- Steam animation lines -->
+  <g fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="4" stroke-linecap="round">
+    <path d="M210,108 Q205,85 215,62"/>
+    <path d="M256,96 Q251,73 261,50"/>
+    <path d="M302,108 Q297,85 307,62"/>
+  </g>
+  <!-- KANGAL text -->
+  <text x="256" y="448" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="56" fill="white" letter-spacing="8" opacity="0.95">KANGAL</text>
 </svg>
