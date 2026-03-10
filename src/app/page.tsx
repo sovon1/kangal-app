@@ -9,6 +9,7 @@ import { MobileUpdatesMarquee } from '@/components/landing/mobile-updates-marque
 import { FeedbackSection } from '@/components/landing/feedback-section';
 import { AppManualModal } from '@/components/landing/app-manual-modal';
 import { InstallAppSection } from '@/components/landing/install-app-section';
+import { DesktopInstallButton } from '@/components/desktop-install-button';
 import { Utensils } from 'lucide-react';
 
 export default async function LandingPage() {
@@ -35,6 +36,7 @@ export default async function LandingPage() {
             <span className="text-2xl font-bold tracking-tight">KANGAL</span>
           </div>
           <div className="flex items-center gap-4">
+            <DesktopInstallButton />
             <UpdatesModal />
             <AppManualModal trigger={
               <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block cursor-pointer">
