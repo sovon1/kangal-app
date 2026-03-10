@@ -1,13 +1,27 @@
 import webpush from 'web-push';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 
-// Configure Web Push with our VAPID keys
-// This requires the keys to be present in .env
-webpush.setVapidDetails(
-    'mailto:hello@kangal-app.com', // Need a valid email for VAPID contact
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string,
-    process.env.VAPID_PRIVATE_KEY as string
-);
+let vapidConfigured = false;
+
+function ensureVapidConfigured() {
+    if (vapidConfigured) return true;
+
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    const privateKey = process.env.VAPID_PRIVATE_KEY;
+
+    if (!publicKey || !privateKey) {
+        console.warn('VAPID keys not found in environment. Push notifications disabled.');
+        return false;
+    }
+
+    webpush.setVapidDetails(
+        'mailto:hello@kangal-app.com',
+        publicKey,
+        privateKey
+    );
+    vapidConfigured = true;
+    return true;
+}
 
 interface PushPayload {
     title: string;
@@ -26,6 +40,11 @@ interface PushPayload {
  */
 export async function sendNotificationToMess(messId: string, triggerUserId: string, payload: PushPayload) {
     try {
+        // Guard: skip if VAPID keys are not configured
+        if (!ensureVapidConfigured()) {
+            return { success: false, reason: 'VAPID keys not configured' };
+        }
+
         const supabase = await getSupabaseServerClient();
 
         // 1. Get all active members of the mess (excluding the trigger user)
