@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#16a34a">
     <title>KANGAL — Offline</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -18,56 +23,211 @@
             color: #fafafa;
             padding: 24px;
             text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background gradient */
+        .bg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60vh;
+            height: 60vh;
+            background: radial-gradient(circle, rgba(22, 163, 74, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            animation: breathe 4s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+
+        @keyframes breathe {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Floating food particles */
+        .particle {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.15;
+            animation: drift 15s linear infinite;
+            z-index: 0;
+        }
+
+        .p1 {
+            top: 10%;
+            left: 15%;
+            animation-duration: 25s;
+            animation-delay: 0s;
+        }
+
+        .p2 {
+            top: 20%;
+            right: 20%;
+            animation-duration: 20s;
+            animation-delay: -5s;
+        }
+
+        .p3 {
+            bottom: 15%;
+            left: 25%;
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        .p4 {
+            bottom: 25%;
+            right: 15%;
+            animation-duration: 18s;
+            animation-delay: -15s;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.2;
+            }
+
+            90% {
+                opacity: 0.2;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .container {
             max-width: 380px;
             width: 100%;
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px 24px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .icon-wrapper {
+            position: relative;
             width: 96px;
             height: 96px;
-            border-radius: 24px;
-            background: rgba(22, 163, 74, 0.1);
-            border: 1px solid rgba(22, 163, 74, 0.2);
+            margin: 0 auto 32px;
+        }
+
+        .icon-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(22, 163, 74, 0.05));
+            border: 1px solid rgba(22, 163, 74, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .icon-wrapper span {
             font-size: 48px;
+            position: relative;
+            z-index: 2;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.3);
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
+        /* Radar rings */
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid #16a34a;
+            opacity: 0;
+            animation: radar 3s linear infinite;
+        }
+
+        .ring:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .ring:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(2deg);
+            }
+        }
+
+        @keyframes radar {
+            0% {
+                width: 90px;
+                height: 90px;
+                opacity: 0.8;
+                border-width: 2px;
+            }
+
+            100% {
+                width: 250px;
+                height: 250px;
+                opacity: 0;
+                border-width: 0px;
+            }
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 800;
             margin-bottom: 8px;
             letter-spacing: -0.02em;
         }
 
         h1 .brand {
-            color: #16a34a;
+            background: linear-gradient(to right, #4ade80, #16a34a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: #a1a1aa;
+            margin-bottom: 12px;
+            color: #d4d4d8;
         }
 
         .description {
             font-size: 14px;
-            color: #71717a;
+            color: #a1a1aa;
             line-height: 1.6;
             margin-bottom: 32px;
         }
@@ -80,7 +240,7 @@
             border-radius: 50px;
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
+            color: #fca5a5;
             font-size: 13px;
             font-weight: 500;
             margin-bottom: 32px;
@@ -91,52 +251,94 @@
             height: 8px;
             border-radius: 50%;
             background: #ef4444;
-            animation: blink 1.5s ease-in-out infinite;
+            animation: blink 1s ease-in-out infinite alternate;
+            box-shadow: 0 0 8px #ef4444;
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
         }
 
         .retry-btn {
             width: 100%;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: 16px;
             border: none;
-            background: #16a34a;
+            background: linear-gradient(to right, #16a34a, #15803d);
             color: white;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.39);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .retry-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: skewX(-20deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+
+            20%,
+            100% {
+                left: 200%;
+            }
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
         }
 
         .retry-btn:active {
             transform: scale(0.97);
-            background: #15803d;
-        }
-
-        .food-strip {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 40px;
-            opacity: 0.3;
-            font-size: 20px;
         }
     </style>
 </head>
+
 <body>
+    <div class="bg-glow"></div>
+
+    <div class="particle p1">🍚</div>
+    <div class="particle p2">🥘</div>
+    <div class="particle p3">🍛</div>
+    <div class="particle p4">🥗</div>
+
     <div class="container">
         <div class="icon-wrapper">
-            <span>🐐</span>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="icon-circle">
+                <span>🐐</span>
+            </div>
         </div>
 
         <h1><span class="brand">KANGAL</span></h1>
-        <p class="subtitle">ইন্টারনেট নেই! 📡</p>
+        <p class="subtitle">ইন্টারনেট কানেকশন নেই! 📡</p>
         <p class="description">
-            আপনি এখন অফলাইনে আছেন। ইন্টারনেট সংযোগ ফিরে এলে আবার চেষ্টা করুন।
+            আপনি এখন অফলাইনে আছেন। ইন্টারনেট সংযোগ ফিরে এলে আমরা আপনাকে অটোমেটিক কানেক্ট করবো।
         </p>
 
         <div class="status-pill">
@@ -144,19 +346,9 @@
             No internet connection
         </div>
 
-        <br><br>
-
         <button class="retry-btn" onclick="window.location.reload()">
             🔄 আবার চেষ্টা করুন
         </button>
-
-        <div class="food-strip">
-            <span>🍚</span>
-            <span>🥘</span>
-            <span>🍛</span>
-            <span>🥗</span>
-            <span>🍲</span>
-        </div>
     </div>
 
     <script>
@@ -166,4 +358,5 @@
         });
     </script>
 </body>
+
 </html>

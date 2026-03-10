@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import { DesktopInstallButton } from '@/components/desktop-install-button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -137,6 +138,9 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
 
                 {/* Right side */}
                 <div className="flex items-center gap-2 ml-auto">
+                    {/* Desktop Install Button */}
+                    <DesktopInstallButton />
+
                     {/* Theme Toggle */}
                     <Button
                         variant="ghost"
