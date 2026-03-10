@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { PushManager } from '@/components/push-manager';
 import { Settings, User, LogOut, Loader2, Save, Check, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -102,6 +103,9 @@ export default function SettingsPage() {
                 <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
                 <p className="text-muted-foreground text-sm mt-0.5">Manage your profile and preferences</p>
             </div>
+
+            {/* Notification Settings */}
+            <PushManager />
 
             {/* Profile Card */}
             <Card>

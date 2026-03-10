@@ -3,6 +3,8 @@
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { bazaarExpenseSchema, updateBazaarExpenseSchema } from '@/lib/validations';
 
+import { sendNotificationToMess } from '@/lib/notifications/send';
+
 // ============================================================================
 // ADD BAZAAR EXPENSE (with items → triggers inventory deduction)
 // ============================================================================
@@ -63,6 +65,22 @@ export async function addBazaarExpense(input: unknown) {
     if (rpcError) {
         return { error: rpcError.message };
     }
+
+    // --- PUSH NOTIFICATION ---
+    // Try to get the name of the shopper for the notification
+    let shopperName = 'Someone';
+    const { data: profileData } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
+    if (profileData?.full_name) shopperName = profileData.full_name;
+
+    const notifTitle = isManager ? 'New Bazaar Approved ✅' : 'New Bazaar Added 🛒';
+    const notifBody = `${shopperName} added a bazaar cost of ৳${totalAmount}. ${isManager ? '' : 'Pending approval.'}`;
+
+    // Send push notification asynchronously (don't block the response)
+    sendNotificationToMess(messId, user.id, {
+        title: notifTitle,
+        body: notifBody,
+        click_action: '/dashboard/bazaar'
+    });
 
     return { success: true, expenseId };
 }

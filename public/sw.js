@@ -109,3 +109,60 @@ self.addEventListener('message', (event) => {
         self.skipWaiting();
     }
 });
+
+// --- Push Notification Handlers ---
+
+// Handle incoming push messages
+self.addEventListener('push', (event) => {
+    if (!event.data) return;
+
+    try {
+        const payload = event.data.json();
+
+        const options = {
+            body: payload.body || 'You have a new update.',
+            icon: payload.icon || '/icons/icon-192.png',
+            badge: '/icons/icon-192.png', // Small icon for Android status bar
+            vibrate: [100, 50, 100],
+            data: {
+                url: payload.click_action || '/', // Where to go when clicked
+            },
+            requireInteraction: true,
+        };
+
+        event.waitUntil(
+            self.registration.showNotification(payload.title || 'KANGAL', options)
+        );
+    } catch (e) {
+        console.error('Error parsing push payload:', e);
+        // Fallback for plain text pushes
+        event.waitUntil(
+            self.registration.showNotification('KANGAL', {
+                body: event.data.text(),
+                icon: '/icons/icon-192.png',
+            })
+        );
+    }
+});
+
+// Handle notification click
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    const urlToOpen = event.notification.data?.url || '/';
+
+    event.waitUntil(
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            // Check if there is already a window/tab open with the target URL
+            const client = windowClients.find((c) => c.url === new URL(urlToOpen, self.location.origin).href);
+
+            if (client && 'focus' in client) {
+                // If so, just focus it
+                return client.focus();
+            } else if (self.clients.openWindow) {
+                // If not, open a new window
+                return self.clients.openWindow(urlToOpen);
+            }
+        })
+    );
+});
