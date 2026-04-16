@@ -104,8 +104,8 @@ export function InstallAppSection() {
                 <div className="px-5 py-6">
                     <div className="flex items-start gap-4">
                         {/* App Icon */}
-                        <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-primary/15 border border-primary/20 flex items-center justify-center shadow-lg shadow-primary/5">
-                            <span className="text-2xl">🐐</span>
+                        <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 overflow-hidden flex items-center justify-center shadow-lg shadow-emerald-500/10">
+                            <img src="/food-animated-icon.svg" className="w-[120%] h-[120%] object-cover" alt="App Icon" />
                         </div>
 
                         <div className="flex-1 min-w-0">

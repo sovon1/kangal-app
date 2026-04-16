@@ -115,8 +115,8 @@ export function InstallPrompt() {
                     <div className="relative px-6 pt-8 pb-6">
                         {/* App Icon + Title */}
                         <div className="flex flex-col items-center text-center mb-6">
-                            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/10">
-                                <span className="text-4xl">🐐</span>
+                            <div className="w-20 h-20 rounded-[22px] bg-emerald-500/10 border border-emerald-500/20 overflow-hidden flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/10">
+                                <img src="/food-animated-icon.svg" className="w-[120%] h-[120%] object-cover" alt="Kangal Install Icon" />
                             </div>
                             <h2 className="text-xl font-bold tracking-tight mb-1">
                                 KANGAL ইনস্টল করুন

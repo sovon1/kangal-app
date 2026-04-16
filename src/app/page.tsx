@@ -29,11 +29,15 @@ export default async function LandingPage() {
       {/* Header */}
       <header className="absolute top-0 w-full z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center">
-              <Utensils className="h-6 w-6 text-primary-foreground" />
+          <div className="flex items-center gap-2 font-bold text-2xl tracking-tight group">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
+                <img 
+                    src="/food-animated-icon.svg" 
+                    alt="Kangal Logo" 
+                    className="w-12 h-12 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
+                />
             </div>
-            <span className="text-2xl font-bold tracking-tight">KANGAL</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">KANGAL</span>
           </div>
           <div className="flex items-center gap-4">
             <DesktopInstallButton />
@@ -196,9 +200,13 @@ export default async function LandingPage() {
         {/* Footer */}
         <footer className="relative z-10 py-12 border-t border-border/50 bg-background/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-muted-foreground">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="h-8 w-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                <Utensils className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 font-bold text-lg mb-4 md:mb-0 group">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
+                <img 
+                    src="/food-animated-icon.svg" 
+                    alt="Kangal Logo" 
+                    className="w-10 h-10 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
+                />
               </div>
               <span className="font-semibold text-foreground">KANGAL</span>
             </div>

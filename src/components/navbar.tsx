@@ -114,11 +114,15 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
         <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
             <div className="max-w-7xl mx-auto flex h-14 items-center px-4 gap-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 font-bold text-lg mr-2">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20">
-                        <Utensils className="h-4 w-4 text-primary" />
+                <Link href="/" className="flex items-center gap-2 font-bold text-lg mr-2 group">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
+                        <img 
+                            src="/food-animated-icon.svg" 
+                            alt="Kangal Logo" 
+                            className="w-10 h-10 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
+                        />
                     </div>
-                    <span className="tracking-tight">KANGAL</span>
+                    <span className="tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">KANGAL</span>
                 </Link>
 
                 {/* Desktop Nav */}
