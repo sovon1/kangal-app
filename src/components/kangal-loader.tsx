@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const FOOD_ICONS = ['🍚', '🥘', '🍛', '🥗', '🍲', '🥩', '🧅', '🥕', '🫑', '🍳'];
 
@@ -15,8 +16,10 @@ export function KangalLoader({
 }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [dots, setDots] = useState('');
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         const iconInterval = setInterval(() => {
             setActiveIndex((i) => (i + 1) % FOOD_ICONS.length);
         }, 300);
@@ -98,11 +101,12 @@ export function KangalLoader({
     );
 
     if (fullScreen) {
-        return (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-md transition-all duration-300 animate-in fade-in">
+        const fullScreenContent = (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-md transition-all duration-300 animate-in fade-in" style={{ position: 'fixed' }}>
                 {content}
             </div>
         );
+        return mounted ? createPortal(fullScreenContent, document.body) : null;
     }
 
     return content;
