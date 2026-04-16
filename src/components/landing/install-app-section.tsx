@@ -13,7 +13,7 @@ export function InstallAppSection() {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isInstalled, setIsInstalled] = useState(false);
     const [isInstalling, setIsInstalling] = useState(false);
-    const [dismissed, setDismissed] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
 
     useEffect(() => {
         // Check if already installed
@@ -21,6 +21,25 @@ export function InstallAppSection() {
             setIsInstalled(true);
             return;
         }
+
+        const SHOW_LIMIT_KEY = 'kangal-banner-last-shown';
+        const DISMISS_KEY = 'kangal-banner-dismissed';
+        
+        // 1. If explicitly dismissed, don't show for 3 days
+        const dismissedAt = localStorage.getItem(DISMISS_KEY);
+        if (dismissedAt && Date.now() - parseInt(dismissedAt) < 3 * 24 * 60 * 60 * 1000) {
+            return;
+        }
+
+        // 2. Rate limit: Only show once per day overall
+        const lastShownAt = localStorage.getItem(SHOW_LIMIT_KEY);
+        if (lastShownAt && Date.now() - parseInt(lastShownAt) < 24 * 60 * 60 * 1000) {
+            return;
+        }
+
+        // We passed the checks, safe to render it. Record the show time.
+        localStorage.setItem(SHOW_LIMIT_KEY, Date.now().toString());
+        setShouldRender(true);
 
         const handler = (e: Event) => {
             e.preventDefault();
@@ -41,6 +60,11 @@ export function InstallAppSection() {
         };
     }, []);
 
+    const handleDismiss = () => {
+        setShouldRender(false);
+        localStorage.setItem('kangal-banner-dismissed', Date.now().toString());
+    };
+
     const handleInstall = async () => {
         if (!deferredPrompt) return;
         setIsInstalling(true);
@@ -60,8 +84,8 @@ export function InstallAppSection() {
         setDeferredPrompt(null);
     };
 
-    // Don't show if already installed or dismissed
-    if (isInstalled || dismissed) return null;
+    // Don't show if already installed or rate-limited
+    if (isInstalled || !shouldRender) return null;
 
     // If no prompt available, show manual install instructions
     const showManualInstructions = !deferredPrompt;
@@ -71,7 +95,7 @@ export function InstallAppSection() {
             <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-emerald-500/5">
                 {/* Close button */}
                 <button
-                    onClick={() => setDismissed(true)}
+                    onClick={handleDismiss}
                     className="absolute top-3 right-3 z-10 p-1 rounded-full bg-background/50 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                     <X className="h-4 w-4" />

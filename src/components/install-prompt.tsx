@@ -24,9 +24,18 @@ export function InstallPrompt() {
             return;
         }
 
+        const SHOW_LIMIT_KEY = 'kangal-install-last-shown';
+        const SHOWN_DURATION = 24 * 60 * 60 * 1000; // 1 day
+
         // Check if recently dismissed
         const dismissedAt = localStorage.getItem(DISMISS_KEY);
         if (dismissedAt && Date.now() - parseInt(dismissedAt) < DISMISS_DURATION) {
+            return;
+        }
+
+        // Rate limit: Only show this modal at most once per day
+        const lastShownAt = localStorage.getItem(SHOW_LIMIT_KEY);
+        if (lastShownAt && Date.now() - parseInt(lastShownAt) < SHOWN_DURATION) {
             return;
         }
 
@@ -34,7 +43,10 @@ export function InstallPrompt() {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
             // Show prompt after a short delay for better UX
-            setTimeout(() => setIsVisible(true), 2000);
+            setTimeout(() => {
+                setIsVisible(true);
+                localStorage.setItem(SHOW_LIMIT_KEY, Date.now().toString());
+            }, 2000);
         };
 
         const installedHandler = () => {
