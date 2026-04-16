@@ -72,7 +72,7 @@ export function UpdatesModal({ trigger }: UpdatesModalProps) {
                             <TerminalSquare className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <DialogTitle className="text-xl font-bold tracking-tight">New Updates (10 March 2026)</DialogTitle>
+                            <DialogTitle className="text-xl font-bold tracking-tight">New Updates (17 April 2026)</DialogTitle>
                             <DialogDescription className="text-sm">
                                 what we are doing to make your life easier
                             </DialogDescription>
