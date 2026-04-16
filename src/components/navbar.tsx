@@ -111,7 +111,7 @@ export function Navbar({ userName = 'User', userRole = 'member', hasMess = true 
     };
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
             <div className="max-w-7xl mx-auto flex h-14 items-center px-4 gap-4">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 font-bold text-lg mr-2">

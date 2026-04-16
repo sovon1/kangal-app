@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -56,24 +57,38 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
 
             {/* Member Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {members.map((member) => {
+                {members.map((member, index) => {
                     const totalCost = member.mealCost + member.fixedCostShare + member.individualCostTotal;
                     const isNegative = member.currentBalance < 0;
 
                     return (
                         <Card
                             key={member.memberId}
-                            className={`border transition-all hover:shadow-md ${isNegative ? 'border-red-500/20' : 'border-border/50'
-                                }`}
+                            style={{ animationFillMode: 'both', animationDelay: `${index * 75}ms` }}
+                            className={cn(
+                                "group relative overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 hover:-translate-y-1 hover:shadow-elevated glass",
+                                isNegative ? "border-destructive/30" : "border-border/50"
+                            )}
                         >
-                            <CardContent className="p-4 space-y-3">
+                            {/* Dynamic Background Gradient (Effect 3: Gradient Pos/Neg) */}
+                            <div className={cn(
+                                "absolute inset-0 opacity-20 transition-opacity duration-500 group-hover:opacity-40 pointer-events-none",
+                                isNegative 
+                                    ? "bg-gradient-to-br from-destructive/30 via-transparent to-transparent" 
+                                    : "bg-gradient-to-br from-emerald-500/30 via-transparent to-transparent"
+                            )} />
+
+                            <CardContent className="p-4 space-y-3 relative z-10">
                                 {/* Name + Role */}
                                 <div className="flex items-center justify-between">
-                                    <h3 className={`font-bold text-sm ${isNegative ? 'text-destructive' : 'text-primary'}`}>
+                                    <h3 className={cn(
+                                        "font-bold text-sm drop-shadow-sm transition-colors", 
+                                        isNegative ? "text-destructive" : "text-primary"
+                                    )}>
                                         {member.name}
                                     </h3>
                                     {member.role === 'manager' && (
-                                        <Badge variant="secondary" className="text-[10px]">Manager</Badge>
+                                        <Badge variant="secondary" className="text-[10px] shadow-sm glass">Manager</Badge>
                                     )}
                                 </div>
 
@@ -88,7 +103,12 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
                                             <InfoRow
                                                 label="Balance"
                                                 value={formatCurrency(member.currentBalance)}
-                                                valueClass={isNegative ? 'text-destructive font-bold' : 'text-emerald-600 dark:text-emerald-400 font-bold'}
+                                                valueClass={cn(
+                                                    "font-bold transition-all duration-500 group-hover:scale-105", 
+                                                    isNegative 
+                                                        ? "text-destructive drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" 
+                                                        : "text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]"
+                                                )}
                                             />
                                         </div>
                                     </div>
@@ -111,9 +131,9 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
 
 function InfoRow({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
     return (
-        <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{label}:</span>
-            <span className={valueClass || 'text-foreground'}>{value}</span>
+        <div className="flex items-center justify-between py-0.5">
+            <span className="text-muted-foreground">{label}</span>
+            <span className={`tabular-nums tracking-tight ${valueClass || 'text-foreground font-medium'}`}>{value}</span>
         </div>
     );
 }

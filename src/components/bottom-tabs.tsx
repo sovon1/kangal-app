@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import {
     LayoutDashboard,
     CalendarDays,
@@ -49,7 +50,7 @@ export function BottomTabs({ hasMess = true, isManager = false }: BottomTabsProp
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
             {/* Glassmorphism background */}
-            <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-t border-border/50" />
+            <div className="absolute inset-0 glass border-t border-border/40" />
 
             {/* Safe area spacer for notched devices */}
             <div className="relative flex items-stretch justify-around px-1" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
@@ -86,14 +87,26 @@ export function BottomTabs({ hasMess = true, isManager = false }: BottomTabsProp
                             className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] relative active:scale-90 transition-all duration-150 ${isActive ? '' : 'text-muted-foreground'
                                 }`}
                         >
-                            {/* Active indicator pill */}
+                            {/* Active indicator pill — animated with framer-motion */}
                             {isActive && (
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[3px] rounded-full bg-primary animate-in fade-in zoom-in-50 duration-300" />
+                                <motion.div
+                                    layoutId="bottom-tab-indicator"
+                                    className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[3px] rounded-full bg-primary"
+                                    transition={{
+                                        type: 'spring',
+                                        stiffness: 400,
+                                        damping: 30,
+                                    }}
+                                />
                             )}
 
-                            <div className={`relative transition-all duration-200 ${isActive ? 'text-primary scale-110' : 'hover:text-foreground'}`}>
+                            <motion.div
+                                className={`relative transition-colors duration-200 ${isActive ? 'text-primary' : 'hover:text-foreground'}`}
+                                animate={isActive ? { scale: 1.15, y: -1 } : { scale: 1, y: 0 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                            >
                                 <Icon className="h-5 w-5" />
-                            </div>
+                            </motion.div>
 
                             <span className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-primary font-semibold' : ''
                                 }`}>
@@ -102,7 +115,12 @@ export function BottomTabs({ hasMess = true, isManager = false }: BottomTabsProp
 
                             {/* Active glow effect */}
                             {isActive && (
-                                <div className="absolute inset-0 -top-1 rounded-xl bg-primary/5 animate-in fade-in duration-300" />
+                                <motion.div
+                                    className="absolute inset-0 -top-1 rounded-xl bg-primary/5"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                />
                             )}
                         </Link>
                     );
