@@ -73,8 +73,8 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
                             {/* Dynamic Background Gradient (Effect 3: Gradient Pos/Neg) */}
                             <div className={cn(
                                 "absolute inset-0 opacity-20 transition-opacity duration-500 group-hover:opacity-40 pointer-events-none",
-                                isNegative 
-                                    ? "bg-gradient-to-br from-destructive/30 via-transparent to-transparent" 
+                                isNegative
+                                    ? "bg-gradient-to-br from-destructive/30 via-transparent to-transparent"
                                     : "bg-gradient-to-br from-emerald-500/30 via-transparent to-transparent"
                             )} />
 
@@ -82,7 +82,7 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
                                 {/* Name + Role */}
                                 <div className="flex items-center justify-between">
                                     <h3 className={cn(
-                                        "font-bold text-sm drop-shadow-sm transition-colors", 
+                                        "font-bold text-sm drop-shadow-sm transition-colors",
                                         isNegative ? "text-destructive" : "text-primary"
                                     )}>
                                         {member.name}
@@ -104,9 +104,9 @@ export function AllMemberInfo({ members, loading }: AllMemberInfoProps) {
                                                 label="Balance"
                                                 value={formatCurrency(member.currentBalance)}
                                                 valueClass={cn(
-                                                    "font-bold transition-all duration-500 group-hover:scale-105", 
-                                                    isNegative 
-                                                        ? "text-destructive drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" 
+                                                    "font-bold transition-all duration-500 group-hover:scale-105",
+                                                    isNegative
+                                                        ? "text-destructive drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
                                                         : "text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]"
                                                 )}
                                             />

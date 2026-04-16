@@ -1,7 +1,6 @@
 'use client';
 
-import { TrendingUp, TrendingDown, UtensilsCrossed, Wallet, ShoppingCart, Scale } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { UtensilsCrossed, Wallet, ShoppingCart, Scale } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface MemberBalance {
@@ -25,11 +24,9 @@ function formatCurrency(amount: number): string {
 export function StatsCards({ balance, loading }: StatsCardsProps) {
     if (loading) {
         return (
-            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 p-4 w-full">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
                 {[...Array(4)].map((_, i) => (
-                    <div key={i} className="relative w-36 h-36 sm:w-44 sm:h-44 lg:w-56 lg:h-56 rounded-full bg-slate-100 dark:bg-slate-800 animate-pulse flex items-center justify-center">
-                        <div className="w-3/4 h-3/4 rounded-full border-4 border-slate-200/50 dark:border-slate-700/50"></div>
-                    </div>
+                    <div key={i} className="rounded-2xl bg-muted/50 animate-pulse h-28" />
                 ))}
             </div>
         );
@@ -46,75 +43,123 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
             label: 'মোট মিল',
             value: balance.totalMeals.toString(),
             icon: UtensilsCrossed,
-            color: 'text-slate-700 dark:text-slate-300',
-            ringColor: 'stroke-slate-400 dark:stroke-slate-500',
+            dot: 'bg-violet-400',
+            accent: 'text-violet-600 dark:text-violet-400',
+            glowColor: 'hover:shadow-violet-200/60 dark:hover:shadow-violet-900/40',
             prefix: '',
-            suffix: ' মিল'
+            suffix: ' মিল',
+            animeAvatar: '/avatars/miki.svg',
+            animation: 'group-hover:animate-bounce group-hover:rotate-6'
         },
         {
             id: 'deposit',
             label: 'মোট জমা',
             value: formatCurrency(Math.abs(balance.totalDeposits)),
             icon: Wallet,
-            color: 'text-blue-600 dark:text-blue-400',
-            ringColor: 'stroke-blue-500',
+            dot: 'bg-sky-400',
+            accent: 'text-sky-600 dark:text-sky-400',
+            glowColor: 'hover:shadow-sky-200/60 dark:hover:shadow-sky-900/40',
             prefix: balance.totalDeposits < 0 ? '-' : '',
-            suffix: ''
+            suffix: '',
+            animeAvatar: '/avatars/haru.svg',
+            animation: 'group-hover:animate-[spin_3s_linear_infinite] group-hover:scale-125'
         },
         {
             id: 'cost',
             label: 'মোট খরচ',
             value: formatCurrency(totalCost),
             icon: ShoppingCart,
-            color: 'text-amber-600 dark:text-amber-400',
-            ringColor: 'stroke-amber-500',
+            dot: 'bg-amber-400',
+            accent: 'text-amber-600 dark:text-amber-400',
+            glowColor: 'hover:shadow-amber-200/60 dark:hover:shadow-amber-900/40',
             prefix: '',
-            suffix: ''
+            suffix: '',
+            animeAvatar: '/avatars/yuki.svg',
+            animation: 'group-hover:animate-[pulse_1s_ease-in-out_infinite] group-hover:-translate-y-3'
         },
         {
             id: 'balance',
             label: 'বর্তমান ব্যালেন্স',
             value: formatCurrency(Math.abs(balance.currentBalance)),
             icon: Scale,
-            color: isNegativeBalance ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400',
-            ringColor: isNegativeBalance ? 'stroke-red-500' : 'stroke-emerald-500',
+            dot: isNegativeBalance ? 'bg-rose-400 animate-pulse' : 'bg-emerald-400',
+            accent: isNegativeBalance ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400',
+            glowColor: isNegativeBalance 
+                ? 'hover:shadow-rose-200/60 dark:hover:shadow-rose-900/40' 
+                : 'hover:shadow-emerald-200/60 dark:hover:shadow-emerald-900/40',
             prefix: isNegativeBalance ? '-' : '+',
             suffix: '',
-            trending: true
+            animeAvatar: isNegativeBalance 
+                ? '/avatars/sadie.svg' 
+                : '/avatars/sora.svg',
+            animation: isNegativeBalance 
+                ? 'group-hover:animate-[ping_1s_cubic-bezier(0,0,0.2,1)_infinite]' 
+                : 'group-hover:animate-[bounce_1s_infinite] group-hover:scale-110'
         }
     ];
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full font-sans">
-            {stats.map((stat) => {
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
+            {stats.map((stat, index) => {
                 const Icon = stat.icon;
+
                 return (
-                    <Card key={stat.id} className="relative overflow-hidden group hover:shadow-md transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm">
-                        <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-current to-transparent opacity-[0.03] rounded-bl-full -mr-4 -mt-4 transition-transform duration-500 group-hover:scale-110 ${stat.color}`} />
-                        <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className={`p-2 rounded-xl bg-background/80 shadow-sm border border-border/50 ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
-                                    <Icon className="w-5 h-5" strokeWidth={2} />
-                                </div>
+                    <div
+                        key={stat.id}
+                        className="stagger-item"
+                    >
+                        <div
+                            className={`
+                                group relative flex flex-col justify-between overflow-hidden
+                                h-full p-5 rounded-2xl cursor-default
+                                bg-card/80 dark:bg-card/60
+                                border border-border/40
+                                transition-all duration-500 ease-out
+                                hover:-translate-y-1 hover:shadow-xl
+                                ${stat.glowColor}
+                            `}
+                        >
+                            {/* Animated Anime Character */}
+                            <div className="absolute right-0 bottom-0 pointer-events-none flex items-end justify-end overflow-hidden w-24 h-24 rounded-br-2xl">
+                                <img 
+                                    src={stat.animeAvatar} 
+                                    alt="Anime Chibi Mascot" 
+                                    className={`
+                                        w-16 h-16 object-contain 
+                                        opacity-30 contrast-75 saturate-50 
+                                        transition-all duration-500 ease-spring
+                                        transform translate-y-6 translate-x-2 
+                                        group-hover:opacity-100 group-hover:contrast-100 group-hover:saturate-100 
+                                        group-hover:translate-y-0 group-hover:-translate-x-1
+                                        ${stat.animation}
+                                    `}
+                                />
                             </div>
 
-                            <div>
-                                <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-1 truncate">
-                                    {stat.label}
-                                </h4>
-                                <div className="flex items-baseline gap-1">
-                                    <span className={`text-2xl font-bold tracking-tight ${stat.color}`}>
-                                        {stat.prefix}{stat.value}
-                                    </span>
-                                    {stat.suffix && (
-                                        <span className="text-sm font-medium text-muted-foreground">
-                                            {stat.suffix}
-                                        </span>
-                                    )}
-                                </div>
+                            {/* Top row: soft dot + tiny icon */}
+                            <div className="flex items-center gap-2 mb-auto z-10 relative">
+                                <span className={`w-2 h-2 rounded-full ${stat.dot} shrink-0`} />
+                                <Icon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors duration-300" strokeWidth={2} />
                             </div>
-                        </CardContent>
-                    </Card>
+
+                            {/* Value */}
+                            <div className="mt-4 z-10 relative">
+                                <span className={`text-2xl font-extrabold tracking-tight tabular-nums ${stat.accent}`}>
+                                    {stat.prefix}{stat.value}
+                                </span>
+                                {stat.suffix && (
+                                    <span className="text-xs font-medium text-muted-foreground/60 ml-0.5">
+                                        {stat.suffix}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Label */}
+                            <p className="text-[11px] font-medium text-muted-foreground/70 mt-1 tracking-wide z-10 relative">
+                                {stat.label}
+                            </p>
+                        </div>
+                    </div>
                 );
             })}
         </div>
