@@ -130,7 +130,7 @@ export function PricingSection() {
                             </div>
 
                             <div className="mb-8 relative z-10 flex flex-col items-start gap-1">
-                                <span className="text-lg font-bold text-muted-foreground line-through decoration-destructive/60 decoration-2">৳50 / month</span>
+                                <span className="text-lg font-bold text-muted-foreground line-through decoration-destructive/60 decoration-2">৳25 / month</span>
                                 <div className="flex items-end gap-2">
                                     <span className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">৳0</span>
                                     <span className="text-muted-foreground font-medium mb-2">/ month for 2 years</span>
