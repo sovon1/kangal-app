@@ -2,6 +2,18 @@ const CACHE_VERSION = 'kangal-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
+// Prevent Cache Bloat by limiting the number of files stored
+const limitCacheSize = (name, size) => {
+    caches.open(name).then((cache) => {
+        cache.keys().then((keys) => {
+            if (keys.length > size) {
+                // Delete oldest cache entry recursively until under size limit
+                cache.delete(keys[0]).then(() => limitCacheSize(name, size));
+            }
+        });
+    });
+};
+
 // Static assets to pre-cache
 const STATIC_ASSETS = [
     '/offline.html',
@@ -55,6 +67,7 @@ self.addEventListener('fetch', (event) => {
                     const clone = response.clone();
                     caches.open(DYNAMIC_CACHE).then((cache) => {
                         cache.put(request, clone);
+                        limitCacheSize(DYNAMIC_CACHE, 50);
                     });
                     return response;
                 })
@@ -79,6 +92,7 @@ self.addEventListener('fetch', (event) => {
                     const clone = response.clone();
                     caches.open(STATIC_CACHE).then((cache) => {
                         cache.put(request, clone);
+                        limitCacheSize(STATIC_CACHE, 150);
                     });
                     return response;
                 });
@@ -94,6 +108,7 @@ self.addEventListener('fetch', (event) => {
                 const clone = response.clone();
                 caches.open(DYNAMIC_CACHE).then((cache) => {
                     cache.put(request, clone);
+                    limitCacheSize(DYNAMIC_CACHE, 50);
                 });
                 return response;
             })
