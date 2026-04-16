@@ -109,9 +109,11 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
                         className="stagger-item"
                     >
                         <div
+                            onClick={() => {}}
+                            tabIndex={0}
                             className={`
                                 group relative flex flex-col justify-between overflow-hidden
-                                h-full p-5 rounded-2xl cursor-default
+                                h-full p-5 rounded-2xl cursor-pointer focus:outline-none [-webkit-tap-highlight-color:transparent]
                                 bg-card/80 dark:bg-card/60
                                 border border-border/40
                                 transition-all duration-500 ease-out
