@@ -48,7 +48,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
             glowColor: 'hover:shadow-violet-200/60 dark:hover:shadow-violet-900/40',
             prefix: '',
             suffix: ' মিল',
-            animeAvatar: '/avatars/miki.svg',
+            animeAvatar: '/avatars/miki2.svg',
             animation: 'group-hover:animate-bounce group-hover:rotate-6'
         },
         {
