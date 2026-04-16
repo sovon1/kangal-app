@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { UtensilsCrossed, Wallet, ShoppingCart, Scale } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -22,6 +23,8 @@ function formatCurrency(amount: number): string {
 }
 
 export function StatsCards({ balance, loading }: StatsCardsProps) {
+    const [activeCardId, setActiveCardId] = useState<string | null>(null);
+
     if (loading) {
         return (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
@@ -102,6 +105,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
             {stats.map((stat, index) => {
                 const Icon = stat.icon;
+                const isActive = activeCardId === stat.id;
 
                 return (
                     <div
@@ -109,7 +113,10 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
                         className="stagger-item"
                     >
                         <div
-                            onClick={() => {}}
+                            onFocus={() => setActiveCardId(stat.id)}
+                            onBlur={() => setActiveCardId(null)}
+                            onMouseEnter={() => setActiveCardId(stat.id)}
+                            onMouseLeave={() => setActiveCardId(null)}
                             tabIndex={0}
                             className={`
                                 group relative flex flex-col justify-between overflow-hidden
@@ -119,6 +126,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
                                 transition-all duration-500 ease-out
                                 hover:-translate-y-1 hover:shadow-xl
                                 ${stat.glowColor}
+                                ${isActive ? '-translate-y-1 shadow-xl ' + stat.glowColor.replace(/hover:shadow-/g, 'shadow-') : ''}
                             `}
                         >
                             {/* Animated Anime Character */}
@@ -134,6 +142,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
                                         group-hover:opacity-100 group-hover:contrast-100 group-hover:saturate-100 
                                         group-hover:translate-y-0 group-hover:-translate-x-1
                                         ${stat.animation}
+                                        ${isActive ? 'opacity-100 contrast-100 saturate-100 translate-y-0 -translate-x-1 ' + stat.animation.replace(/group-hover:/g, '') : ''}
                                     `}
                                 />
                             </div>
@@ -141,7 +150,7 @@ export function StatsCards({ balance, loading }: StatsCardsProps) {
                             {/* Top row: soft dot + tiny icon */}
                             <div className="flex items-center gap-2 mb-auto z-10 relative">
                                 <span className={`w-2 h-2 rounded-full ${stat.dot} shrink-0`} />
-                                <Icon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors duration-300" strokeWidth={2} />
+                                <Icon className={`w-3.5 h-3.5 transition-colors duration-300 ${isActive ? 'text-muted-foreground' : 'text-muted-foreground/50'} group-hover:text-muted-foreground`} strokeWidth={2} />
                             </div>
 
                             {/* Value */}
