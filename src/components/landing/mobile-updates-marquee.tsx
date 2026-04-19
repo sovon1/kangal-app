@@ -1,25 +1,25 @@
 'use client';
 
-import { Sparkles, Smartphone, Bug, TerminalSquare } from 'lucide-react';
+import { Sparkles, Smartphone, Bug, TerminalSquare, Zap } from 'lucide-react';
 import React from 'react';
 
 const updates = [
     {
         id: 1,
-        icon: Smartphone,
-        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
+        icon: Zap,
+        title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
         isExclusive: true,
     },
     {
         id: 2,
-        icon: Sparkles,
-        title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
+        icon: Smartphone,
+        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
         isExclusive: false,
     },
     {
         id: 3,
-        icon: Bug,
-        title: "নতুন ডিজাইন ও বাগ ফিক্স! 💫",
+        icon: Sparkles,
+        title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
         isExclusive: false,
     },
 ];

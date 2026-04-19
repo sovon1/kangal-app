@@ -83,7 +83,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-20 bg-muted/30 scroll-mt-8">
+      <section id="features" className="pt-20 pb-8 bg-muted/30 scroll-mt-8">
         <div className="max-w-7xl mx-auto px-6">
           <FeatureCards />
         </div>

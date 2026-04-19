@@ -16,7 +16,7 @@ export function PricingSection() {
 
     useEffect(() => {
         const supabase = getSupabaseBrowserClient();
-        
+
         // Initial check
         supabase.auth.getSession().then(({ data }) => {
             setIsLoggedIn(!!data.session);
@@ -47,15 +47,15 @@ export function PricingSection() {
         }
     };
     return (
-        <section id="pricing" className="py-32 relative overflow-hidden bg-background scroll-mt-8">
-            <div className="max-w-7xl mx-auto px-6 relative z-10 mt-10">
+        <section id="pricing" className="pt-8 pb-32 md:pt-12 md:pb-40 relative bg-background scroll-mt-8">
+            <div className="max-w-7xl mx-auto px-6 relative z-10">
                 {/* Section Header — clean, no decorative icons */}
                 <motion.div
                     initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                     whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-                    className="text-center mb-20"
+                    className="text-center mb-10 md:mb-16"
                 >
                     <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6 text-foreground">
                         Two plans. <br className="md:hidden" />
@@ -70,7 +70,7 @@ export function PricingSection() {
                     </p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-2 gap-12 lg:gap-16 max-w-5xl mx-auto items-center mt-10">
+                <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto items-stretch mt-10">
 
                     {/* ── Free Tier ── */}
                     <motion.div
@@ -79,7 +79,7 @@ export function PricingSection() {
                         viewport={{ once: true }}
                         whileHover={{ y: -5 }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-                        className="relative z-10"
+                        className="relative z-10 flex flex-col h-full md:scale-[0.96] md:origin-right transition-transform"
                     >
                         {/* Mascot — subtle float, no rotation */}
                         <motion.img
@@ -97,9 +97,16 @@ export function PricingSection() {
                                     The minimalist companion to organize your mess.
                                 </CardDescription>
                             </div>
-                            <div className="mb-8 flex items-end gap-2">
-                                <span className="text-5xl md:text-6xl font-black text-foreground/80">৳0</span>
-                                <span className="text-muted-foreground font-medium mb-2">/ month forever</span>
+                            
+                            {/* Structural spacing parity with Pro card to align buttons mathematically */}
+                            <div className="mb-8 flex flex-col items-start gap-1">
+                                <span className="text-lg font-bold opacity-0 select-none hidden md:block">
+                                    Placeholder
+                                </span>
+                                <div className="flex items-end gap-2">
+                                    <span className="text-5xl md:text-6xl font-black text-foreground/80">৳0</span>
+                                    <span className="text-muted-foreground font-medium mb-2">/ month forever</span>
+                                </div>
                             </div>
                             <ul className="space-y-4 mb-8 flex-1">
                                 {[
@@ -117,13 +124,15 @@ export function PricingSection() {
                                     </li>
                                 ))}
                             </ul>
-                            <Button
-                                variant="secondary"
-                                className="w-full h-14 text-lg rounded-2xl font-semibold backdrop-blur-md border border-border/50 hover:bg-muted/80 transition-all mt-auto cursor-pointer"
-                                onClick={handleClick}
-                            >
-                                Start Free
-                            </Button>
+                            <div className="pt-4 mt-auto">
+                                <Button
+                                    variant="secondary"
+                                    className="w-full h-14 text-lg rounded-2xl font-semibold backdrop-blur-md border border-border/50 hover:bg-muted/80 transition-all cursor-pointer"
+                                    onClick={handleClick}
+                                >
+                                    Start Free
+                                </Button>
+                            </div>
                         </Card>
                     </motion.div>
 
@@ -134,7 +143,7 @@ export function PricingSection() {
                         viewport={{ once: true }}
                         whileHover={{ y: -5 }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-                        className="relative group z-20 md:-my-4 mt-8 md:mt-0"
+                        className="relative group z-20 mt-16 md:mt-0 flex flex-col h-full transform-gpu"
                     >
                         {/* Mascot — subtle float only */}
                         <motion.img
@@ -151,13 +160,13 @@ export function PricingSection() {
                         <Card className="relative p-8 pt-12 bg-gradient-to-b from-card/80 to-card/30 backdrop-blur-3xl border border-emerald-500/30 shadow-[0_15px_50px_-15px_rgba(16,185,129,0.2)] flex flex-col h-full rounded-[2rem] overflow-hidden">
 
                             <div className="absolute top-5 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap">
-                                <Badge className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/20 font-bold px-3 py-1 rounded-full text-[10px] md:text-xs">
+                                <Badge className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 font-bold px-3 py-1 rounded-full text-[10px] md:text-xs">
                                     <Sparkles className="w-3.5 h-3.5 mr-1.5 inline" /> Free for 2 Years
                                 </Badge>
                             </div>
 
-                            <div className="mb-6 relative z-10 mt-4">
-                                <CardTitle className="text-2xl font-bold text-emerald-500 dark:text-emerald-400 mb-2">
+                            <div className="mb-6 relative z-10 mt-4 md:mt-0">
+                                <CardTitle className="text-2xl font-bold text-emerald-500 dark:text-emerald-400 mb-2 mt-4 md:mt-0">
                                     Pro Magic
                                 </CardTitle>
                                 <CardDescription className="text-base text-muted-foreground">
@@ -194,12 +203,14 @@ export function PricingSection() {
                                 ))}
                             </ul>
 
-                            <Button
-                                className="w-full h-14 text-lg rounded-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] mt-auto relative z-10 cursor-pointer"
-                                onClick={handleClick}
-                            >
-                                Get Pro Free
-                            </Button>
+                            <div className="pt-4 mt-auto relative z-10">
+                                <Button
+                                    className="w-full h-14 text-lg rounded-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] cursor-pointer"
+                                    onClick={handleClick}
+                                >
+                                    Get Pro Free
+                                </Button>
+                            </div>
                         </Card>
                     </motion.div>
                 </div>

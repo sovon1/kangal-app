@@ -9,9 +9,20 @@ import {
     DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Smartphone, Bug, TerminalSquare } from 'lucide-react';
+import { Sparkles, Smartphone, Bug, TerminalSquare, Zap } from 'lucide-react';
 
 const updates = [
+    {
+        id: 0,
+        icon: Zap,
+        title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
+        short: "Performance",
+        desc: "সম্পূর্ণ নতুন আর্কিটেকচার! এখন KANGAL অ্যাপ আরও দ্রুত লোড হবে এবং অফলাইন সাপোর্ট আগের চেয়ে অনেক বেশি স্ট্যাবল। কোনো ল্যাগ নেই!",
+        iconColor: "text-blue-500 dark:text-blue-400",
+        iconBg: "bg-blue-500/20 border-blue-500/30",
+        glow: "hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:border-blue-500/50 hover:-translate-y-1",
+        isExclusive: true,
+    },
     {
         id: 1,
         icon: Smartphone,
@@ -20,8 +31,8 @@ const updates = [
         desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেটিভ এক্সপেরিয়েন্স।",
         iconColor: "text-amber-500 dark:text-amber-400",
         iconBg: "bg-amber-500/20 border-amber-500/30",
-        glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40",
-        isExclusive: true,
+        glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40 hover:-translate-y-1",
+        isExclusive: false,
     },
     {
         id: 2,
@@ -31,18 +42,7 @@ const updates = [
         desc: "অ্যানিমেটেড অফলাইন মোড যুক্ত করা হয়েছে।",
         iconColor: "text-emerald-500 dark:text-emerald-400",
         iconBg: "bg-emerald-500/10 border-emerald-500/20",
-        glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-500/30",
-        isExclusive: false,
-    },
-    {
-        id: 3,
-        icon: Bug,
-        title: "ডিজাইন ও বাগ ফিক্স",
-        short: "UX Fixes",
-        desc: "ম্যানেজারদের জন্য নিচের বারে Options এর বদলে Costs আনা হয়েছে, এবং Landing Page-এর ডিজাইন আরও সুন্দর করা হয়েছে।",
-        iconColor: "text-purple-500 dark:text-purple-400",
-        iconBg: "bg-purple-500/10 border-purple-500/20",
-        glow: "hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:border-purple-500/30",
+        glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-500/30 hover:-translate-y-1",
         isExclusive: false,
     },
 ];
@@ -65,15 +65,15 @@ export function UpdatesModal({ trigger }: UpdatesModalProps) {
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-border/50 bg-background/95 backdrop-blur-xl">
+            <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-primary/20 bg-background/95 backdrop-blur-3xl shadow-[0_0_40px_-10px_rgba(16,185,129,0.15)]">
                 <DialogHeader className="px-6 pt-6 pb-2">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                        <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-inner">
                             <TerminalSquare className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <DialogTitle className="text-xl font-bold tracking-tight">New Updates (17 April 2026)</DialogTitle>
-                            <DialogDescription className="text-sm">
+                            <DialogTitle className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">New Updates (20 April 2026)</DialogTitle>
+                            <DialogDescription className="text-sm font-medium">
                                 what we are doing to make your life easier
                             </DialogDescription>
                         </div>
