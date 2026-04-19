@@ -7,6 +7,7 @@ import { Utensils, ArrowRight } from 'lucide-react';
 import { MobileUpdatesMarquee } from './mobile-updates-marquee';
 import { AppManualModal } from './app-manual-modal';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { HeroMobileInstallButton } from './hero-mobile-install-button';
 
 /* ── animation variants ─────────────────────────────────── */
 
@@ -153,6 +154,7 @@ export function HeroSection() {
                         />
                     </>
                 )}
+                <HeroMobileInstallButton />
             </motion.div>
 
             {/* Mobile Updates Marquee */}
