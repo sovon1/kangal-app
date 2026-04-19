@@ -8,6 +8,8 @@ export interface MessContextValue {
     messId: string;
     cycleId: string;
     role: 'manager' | 'member' | 'cook';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initialDashboardData?: any;
 }
 
 const MessContext = createContext<MessContextValue | null>(null);

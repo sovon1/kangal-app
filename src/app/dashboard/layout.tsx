@@ -3,6 +3,7 @@ import { Navbar } from '@/components/navbar';
 import { BottomTabs } from '@/components/bottom-tabs';
 import { MessProvider, type MessContextValue } from '@/components/mess-context';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { getDashboardData } from '@/lib/actions/finance';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
     const supabase = await getSupabaseServerClient();
@@ -49,12 +50,20 @@ export default async function DashboardLayout({ children }: { children: ReactNod
                 .single();
 
             if (cycle) {
+                // Prefetch dashboard data server-side (arrives with HTML — no loading state!)
+                const dashboardData = await getDashboardData({
+                    memberId: m.id,
+                    messId: m.mess_id,
+                    cycleId: cycle.id,
+                });
+
                 messCtx = {
                     userId: user.id,
                     memberId: m.id,
                     messId: m.mess_id,
                     cycleId: cycle.id,
                     role: userRole,
+                    initialDashboardData: 'error' in dashboardData ? undefined : dashboardData,
                 };
             }
         }

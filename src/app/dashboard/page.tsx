@@ -125,7 +125,7 @@ export default function DashboardPage() {
         router.refresh();
     };
 
-    // ========== UNIFIED DASHBOARD DATA (1 server call instead of 4) ==========
+    // ========== UNIFIED DASHBOARD DATA (prefetched in layout, instant render) ==========
     const dashboardQuery = useQuery({
         queryKey: ['dashboard-data', userContext?.memberId, userContext?.messId, userContext?.cycleId],
         queryFn: async () => {
@@ -141,6 +141,8 @@ export default function DashboardPage() {
         enabled: !!userContext,
         staleTime: 15000,
         refetchInterval: 30000,
+        // Server-prefetched data — renders instantly, no loading skeleton!
+        initialData: userContext?.initialDashboardData ?? undefined,
     });
 
     // Destructure for backward compatibility with existing component props
