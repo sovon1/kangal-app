@@ -9,7 +9,7 @@ import { AllMemberInfo } from '@/components/dashboard/all-member-info';
 import { MessOverview } from '@/components/dashboard/mess-overview';
 import { MealToggles } from '@/components/dashboard/meal-toggles';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
-import { MealComparison } from '@/components/dashboard/spending-chart';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -545,10 +545,7 @@ export default function DashboardPage() {
                         <AllMemberInfoSection messId={userContext.messId} cycleId={userContext.cycleId} />
                     )}
 
-                    {/* Member Meal Comparison — at the bottom */}
-                    {userContext && (
-                        <MealComparison cycleId={userContext.cycleId} messId={userContext.messId} />
-                    )}
+
                 </div>
             </PageTransition>
         </PullToRefresh>
