@@ -31,11 +31,11 @@ export default async function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-2xl tracking-tight group">
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
-                <img 
-                    src="/food-animated-icon.svg" 
-                    alt="Kangal Logo" 
-                    className="w-12 h-12 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
-                />
+              <img
+                src="/food-animated-icon.svg"
+                alt="Kangal Logo"
+                className="w-12 h-12 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
+              />
             </div>
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">KANGAL</span>
           </div>
@@ -162,10 +162,10 @@ export default async function LandingPage() {
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-muted-foreground">
             <div className="flex items-center gap-2 font-bold text-lg mb-4 md:mb-0 group">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
-                <img 
-                    src="/food-animated-icon.svg" 
-                    alt="Kangal Logo" 
-                    className="w-10 h-10 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
+                <img
+                  src="/food-animated-icon.svg"
+                  alt="Kangal Logo"
+                  className="w-10 h-10 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
                 />
               </div>
               <span className="font-semibold text-foreground">KANGAL</span>

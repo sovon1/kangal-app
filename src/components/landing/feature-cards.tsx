@@ -69,7 +69,7 @@ const cellVariants = {
 /* ── main component ──────────────────────────────────────── */
 
 export function FeatureCards() {
-    const [expandedIndex, setExpandedIndex] = useState<number | null>(0); // first card open by default (teaches the pattern)
+    const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
     return (
         <div>
