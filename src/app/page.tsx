@@ -158,7 +158,7 @@ export default async function LandingPage() {
         </section>
 
         {/* Footer */}
-        <footer className="relative z-10 py-12 border-t border-border/50 bg-background/80 backdrop-blur-sm">
+        <footer className="relative z-10 py-4 border-t border-border/50 bg-background/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-muted-foreground">
             <div className="flex items-center gap-2 font-bold text-lg mb-4 md:mb-0 group">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
@@ -170,9 +170,18 @@ export default async function LandingPage() {
               </div>
               <span className="font-semibold text-foreground">KANGAL</span>
             </div>
-            <p className="text-sm">
-              &copy; {new Date().getFullYear()} KANGAL. Built with 💚 at CSTE18, NSTU.
-            </p>
+            <p className="text-sm">&copy; {new Date().getFullYear()} KANGAL.<br />CSTE18,NSTU</p>
+
+            <a
+              href="https://github.com/sovon1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative text-[11px] italic tracking-widest text-muted-foreground/20 hover:text-muted-foreground/50 transition-all duration-1000"
+              style={{ fontFamily: 'var(--font-display), serif' }}
+            >
+              Made by Sovon
+              <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-muted-foreground/20 group-hover:w-full transition-all duration-1000 ease-out" />
+            </a>
           </div>
         </footer>
       </div>
