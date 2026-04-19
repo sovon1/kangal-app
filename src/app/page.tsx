@@ -180,7 +180,7 @@ export default async function LandingPage() {
                 href="https://github.com/sovon1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative italic text-muted-foreground/20 hover:text-muted-foreground/50 transition-all duration-1000"
+                className="group relative italic text-muted-foreground/90 hover:text-muted-foreground/100 transition-all duration-700"
                 style={{ fontFamily: 'var(--font-display), serif' }}
               >
                 Made by Sovon
