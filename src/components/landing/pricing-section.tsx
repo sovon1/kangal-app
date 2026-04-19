@@ -70,7 +70,7 @@ export function PricingSection() {
                     </p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto items-stretch mt-10">
+                <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto items-stretch mt-20 md:mt-16">
 
                     {/* ── Free Tier ── */}
                     <motion.div
