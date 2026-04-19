@@ -17,7 +17,7 @@ export function PricingSection({ isLoggedIn }: PricingSectionProps) {
 
     const handleClick = () => {
         if (isLoggedIn) {
-            toast('আপনি তো আগেই Pro! 🎉', {
+            toast('আপনি তো আগে থেকেই Pro plan এ আছেন! 🎉', {
                 description: 'Dashboard-এ যাচ্ছি...',
             });
             router.push('/dashboard');
