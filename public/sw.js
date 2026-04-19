@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'kangal-v2';
+const CACHE_VERSION = 'kangal-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -80,22 +80,50 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // For static assets (JS, CSS, images, fonts) — Cache First
+    // For static assets (JS, CSS, fonts) — Cache First (immutable builds)
     if (
         url.pathname.startsWith('/_next/static/') ||
-        url.pathname.match(/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|avif|ico)$/)
+        url.pathname.match(/\.(js|css|woff2?|ttf|eot)$/)
     ) {
         event.respondWith(
             caches.match(request).then((cached) => {
                 if (cached) return cached;
                 return fetch(request).then((response) => {
-                    const clone = response.clone();
-                    caches.open(STATIC_CACHE).then((cache) => {
-                        cache.put(request, clone);
-                        limitCacheSize(STATIC_CACHE, 150);
-                    });
+                    // Only cache valid responses
+                    if (response.ok && response.status === 200) {
+                        const clone = response.clone();
+                        caches.open(STATIC_CACHE).then((cache) => {
+                            cache.put(request, clone);
+                            limitCacheSize(STATIC_CACHE, 150);
+                        });
+                    }
                     return response;
                 });
+            })
+        );
+        return;
+    }
+
+    // For images (SVG, PNG, etc.) — Stale While Revalidate (self-healing)
+    if (
+        url.pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|avif|ico)$/)
+    ) {
+        event.respondWith(
+            caches.match(request).then((cached) => {
+                // Always fetch fresh in background
+                const fetchPromise = fetch(request).then((response) => {
+                    // Only cache valid, complete responses
+                    if (response.ok && response.status === 200 && response.type !== 'opaque') {
+                        const clone = response.clone();
+                        caches.open(STATIC_CACHE).then((cache) => {
+                            cache.put(request, clone);
+                        });
+                    }
+                    return response;
+                }).catch(() => cached); // If fetch fails, fall back to cache
+
+                // Return cached immediately if available, otherwise wait for network
+                return cached || fetchPromise;
             })
         );
         return;
