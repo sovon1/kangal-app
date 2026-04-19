@@ -70,7 +70,7 @@ const cardVariants = {
         filter: 'blur(0px)',
         transition: {
             duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
         },
     },
 };
@@ -85,7 +85,7 @@ export function FeatureCards() {
                 initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
                 className="mb-12"
             >
                 <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase mb-3">

@@ -40,7 +40,7 @@ export function FeedbackSection() {
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
                 className="max-w-3xl mx-auto px-6 relative z-10"
             >
                 <div className="text-center mb-10">

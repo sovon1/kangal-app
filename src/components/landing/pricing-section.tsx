@@ -16,7 +16,7 @@ export function PricingSection() {
                     initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                     whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
                     className="text-center mb-20"
                 >
                     <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6 text-foreground">
@@ -40,7 +40,7 @@ export function PricingSection() {
                         whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                         viewport={{ once: true }}
                         whileHover={{ y: -5 }}
-                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
                         className="relative z-10"
                     >
                         {/* Mascot — subtle float, no rotation */}
@@ -96,7 +96,7 @@ export function PricingSection() {
                         whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                         viewport={{ once: true }}
                         whileHover={{ y: -5 }}
-                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
                         className="relative group z-20 md:-my-4 mt-8 md:mt-0"
                     >
                         {/* Mascot — subtle float only */}
