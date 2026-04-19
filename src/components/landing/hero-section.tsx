@@ -45,9 +45,18 @@ export function HeroSection() {
 
     useEffect(() => {
         const supabase = getSupabaseBrowserClient();
+        
+        // Initial check
         supabase.auth.getSession().then(({ data }) => {
             setIsLoggedIn(!!data.session);
         });
+
+        // Listen for live auth changes (e.g., cross-tab login/logout)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setIsLoggedIn(!!session);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     return (
