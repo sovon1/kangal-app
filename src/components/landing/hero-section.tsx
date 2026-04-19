@@ -99,8 +99,7 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
                 variants={blurUp}
                 className="text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
             >
-                KANGAL automates your entire mess — meals, bazaar, deposits,
-                dues — so you never have to argue over money again.
+                মিল থেকে বাজার, জমা থেকে বকেয়া — পুরো মেসের হিসাব এক অ্যাপে।
             </motion.p>
 
             {/* CTA Buttons */}
