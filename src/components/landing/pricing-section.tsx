@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
@@ -7,13 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
-interface PricingSectionProps {
-    isLoggedIn: boolean;
-}
-
-export function PricingSection({ isLoggedIn }: PricingSectionProps) {
+export function PricingSection() {
     const router = useRouter();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const supabase = getSupabaseBrowserClient();
+        supabase.auth.getSession().then(({ data }) => {
+            setIsLoggedIn(!!data.session);
+        });
+    }, []);
 
     const handleClick = () => {
         if (isLoggedIn) {

@@ -1,11 +1,12 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Utensils, ArrowRight } from 'lucide-react';
 import { MobileUpdatesMarquee } from './mobile-updates-marquee';
 import { AppManualModal } from './app-manual-modal';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 /* ── animation variants ─────────────────────────────────── */
 
@@ -39,11 +40,16 @@ const blurUp = {
 
 /* ── component ───────────────────────────────────────────── */
 
-interface HeroSectionProps {
-    isLoggedIn: boolean;
-}
+export function HeroSection() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-export function HeroSection({ isLoggedIn }: HeroSectionProps) {
+    useEffect(() => {
+        const supabase = getSupabaseBrowserClient();
+        supabase.auth.getSession().then(({ data }) => {
+            setIsLoggedIn(!!data.session);
+        });
+    }, []);
+
     return (
         <motion.div
             variants={container}

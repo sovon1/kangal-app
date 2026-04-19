@@ -1,6 +1,5 @@
 
 import Link from 'next/link';
-import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { FeatureCards } from '@/components/landing/feature-cards';
 import { PricingSection } from '@/components/landing/pricing-section';
@@ -10,20 +9,9 @@ import { FeedbackSection } from '@/components/landing/feedback-section';
 import { AppManualModal } from '@/components/landing/app-manual-modal';
 import { InstallAppSection } from '@/components/landing/install-app-section';
 import { DesktopInstallButton } from '@/components/desktop-install-button';
-import { Utensils } from 'lucide-react';
+import { LandingAuthButtons } from '@/components/landing/auth-buttons';
 
-export default async function LandingPage() {
-  const supabase = await getSupabaseServerClient();
-
-  let user = null;
-  try {
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
-  } catch (error) {
-    // Supabase might be down or network issue - treat as logged out
-    console.error('Auth check failed:', error);
-  }
-
+export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
@@ -53,20 +41,8 @@ export default async function LandingPage() {
             <Link href="#feedback" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block mr-2">
               Feedback
             </Link>
-            {user ? (
-              <Link href="/dashboard">
-                <Button>Go to Dashboard</Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" className="text-base">Log in</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="font-semibold">Get Started</Button>
-                </Link>
-              </>
-            )}
+            {/* Client-side auth-aware buttons — no server delay */}
+            <LandingAuthButtons location="header" />
           </div>
         </div>
       </header>
@@ -88,7 +64,7 @@ export default async function LandingPage() {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none z-[5] bg-emerald-400/[0.06] dark:bg-emerald-400/[0.04] blur-[100px] animate-[drift_20s_ease-in-out_infinite]" />
 
         <div className="relative z-20 max-w-7xl mx-auto px-6 text-center">
-          <HeroSection isLoggedIn={!!user} />
+          <HeroSection />
         </div>
 
         {/* Mobile Only: Install App Section */}
@@ -114,7 +90,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <PricingSection isLoggedIn={!!user} />
+      <PricingSection />
 
       {/* Feedback Section */}
       <FeedbackSection />
@@ -133,27 +109,7 @@ export default async function LandingPage() {
           <h2 className="text-2xl font-bold mb-3">তাহলে আর দেরি কেন?</h2>
           <p className="text-muted-foreground mb-8">আজকেই শুরু করেন, ফ্রি!</p>
           <div className="flex items-center justify-center gap-4">
-            {user ? (
-              <Link href="/dashboard">
-                <Button size="lg" className="h-12 px-8 text-lg gap-2">
-                  <Utensils className="h-5 w-5" />
-                  Open Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signup">
-                  <Button size="lg" className="h-12 px-8 text-lg shadow-lg shadow-primary/20">
-                    Sign Up
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="outline" size="lg" className="h-12 px-8 text-lg">
-                    Log In
-                  </Button>
-                </Link>
-              </>
-            )}
+            <LandingAuthButtons location="cta" />
           </div>
         </section>
 
@@ -193,4 +149,3 @@ export default async function LandingPage() {
     </div>
   );
 }
-
