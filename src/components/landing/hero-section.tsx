@@ -60,19 +60,37 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
                 For students who eat together
             </motion.div>
 
-            {/* Heading — curved cute Bengali text with Galada font */}
+            {/* Heading — premium serif Bengali with decorative swoosh */}
             <h1
-                className="text-5xl lg:text-7xl leading-snug mb-7"
-                style={{ fontFamily: 'var(--font-display), cursive' }}
+                className="text-5xl sm:text-6xl lg:text-8xl font-semibold leading-tight mb-8"
+                style={{ fontFamily: 'var(--font-display), serif' }}
             >
                 <motion.span variants={blurUp} className="block text-foreground">
                     মেসের হিসাব করুন
                 </motion.span>
                 <motion.span
                     variants={blurUp}
-                    className="block text-emerald-500 dark:text-emerald-400"
+                    className="relative inline-block text-emerald-500 dark:text-emerald-400"
                 >
                     ঝামেলা ছাড়া
+                    {/* Animated curved swoosh underline */}
+                    <motion.svg
+                        className="absolute -bottom-2 sm:-bottom-3 left-0 w-full overflow-visible"
+                        viewBox="0 0 300 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                    >
+                        <motion.path
+                            d="M4 12 C60 2, 120 16, 150 8 S240 2, 296 13"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ pathLength: 1, opacity: 0.6 }}
+                            transition={{ duration: 1.2, delay: 1.0, ease: 'easeOut' }}
+                        />
+                    </motion.svg>
                 </motion.span>
             </h1>
 
