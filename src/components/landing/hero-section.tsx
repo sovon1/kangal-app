@@ -100,7 +100,7 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
                 className="text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
             >
                 KANGAL automates your entire mess — meals, bazaar, deposits,
-                dues — so month-end doesn&apos;t end friendships.
+                dues — so you never have to argue over money again.
             </motion.p>
 
             {/* CTA Buttons */}
