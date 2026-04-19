@@ -52,10 +52,10 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    // Redirect authenticated users away from auth pages
+    // Redirect authenticated users away from auth pages straight to the dashboard
     if (user && isAuthPage) {
         const url = request.nextUrl.clone();
-        url.pathname = '/';
+        url.pathname = '/dashboard';
         return NextResponse.redirect(url);
     }
 
