@@ -3,11 +3,34 @@
 import { Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
-export function PricingSection() {
+interface PricingSectionProps {
+    isLoggedIn: boolean;
+}
+
+export function PricingSection({ isLoggedIn }: PricingSectionProps) {
+    const router = useRouter();
+
+    const handleClick = () => {
+        if (isLoggedIn) {
+            toast('আপনি তো আগেই Pro! 🎉', {
+                description: 'Dashboard-এ যাচ্ছি...',
+            });
+            router.push('/dashboard');
+        } else {
+            toast('আগে একটু লগিন করে আসুন 🥺', {
+                description: 'অ্যাকাউন্ট তৈরি করুন অথবা লগিন করুন!',
+                action: {
+                    label: 'Sign Up',
+                    onClick: () => router.push('/signup'),
+                },
+            });
+        }
+    };
     return (
         <section id="pricing" className="py-32 relative overflow-hidden bg-background scroll-mt-8">
             <div className="max-w-7xl mx-auto px-6 relative z-10 mt-10">
@@ -79,14 +102,13 @@ export function PricingSection() {
                                     </li>
                                 ))}
                             </ul>
-                            <Link href="/signup" className="mt-auto">
-                                <Button
-                                    variant="secondary"
-                                    className="w-full h-14 text-lg rounded-2xl font-semibold backdrop-blur-md border border-border/50 hover:bg-muted/80 transition-all"
-                                >
-                                    Start Free
-                                </Button>
-                            </Link>
+                            <Button
+                                variant="secondary"
+                                className="w-full h-14 text-lg rounded-2xl font-semibold backdrop-blur-md border border-border/50 hover:bg-muted/80 transition-all mt-auto cursor-pointer"
+                                onClick={handleClick}
+                            >
+                                Start Free
+                            </Button>
                         </Card>
                     </motion.div>
 
@@ -157,11 +179,12 @@ export function PricingSection() {
                                 ))}
                             </ul>
 
-                            <Link href="/login" className="mt-auto relative z-10">
-                                <Button className="w-full h-14 text-lg rounded-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]">
-                                    Get Pro Free
-                                </Button>
-                            </Link>
+                            <Button
+                                className="w-full h-14 text-lg rounded-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] mt-auto relative z-10 cursor-pointer"
+                                onClick={handleClick}
+                            >
+                                Get Pro Free
+                            </Button>
                         </Card>
                     </motion.div>
                 </div>

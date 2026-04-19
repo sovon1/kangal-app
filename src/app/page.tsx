@@ -114,7 +114,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <PricingSection />
+      <PricingSection isLoggedIn={!!user} />
 
       {/* Feedback Section */}
       <FeedbackSection />
