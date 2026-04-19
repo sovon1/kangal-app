@@ -25,8 +25,8 @@ import {
 } from '@/components/ui/dialog';
 import { Plus, ArrowRight, TrendingUp, CalendarDays, Loader2, Copy, Check, BookOpen, Users, Sparkles, Rocket, ShoppingCart, Wallet, Calculator } from 'lucide-react';
 import { toast } from 'sonner';
-import { toggleMeal, updateGuestMeal, getTodayMeals } from '@/lib/actions/meals';
-import { getDashboardStats, getMemberBalance, getRecentActivity, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
+import { toggleMeal, updateGuestMeal } from '@/lib/actions/meals';
+import { getDashboardData, getAllMemberBalances, getMessOverview } from '@/lib/actions/finance';
 import { downloadFullMessReport } from '@/lib/pdf-export';
 import { KangalLoader } from '@/components/kangal-loader';
 import { PullToRefresh } from '@/components/pull-to-refresh';
@@ -125,55 +125,29 @@ export default function DashboardPage() {
         router.refresh();
     };
 
-    // Dashboard Stats Query
-    const statsQuery = useQuery<DashboardStats | null>({
-        queryKey: ['dashboard-stats', userContext?.messId, userContext?.cycleId],
+    // ========== UNIFIED DASHBOARD DATA (1 server call instead of 4) ==========
+    const dashboardQuery = useQuery({
+        queryKey: ['dashboard-data', userContext?.memberId, userContext?.messId, userContext?.cycleId],
         queryFn: async () => {
             if (!userContext) return null;
-            return await getDashboardStats(userContext.messId, userContext.cycleId);
-        },
-        enabled: !!userContext,
-        staleTime: 30000,
-        refetchInterval: 30000,
-    });
-
-    // Member Balance Query
-    const balanceQuery = useQuery({
-        queryKey: ['member-balance', userContext?.memberId, userContext?.cycleId],
-        queryFn: async () => {
-            if (!userContext) return null;
-            const result = await getMemberBalance(userContext.memberId, userContext.cycleId);
+            const result = await getDashboardData({
+                memberId: userContext.memberId,
+                messId: userContext.messId,
+                cycleId: userContext.cycleId,
+            });
             if ('error' in result) return null;
             return result;
         },
         enabled: !!userContext,
-        staleTime: 30000,
+        staleTime: 15000,
         refetchInterval: 30000,
     });
 
-    // Today's Meals Query
-    const mealsQuery = useQuery<MealToggleState | null>({
-        queryKey: ['today-meals', userContext?.memberId, userContext?.messId],
-        queryFn: async () => {
-            if (!userContext) return null;
-            return await getTodayMeals(userContext.memberId, userContext.messId);
-        },
-        enabled: !!userContext,
-        staleTime: 15000,
-    });
-
-    // Recent Activity Query
-    const activityQuery = useQuery({
-        queryKey: ['recent-activity', userContext?.messId],
-        queryFn: async () => {
-            if (!userContext) return null;
-            const result = await getRecentActivity(userContext.messId);
-            if ('error' in result) return null;
-            return result.data || null;
-        },
-        enabled: !!userContext,
-        staleTime: 30000,
-    });
+    // Destructure for backward compatibility with existing component props
+    const statsData = dashboardQuery.data?.stats ?? null;
+    const balanceData = dashboardQuery.data?.balance ?? null;
+    const mealsData = dashboardQuery.data?.todayMeals ?? null;
+    const activityData = dashboardQuery.data?.activity ?? null;
 
     // Meal toggle handlers
     const handleMealToggle = useCallback(async (mealType: 'breakfast' | 'lunch' | 'dinner', value: number) => {
@@ -470,8 +444,8 @@ export default function DashboardPage() {
 
                     {/* Stats Cards */}
                     <StatsCards
-                        balance={balanceQuery.data ?? null}
-                        loading={balanceQuery.isLoading}
+                        balance={balanceData}
+                        loading={dashboardQuery.isLoading}
                     />
 
                     {/* Mess Overview + Balance Breakdown (Two Column) */}
@@ -487,25 +461,25 @@ export default function DashboardPage() {
                                 <CardTitle className="text-lg">My Balance Breakdown</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {balanceQuery.isLoading ? (
+                                {dashboardQuery.isLoading ? (
                                     <div className="space-y-3">
                                         {[...Array(5)].map((_, i) => (
                                             <Skeleton key={i} className="h-4 w-full" />
                                         ))}
                                     </div>
-                                ) : balanceQuery.data ? (
+                                ) : balanceData ? (
                                     <div className="space-y-2.5">
-                                        <BalanceRow label="Opening Balance" amount={balanceQuery.data.openingBalance} />
-                                        <BalanceRow label="Deposits" amount={balanceQuery.data.totalDeposits} positive />
+                                        <BalanceRow label="Opening Balance" amount={balanceData.openingBalance} />
+                                        <BalanceRow label="Deposits" amount={balanceData.totalDeposits} positive />
                                         <div className="border-t border-border/50" />
-                                        <BalanceRow label={`Meals (${balanceQuery.data.totalMeals}×)`} amount={-balanceQuery.data.mealCost} />
-                                        <BalanceRow label="Fixed Costs" amount={-balanceQuery.data.fixedCostShare} />
-                                        <BalanceRow label="Individual Costs" amount={-balanceQuery.data.individualCostTotal} />
+                                        <BalanceRow label={`Meals (${balanceData.totalMeals}×)`} amount={-balanceData.mealCost} />
+                                        <BalanceRow label="Fixed Costs" amount={-balanceData.fixedCostShare} />
+                                        <BalanceRow label="Individual Costs" amount={-balanceData.individualCostTotal} />
                                         <div className="border-t border-border/50 pt-1" />
                                         <div className="flex items-center justify-between font-bold">
                                             <span className="text-sm">Current Balance</span>
-                                            <span className={`text-base ${balanceQuery.data.currentBalance >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
-                                                ৳{balanceQuery.data.currentBalance.toLocaleString()}
+                                            <span className={`text-base ${balanceData.currentBalance >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
+                                                ৳{balanceData.currentBalance.toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
@@ -521,11 +495,11 @@ export default function DashboardPage() {
                         {/* Meal Toggles — Takes 2 columns on desktop */}
                         <div className="lg:col-span-2">
                             <MealToggles
-                                meals={mealsQuery.data ?? null}
+                                meals={mealsData}
                                 memberId={userContext?.memberId ?? ''}
                                 cycleId={userContext?.cycleId ?? ''}
                                 messId={userContext?.messId ?? ''}
-                                loading={mealsQuery.isLoading}
+                                loading={dashboardQuery.isLoading}
                                 onToggle={handleMealToggle}
                                 onGuestUpdate={handleGuestUpdate}
                             />
@@ -534,8 +508,8 @@ export default function DashboardPage() {
                         {/* Right Column: Recent Activity */}
                         <div className="space-y-6">
                             <RecentActivity
-                                activities={activityQuery.data ?? null}
-                                loading={activityQuery.isLoading}
+                                activities={activityData}
+                                loading={dashboardQuery.isLoading}
                             />
                         </div>
                     </div>

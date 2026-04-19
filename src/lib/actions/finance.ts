@@ -701,3 +701,208 @@ export async function settleMemberBalance(
 
     return { success: true };
 }
+
+// ============================================================================
+// UNIFIED DASHBOARD DATA (Single server action, 1 auth call, all parallel)
+// ============================================================================
+
+interface CutoffConfig {
+    breakfast_cutoff: string;
+    lunch_cutoff: string;
+    dinner_cutoff: string;
+}
+
+function getBDTime(): Date {
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcMs + 6 * 3600000);
+}
+
+function isMealLocked(mealType: 'breakfast' | 'lunch' | 'dinner', mealDate: string, config: CutoffConfig): boolean {
+    const now = getBDTime();
+    const [year, month, day] = mealDate.split('-').map(Number);
+
+    let cutoffTime: string;
+    let cutoffDay: number = day;
+
+    switch (mealType) {
+        case 'breakfast':
+            cutoffTime = config.breakfast_cutoff;
+            cutoffDay = day - 1;
+            break;
+        case 'lunch':
+            cutoffTime = config.lunch_cutoff;
+            break;
+        case 'dinner':
+            cutoffTime = config.dinner_cutoff;
+            break;
+    }
+
+    const [hours, minutes] = cutoffTime.split(':').map(Number);
+    const cutoffDate = new Date(year, month - 1, cutoffDay, hours, minutes, 0, 0);
+    return now > cutoffDate;
+}
+
+export async function getDashboardData(params: {
+    memberId: string;
+    messId: string;
+    cycleId: string;
+}) {
+    const { memberId, messId, cycleId } = params;
+    const supabase = await getSupabaseServerClient();
+    const today = new Date().toISOString().split('T')[0];
+
+    // ONE auth check (was 4 before!)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' as const };
+
+    // ALL queries in parallel — single Promise.all
+    const [
+        membersResult,
+        mealRateResult,
+        todayMealsResult,
+        bazaarResult,
+        depositsResult,
+        cycleResult,
+        balanceResult,
+        myMealResult,
+        cutoffResult,
+        activityResult,
+    ] = await Promise.all([
+        // === Dashboard Stats ===
+        supabase
+            .from('mess_members')
+            .select('id', { count: 'exact' })
+            .eq('mess_id', messId)
+            .eq('status', 'active'),
+
+        supabase.rpc('calculate_meal_rate', { p_cycle_id: cycleId }),
+
+        supabase
+            .from('daily_meals')
+            .select('breakfast, lunch, dinner, guest_breakfast, guest_lunch, guest_dinner')
+            .eq('mess_id', messId)
+            .eq('meal_date', today),
+
+        supabase
+            .from('bazaar_expenses')
+            .select('total_amount')
+            .eq('cycle_id', cycleId)
+            .eq('approval_status', 'approved'),
+
+        supabase
+            .from('transactions')
+            .select('amount')
+            .eq('cycle_id', cycleId)
+            .eq('approval_status', 'approved'),
+
+        supabase
+            .from('mess_cycles')
+            .select('start_date, end_date')
+            .eq('id', cycleId)
+            .single(),
+
+        // === Member Balance ===
+        supabase.rpc('calculate_member_balance', {
+            p_member_id: memberId,
+            p_cycle_id: cycleId,
+        }),
+
+        // === Today's Meals (my meals) ===
+        supabase
+            .from('daily_meals')
+            .select('*')
+            .eq('member_id', memberId)
+            .eq('meal_date', today)
+            .single(),
+
+        // === Meal Cutoff Config ===
+        supabase
+            .from('meal_cutoff_config')
+            .select('*')
+            .eq('mess_id', messId)
+            .single(),
+
+        // === Recent Activity ===
+        supabase
+            .from('activity_log')
+            .select(`*, actor:profiles(full_name, avatar_url)`)
+            .eq('mess_id', messId)
+            .order('created_at', { ascending: false })
+            .limit(5),
+    ]);
+
+    // ---------- Process Dashboard Stats ----------
+    const todayMealCount = (todayMealsResult.data || []).reduce((sum, m) => {
+        return sum +
+            (m.breakfast ? 1 : 0) + (m.lunch ? 1 : 0) + (m.dinner ? 1 : 0) +
+            (m.guest_breakfast || 0) + (m.guest_lunch || 0) + (m.guest_dinner || 0);
+    }, 0);
+
+    let cycleProgress = 0;
+    let daysRemaining = 0;
+    if (cycleResult.data) {
+        const start = new Date(cycleResult.data.start_date);
+        const end = new Date(cycleResult.data.end_date);
+        const now = new Date();
+        const totalDays = Math.max((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24), 1);
+        const elapsed = Math.max((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24), 0);
+        cycleProgress = Math.min(Math.round((elapsed / totalDays) * 100), 100);
+        daysRemaining = Math.max(Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)), 0);
+    }
+
+    const stats = {
+        currentMealRate: Number(mealRateResult.data) || 0,
+        provisionalMealRate: Number(mealRateResult.data) || 0,
+        totalMembers: membersResult.count || 0,
+        activeMembers: membersResult.count || 0,
+        totalMealsToday: todayMealCount,
+        totalBazaarExpense: (bazaarResult.data || []).reduce((s, e) => s + Number(e.total_amount), 0),
+        totalDeposits: (depositsResult.data || []).reduce((s, d) => s + Number(d.amount), 0),
+        cycleProgress,
+        daysRemaining,
+    };
+
+    // ---------- Process Member Balance ----------
+    const balRow = Array.isArray(balanceResult.data) ? balanceResult.data[0] : balanceResult.data;
+    const balance = {
+        openingBalance: Number(balRow?.opening_balance) || 0,
+        totalDeposits: Number(balRow?.total_deposits) || 0,
+        totalMeals: Number(balRow?.total_meals) || 0,
+        mealRate: Number(balRow?.meal_rate) || 0,
+        mealCost: Number(balRow?.meal_cost) || 0,
+        fixedCostShare: Number(balRow?.fixed_cost_share) || 0,
+        individualCostTotal: Number(balRow?.individual_cost_total) || 0,
+        currentBalance: Number(balRow?.current_balance) || 0,
+    };
+
+    // ---------- Process Today's Meals ----------
+    const cutoffConfig: CutoffConfig = cutoffResult.data || {
+        breakfast_cutoff: '21:00',
+        lunch_cutoff: '10:00',
+        dinner_cutoff: '15:00',
+    };
+    const meal = myMealResult.data;
+    const todayMeals = {
+        date: today,
+        breakfast: Number(meal?.breakfast || 0),
+        lunch: Number(meal?.lunch || 0),
+        dinner: Number(meal?.dinner || 0),
+        guestBreakfast: meal?.guest_breakfast ?? 0,
+        guestLunch: meal?.guest_lunch ?? 0,
+        guestDinner: meal?.guest_dinner ?? 0,
+        breakfastLocked: isMealLocked('breakfast', today, cutoffConfig),
+        lunchLocked: isMealLocked('lunch', today, cutoffConfig),
+        dinnerLocked: isMealLocked('dinner', today, cutoffConfig),
+    };
+
+    // ---------- Process Activity ----------
+    const activity = activityResult.data || [];
+
+    return {
+        stats,
+        balance,
+        todayMeals,
+        activity,
+    };
+}
