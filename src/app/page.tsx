@@ -158,30 +158,35 @@ export default async function LandingPage() {
         </section>
 
         {/* Footer */}
-        <footer className="relative z-10 py-4 border-t border-border/50 bg-background/80 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-muted-foreground">
-            <div className="flex items-center gap-2 font-bold text-lg mb-4 md:mb-0 group">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 overflow-hidden shadow-sm">
+        <footer className="relative z-10 py-3 border-t border-border/50 bg-background/80 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-6 flex items-center justify-between gap-4 text-muted-foreground">
+            {/* Left — logo */}
+            <div className="flex items-center gap-2 group shrink-0">
+              <div className="flex items-center justify-center w-6 h-6 rounded-md bg-emerald-500/10 border border-emerald-500/20 overflow-hidden">
                 <img
                   src="/food-animated-icon.svg"
                   alt="Kangal Logo"
-                  className="w-10 h-10 object-cover scale-[1.3] group-hover:scale-[1.4] transition-transform duration-300"
+                  className="w-8 h-8 object-cover scale-[1.3]"
                 />
               </div>
-              <span className="font-semibold text-foreground">KANGAL</span>
+              <span className="text-xs font-semibold text-foreground/70">KANGAL</span>
             </div>
-            <p className="text-sm">&copy; {new Date().getFullYear()} KANGAL.<br />CSTE18,NSTU</p>
 
-            <a
-              href="https://github.com/sovon1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative text-[11px] italic tracking-widest text-muted-foreground/20 hover:text-muted-foreground/50 transition-all duration-1000"
-              style={{ fontFamily: 'var(--font-display), serif' }}
-            >
-              Made by Sovon
-              <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-muted-foreground/20 group-hover:w-full transition-all duration-1000 ease-out" />
-            </a>
+            {/* Right — copyright + credit */}
+            <div className="flex items-center gap-3 text-[10px] sm:text-xs text-muted-foreground/40">
+              <span>&copy; {new Date().getFullYear()} CSTE18, NSTU</span>
+              <span className="text-border/50">·</span>
+              <a
+                href="https://github.com/sovon1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative italic text-muted-foreground/20 hover:text-muted-foreground/50 transition-all duration-1000"
+                style={{ fontFamily: 'var(--font-display), serif' }}
+              >
+                Made by Sovon
+                <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-muted-foreground/20 group-hover:w-full transition-all duration-1000 ease-out" />
+              </a>
+            </div>
           </div>
         </footer>
       </div>
