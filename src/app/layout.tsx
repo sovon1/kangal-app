@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono, Galada } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import "./globals.css";
@@ -13,6 +13,12 @@ const plusJakarta = Plus_Jakarta_Sans({
 const geistMono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+});
+
+const galada = Galada({
+  weight: "400",
+  subsets: ["bengali", "latin"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -50,7 +56,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body
-        className={`${plusJakarta.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${plusJakarta.variable} ${geistMono.variable} ${galada.variable} font-sans antialiased`}
       >
         <Providers>
           {children}

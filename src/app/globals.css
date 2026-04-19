@@ -71,6 +71,22 @@
   }
 }
 
+@keyframes drift {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  33% {
+    transform: translate(-45%, -55%) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-55%, -45%) scale(0.97);
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

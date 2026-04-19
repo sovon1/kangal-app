@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { FeatureCards } from '@/components/landing/feature-cards';
 import { PricingSection } from '@/components/landing/pricing-section';
 import { UpdatesModal } from '@/components/landing/updates-modal';
-import { MobileUpdatesMarquee } from '@/components/landing/mobile-updates-marquee';
+import { HeroSection } from '@/components/landing/hero-section';
 import { FeedbackSection } from '@/components/landing/feedback-section';
 import { AppManualModal } from '@/components/landing/app-manual-modal';
 import { InstallAppSection } from '@/components/landing/install-app-section';
@@ -84,51 +84,11 @@ export default async function LandingPage() {
         {/* Gradient Overlay for Fade Effect */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent z-10" />
 
+        {/* Ambient gradient orb — adds a living, breathing depth behind the text */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none z-[5] bg-emerald-400/[0.06] dark:bg-emerald-400/[0.04] blur-[100px] animate-[drift_20s_ease-in-out_infinite]" />
+
         <div className="relative z-20 max-w-7xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            Mess Management Made Simple
-          </div>
-
-          <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-            Manage Your Mess Life<br />
-            <span className="text-primary">Without the Chaos</span>
-          </h1>
-
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Track meals, split bazaar costs, and manage finances effortlessly.
-            Say goodbye to spreadsheets and confusion.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 lg:mb-16">
-            {user ? (
-              <Link href="/dashboard" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full h-12 px-8 text-lg gap-2">
-                  <Utensils className="h-5 w-5" />
-                  Open Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full h-12 px-8 text-lg shadow-lg shadow-primary/20">
-                    Start Your Mess
-                  </Button>
-                </Link>
-                <AppManualModal trigger={
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-lg cursor-pointer">
-                    How it Works
-                  </Button>
-                } />
-              </>
-            )}
-          </div>
-
-          {/* Mobile Only: Updates Marquee in the gap */}
-          <MobileUpdatesMarquee />
+          <HeroSection isLoggedIn={!!user} />
         </div>
 
         {/* Mobile Only: Install App Section */}
@@ -211,7 +171,7 @@ export default async function LandingPage() {
               <span className="font-semibold text-foreground">KANGAL</span>
             </div>
             <p className="text-sm">
-              &copy; {new Date().getFullYear()} KANGAL. some lifeless guy from CSTE18 NSTU.
+              &copy; {new Date().getFullYear()} KANGAL. Built with 💚 at CSTE18, NSTU.
             </p>
           </div>
         </footer>
