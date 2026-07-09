@@ -61,9 +61,9 @@
             "label": "KANGAL Mess Management Dashboard"
         },
         {
-            "src": "/auth-bg.png",
-            "sizes": "1280x720",
-            "type": "image/png",
+            "src": "/nstu-bg.jpg",
+            "sizes": "1740x892",
+            "type": "image/jpeg",
             "form_factor": "wide",
             "label": "KANGAL Dashboard on Desktop"
         }
