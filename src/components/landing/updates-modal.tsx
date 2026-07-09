@@ -9,13 +9,14 @@ import {
     DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Smartphone, Bug, TerminalSquare, Zap } from 'lucide-react';
+import { Sparkles, Smartphone, TerminalSquare, Zap } from 'lucide-react';
 
 const updates = [
     {
         id: 0,
         icon: Sparkles,
         title: "বাজার খরচ এখন সরাসরি ডিপোজিট! 💰",
+        date: "10 July 2026",
         short: "Bazaar Deposit",
         desc: "বাজার এন্ট্রি করার সময় নিজের পকেট থেকে খরচ করলে সরাসরি আপনার অথবা অন্য যেকোনো মেম্বারের নামে ডিপোজিট (জমা) হিসেবে যোগ করে নিতে পারবেন এক ক্লিকেই!",
         iconColor: "text-rose-500 dark:text-rose-400",
@@ -27,6 +28,7 @@ const updates = [
         id: 1,
         icon: Zap,
         title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
+        date: "09 July 2026",
         short: "Performance",
         desc: "সম্পূর্ণ নতুন আর্কিটেকচার! এখন KANGAL অ্যাপ আরও দ্রুত লোড হবে এবং অফলাইন সাপোর্ট আগের চেয়ে অনেক বেশি স্ট্যাবল। কোনো ল্যাগ নেই!",
         iconColor: "text-blue-500 dark:text-blue-400",
@@ -38,8 +40,9 @@ const updates = [
         id: 2,
         icon: Smartphone,
         title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
+        date: "08 July 2026",
         short: "App Install",
-        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেটিভ এক্সপেরিয়েন্স।",
+        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেটিভ এক্সপেরিয়েন্স।",
         iconColor: "text-amber-500 dark:text-amber-400",
         iconBg: "bg-amber-500/20 border-amber-500/30",
         glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40 hover:-translate-y-1",
@@ -98,12 +101,17 @@ export function UpdatesModal({ trigger }: UpdatesModalProps) {
                                 </div>
 
                                 <div className="flex-1 relative z-10 pt-1">
-                                    <div className="flex items-center justify-between mb-1 gap-2">
-                                        <h4 className={`text-base font-bold ${update.isExclusive ? 'text-amber-500' : 'text-foreground'}`}>
-                                            {update.title}
-                                        </h4>
+                                    <div className="flex items-start justify-between mb-1 gap-2">
+                                        <div className="flex flex-col">
+                                            <h4 className={`text-base font-bold leading-snug ${update.isExclusive ? 'text-amber-500' : 'text-foreground'}`}>
+                                                {update.title}
+                                            </h4>
+                                            <span className="text-[11px] text-muted-foreground/80 font-medium mt-0.5">
+                                                {update.date}
+                                            </span>
+                                        </div>
                                         {update.isExclusive && (
-                                            <span className="text-[10px] uppercase tracking-wider font-bold text-amber-500 animate-pulse whitespace-nowrap hidden sm:inline-block">
+                                            <span className="text-[10px] uppercase tracking-wider font-bold text-amber-500 animate-pulse whitespace-nowrap hidden sm:inline-block mt-0.5">
                                                 Exclusive
                                             </span>
                                         )}

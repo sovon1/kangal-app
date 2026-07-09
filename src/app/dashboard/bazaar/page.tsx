@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { addBazaarExpense, getBazaarExpenses, approveBazaarExpense, updateBazaarExpense, deleteBazaarExpense } from '@/lib/actions/bazaar';
@@ -17,11 +17,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock, Edit2, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
+import dynamic from 'next/dynamic';
+
+const AnimatedCat = dynamic(() => import('@/components/bazaar/animated-cat'), {
+    ssr: false,
+    loading: () => null,
+});
 
 export default function BazaarPage() {
     const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
     const ctx = useMessContext();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMounted(true);
+    }, []);
     const [addOpen, setAddOpen] = useState(false);
     const [addMode, setAddMode] = useState<'detailed' | 'summary'>('summary');
     const [items, setItems] = useState([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
@@ -308,14 +320,16 @@ export default function BazaarPage() {
                     setSummaryItem({ itemName: '', totalCost: 0 });
                 }
             }}>
-                <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{editingId ? 'Edit Bazaar Expense' : 'Add Bazaar Expense'}</DialogTitle>
-                        <DialogDescription>
+                <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden">
+                    <DialogHeader className="relative pr-24">
+                        {/* Animated Cat roaming in the header */}
+                        {mounted && <AnimatedCat inModal={true} />}
+                        <DialogTitle className="relative z-10">{editingId ? 'Edit Bazaar Expense' : 'Add Bazaar Expense'}</DialogTitle>
+                        <DialogDescription className="relative z-10">
                             {editingId ? 'Modify the items of your submitted bazaar expense.' : 'Add items purchased during a shopping trip.'}
                         </DialogDescription>
                         {!isManager && (
-                            <p className="text-xs text-amber-600 mt-1">Your expense will be submitted for manager approval.</p>
+                            <p className="text-xs text-amber-600 mt-1 relative z-10">Your expense will be submitted for manager approval.</p>
                         )}
                     </DialogHeader>
                     <Tabs value={addMode} onValueChange={(v) => setAddMode(v as 'detailed' | 'summary')} className="w-full mt-4">
@@ -399,9 +413,13 @@ export default function BazaarPage() {
                                             {' '}টাকা{' '}
                                             <span className="font-bold text-emerald-600">
                                                 {depositMemberId === 'self' ? 'আপনার' : (() => {
-                                                    const selected = (membersQuery.data || []).find((m: any) => m.id === depositMemberId);
+                                                    const selected = (membersQuery.data || []).find((m) => (m as Record<string, unknown>).id === depositMemberId) as {
+                                                        is_manual: boolean;
+                                                        manual_name: string | null;
+                                                        profile: { full_name: string | null } | null;
+                                                    } | undefined;
                                                     if (!selected) return 'সিলেক্টেড মেম্বারের';
-                                                    return selected.is_manual ? selected.manual_name : (((selected.profile as any)?.full_name) || 'মেম্বারের');
+                                                    return selected.is_manual ? (selected.manual_name || 'মেম্বারের') : (selected.profile?.full_name || 'মেম্বারের');
                                                 })()}
                                             </span>{' '}
                                             নামে জমা করুন
@@ -460,6 +478,9 @@ export default function BazaarPage() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Floating Animated Cat Buddy — only visible when dialog is closed */}
+            {mounted && !addOpen && <AnimatedCat />}
         </div>
     );
 }
