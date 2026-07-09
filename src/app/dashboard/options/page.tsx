@@ -81,6 +81,7 @@ export default function OptionsPage() {
     // Leave Mess Dialog
     const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
     const [leavingMess, setLeavingMess] = useState(false);
+    const [activeMemberCount, setActiveMemberCount] = useState<number>(1);
 
     // Loading States
     const [submittingDelete, setSubmittingDelete] = useState(false);
@@ -89,13 +90,15 @@ export default function OptionsPage() {
     useEffect(() => {
         if (!messCtx) return;
         async function loadExtra() {
-            // Fetch mess name for delete confirmation
-            const [messRes, cycleRes] = await Promise.all([
+            // Fetch mess name for delete confirmation and member count
+            const [messRes, cycleRes, countRes] = await Promise.all([
                 supabase.from('messes').select('name').eq('id', messCtx!.messId).single(),
                 supabase.from('mess_cycles').select('name').eq('id', messCtx!.cycleId).single(),
+                supabase.from('mess_members').select('id', { count: 'exact' }).eq('mess_id', messCtx!.messId).eq('status', 'active'),
             ]);
             if (messRes.data) setMessName(messRes.data.name || '');
             if (cycleRes.data) setCycleName(cycleRes.data.name || '');
+            if (countRes.count !== null) setActiveMemberCount(countRes.count);
 
             // Load months
             loadMonths(messCtx!.messId);
@@ -252,7 +255,7 @@ export default function OptionsPage() {
         if (result.error) {
             toast.error(result.error);
         } else {
-            toast.success("Successfully left the mess.");
+            toast.success(result.message || "Successfully left the mess.");
             // Force a full page reload to clear all client-side context and caches
             window.location.href = '/';
         }
@@ -641,11 +644,20 @@ export default function OptionsPage() {
                     </DialogHeader>
 
                     <div className="space-y-4 pt-2">
-                        {role === 'manager' && (
+                        {role === 'manager' && activeMemberCount > 1 && (
                             <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-lg border border-red-200 dark:border-red-500/20 text-xs text-red-700 dark:text-red-400 flex items-start gap-2">
                                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                                 <div>
-                                    <strong>You are the Manager!</strong> You cannot leave the mess until you transfer your manager permissions to someone else on the Members page. If you are the only member left, you can use the &quot;Delete Mess&quot; option instead.
+                                    <strong>You are the Manager!</strong> You cannot leave the mess until you transfer your manager permissions to someone else on the Members page. If you are the only member left, you can leave now (which will delete the mess) or delete the mess directly.
+                                </div>
+                            </div>
+                        )}
+
+                        {role === 'manager' && activeMemberCount === 1 && (
+                            <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-lg border border-red-200 dark:border-red-500/20 text-xs text-red-700 dark:text-red-400 flex items-start gap-2">
+                                <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                                <div>
+                                    <strong>You are the only member in this Mess!</strong> Leaving the mess now will permanently **Delete** the mess and all of its associated cycles, meals, and transaction history.
                                 </div>
                             </div>
                         )}
@@ -661,7 +673,7 @@ export default function OptionsPage() {
                             variant="destructive"
                             className="w-full h-11 gap-2"
                             onClick={handleLeaveMess}
-                            disabled={leavingMess || role === 'manager'}
+                            disabled={leavingMess || (role === 'manager' && activeMemberCount > 1)}
                         >
                             {leavingMess ? (
                                 <><Loader2 className="h-4 w-4 animate-spin" /> Leaving...</>

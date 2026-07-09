@@ -156,18 +156,18 @@ export async function deleteMess(messId: string) {
         .single();
 
     if (member?.role === 'manager') {
-        // Manager: Delete directly
-        // Messes table has CASCADE on delete?
-        // Let's assume standard cascading delete or we might need to delete related items first.
-        // Usually, top-level delete is enough if FKs are set to CASCADE.
-        // Based on schema review, mess_members, mess_cycles, etc references messes(id) ON DELETE CASCADE.
-
-        const { error } = await supabase
-            .from('messes')
-            .delete()
-            .eq('id', messId);
+        const { data, error } = await supabase.rpc('delete_mess_safe', {
+            p_mess_id: messId
+        });
 
         if (error) return { error: error.message };
+        if (data && !data.success) {
+            return { error: data.error || 'Failed to delete mess' };
+        }
+
+        revalidatePath('/dashboard', 'layout');
+        revalidatePath('/dashboard/options');
+        revalidatePath('/');
         return { success: true, message: 'Mess deleted successfully' };
 
     } else {
@@ -247,44 +247,49 @@ export async function leaveMess(messId: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Not authenticated' };
 
-    const { data: member } = await supabase
-        .from('mess_members')
-        .select('id, role')
-        .eq('mess_id', messId)
-        .eq('user_id', user.id)
-        .single();
-
-    if (!member) return { error: 'You are not a member of this mess' };
-
-    if (member.role === 'manager') {
-        return { error: 'You are the manager! You must transfer your manager role to someone else before leaving the mess. (Or Delete the mess if you are the only one left)' };
-    }
-
-    // SOFT DELETE: Mark as inactive instead of deleting to prevent catastrophic cascading deletion
-    // of all their historical deposits, meals, and bazaar expenses.
-    const todayStr = new Date().toISOString().split('T')[0];
-    const { error } = await supabase
-        .from('mess_members')
-        .update({
-            status: 'inactive',
-            leave_date: todayStr
-        })
-        .eq('id', member.id);
+    const { data, error } = await supabase.rpc('leave_mess_safe', {
+        p_mess_id: messId
+    });
 
     if (error) return { error: error.message };
-
-    // Log the action
-    await supabase.from('activity_log').insert({
-        mess_id: messId,
-        actor_id: user.id,
-        action: 'member_left',
-        details: { status: 'inactive' }
-    });
+    if (data && !data.success) {
+        return { error: data.error || 'Failed to leave mess' };
+    }
 
     // Aggressive revalidation to clear layout and data caches
     revalidatePath('/dashboard', 'layout');
     revalidatePath('/dashboard/options');
     revalidatePath('/');
 
-    return { success: true, message: 'You have left the mess successfully.' };
+    return { 
+        success: true, 
+        message: data?.message || 'You have left the mess successfully.',
+        action: data?.action 
+    };
+}
+
+// ============================================================================
+// REMOVE MEMBER (Manager executes)
+// ============================================================================
+
+export async function removeMember(messId: string, memberId: string) {
+    const supabase = await getSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Not authenticated' };
+
+    const { data, error } = await supabase.rpc('remove_member_safe', {
+        p_mess_id: messId,
+        p_target_member_id: memberId
+    });
+
+    if (error) return { error: error.message };
+    if (data && !data.success) {
+        return { error: data.error || 'Failed to remove member' };
+    }
+
+    revalidatePath('/dashboard', 'layout');
+    revalidatePath('/dashboard/options');
+    revalidatePath('/dashboard/admin/members');
+
+    return { success: true, message: data?.message || 'Member removed successfully.' };
 }

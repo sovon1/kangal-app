@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
-import { Users, Crown, ChefHat, User, Copy, Check, UserPlus, Loader2, ArrowRightLeft, AlertTriangle, UserCog } from 'lucide-react';
+import { Users, Crown, ChefHat, User, Copy, Check, UserPlus, Loader2, ArrowRightLeft, AlertTriangle, UserCog, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
 
@@ -129,6 +129,23 @@ export default function MembersPage() {
         queryClient.invalidateQueries({ queryKey: ['all-members'] });
     };
 
+    const handleRemoveMember = async (memberId: string, name: string) => {
+        if (!ctx) return;
+        const confirmed = window.confirm(`Are you sure you want to remove "${name}" from the mess?`);
+        if (!confirmed) return;
+
+        const { removeMember } = await import('@/lib/actions/options');
+        const result = await removeMember(ctx.messId, memberId);
+
+        if (result.error) {
+            toast.error(result.error);
+        } else {
+            toast.success(result.message || 'Member removed successfully.');
+            queryClient.invalidateQueries({ queryKey: ['all-members'] });
+            router.refresh();
+        }
+    };
+
     const activeCount = (membersQuery.data || []).filter((m: Record<string, unknown>) => m.status === 'active').length;
     const otherMembers = (membersQuery.data || []).filter((m: Record<string, unknown>) => m.id !== ctx?.memberId && m.status === 'active');
 
@@ -214,6 +231,16 @@ export default function MembersPage() {
                                             <Icon className="h-3 w-3" />
                                             {role}
                                         </Badge>
+                                        {isManager && !isMe && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
+                                                onClick={() => handleRemoveMember(m.id as string, name)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
