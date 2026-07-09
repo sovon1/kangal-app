@@ -15,6 +15,7 @@ export function InstallPrompt() {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [isInstalling, setIsInstalling] = useState(false);
+    const [isAndroid, setIsAndroid] = useState(false);
     const [isInstalled, setIsInstalled] = useState(() => {
         if (typeof window !== 'undefined') {
             return window.matchMedia('(display-mode: standalone)').matches;
@@ -23,6 +24,10 @@ export function InstallPrompt() {
     });
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setIsAndroid(/android/i.test(navigator.userAgent));
+        }
+
         // Check if already installed (standalone mode)
         if (isInstalled) {
             return;
@@ -43,6 +48,18 @@ export function InstallPrompt() {
             return;
         }
 
+        const checkPrompt = () => {
+            if ((window as any).deferredPrompt) {
+                setDeferredPrompt((window as any).deferredPrompt as BeforeInstallPromptEvent);
+                setTimeout(() => {
+                    setIsVisible(true);
+                    localStorage.setItem(SHOW_LIMIT_KEY, Date.now().toString());
+                }, 2000);
+            }
+        };
+
+        checkPrompt();
+
         const handler = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -60,10 +77,12 @@ export function InstallPrompt() {
         };
 
         window.addEventListener('beforeinstallprompt', handler);
+        window.addEventListener('pwa-install-prompt-received', checkPrompt);
         window.addEventListener('appinstalled', installedHandler);
 
         return () => {
             window.removeEventListener('beforeinstallprompt', handler);
+            window.removeEventListener('pwa-install-prompt-received', checkPrompt);
             window.removeEventListener('appinstalled', installedHandler);
         };
     }, [isInstalled]);
@@ -126,7 +145,9 @@ export function InstallPrompt() {
                                 KANGAL ইনস্টল করুন
                             </h2>
                             <p className="text-sm text-muted-foreground max-w-[280px]">
-                                অ্যাপটি ইনস্টল করে আরও ভালো এক্সপেরিয়েন্স পান!
+                                {isAndroid 
+                                  ? 'অফলাইন ডাটা সিঙ্ক ও নোটিফিকেশনের জন্য অফিশিয়াল APK ডাউনলোড করুন!' 
+                                  : 'অ্যাপটি ইনস্টল করে আরও ভালো এক্সপেরিয়েন্স পান!'}
                             </p>
                         </div>
 
@@ -154,28 +175,39 @@ export function InstallPrompt() {
                             </div>
                             <div className="flex sm:hidden items-center gap-1.5">
                                 <Smartphone className="h-3.5 w-3.5" />
-                                <span>Phone App হিসেবে ইনস্টল হবে</span>
+                                <span>{isAndroid ? 'সরাসরি ফোনে APK ডাউনলোড হবে' : 'Phone App হিসেবে ইনস্টল হবে'}</span>
                             </div>
                         </div>
 
                         {/* Install Button */}
-                        <button
-                            onClick={handleInstall}
-                            disabled={isInstalling}
-                            className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98] disabled:opacity-70"
-                        >
-                            {isInstalling ? (
-                                <>
-                                    <div className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                                    Installing...
-                                </>
-                            ) : (
-                                <>
+                        {isAndroid ? (
+                            <a href="/kangal.apk" download="kangal.apk" className="block w-full" onClick={handleDismiss}>
+                                <button
+                                    className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98]"
+                                >
                                     <Download className="h-4 w-4" />
-                                    এখনই ইনস্টল করুন — Free
-                                </>
-                            )}
-                        </button>
+                                    এখনই ডাউনলোড করুন (APK) — Free
+                                </button>
+                            </a>
+                        ) : (
+                            <button
+                                onClick={handleInstall}
+                                disabled={isInstalling}
+                                className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98] disabled:opacity-70"
+                            >
+                                {isInstalling ? (
+                                    <>
+                                        <div className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                        Installing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="h-4 w-4" />
+                                        এখনই ইনস্টল করুন — Free
+                                    </>
+                                )}
+                            </button>
+                        )}
 
                         {/* Not now link */}
                         <button

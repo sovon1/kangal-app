@@ -26,6 +26,14 @@ export function HeroMobileInstallButton() {
             setIsAndroid(/android/i.test(navigator.userAgent));
         }
 
+        const checkPrompt = () => {
+            if ((window as any).deferredPrompt) {
+                setDeferredPrompt((window as any).deferredPrompt as BeforeInstallPromptEvent);
+            }
+        };
+
+        checkPrompt();
+
         const handler = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -37,10 +45,12 @@ export function HeroMobileInstallButton() {
         };
 
         window.addEventListener('beforeinstallprompt', handler);
+        window.addEventListener('pwa-install-prompt-received', checkPrompt);
         window.addEventListener('appinstalled', installedHandler);
 
         return () => {
             window.removeEventListener('beforeinstallprompt', handler);
+            window.removeEventListener('pwa-install-prompt-received', checkPrompt);
             window.removeEventListener('appinstalled', installedHandler);
         };
     }, []);
