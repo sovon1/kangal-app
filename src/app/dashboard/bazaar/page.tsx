@@ -7,10 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock, Edit2 } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock, Edit2, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
 
@@ -18,13 +20,14 @@ export default function BazaarPage() {
     const queryClient = useQueryClient();
     const ctx = useMessContext();
     const [addOpen, setAddOpen] = useState(false);
-    const [addMode, setAddMode] = useState<'detailed' | 'summary'>('detailed');
+    const [addMode, setAddMode] = useState<'detailed' | 'summary'>('summary');
     const [items, setItems] = useState([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
     const [summaryItem, setSummaryItem] = useState({ itemName: '', totalCost: 0 });
     const [submitting, setSubmitting] = useState(false);
     const [approvingId, setApprovingId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [depositForShopper, setDepositForShopper] = useState(false);
 
     const isManager = ctx?.role === 'manager';
 
@@ -86,17 +89,20 @@ export default function BazaarPage() {
                 cycleId: ctx.cycleId, messId: ctx.messId, shopperId: ctx.memberId,
                 expenseDate: new Date().toISOString().split('T')[0],
                 items: validItems,
-            });
+            }, { depositForShopper });
             setSubmitting(false);
             if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
-            toast.success(isManager ? 'Bazaar expense approved & saved!' : 'Bazaar expense submitted for approval!');
+            const depositMsg = depositForShopper ? ' ডিপোজিটও জমা হয়েছে!' : '';
+            toast.success((isManager ? 'Bazaar expense approved & saved!' : 'Bazaar expense submitted for approval!') + depositMsg);
         }
 
         setAddOpen(false);
         setEditingId(null);
+        setDepositForShopper(false);
         setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
         setSummaryItem({ itemName: '', totalCost: 0 });
         queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
+        queryClient.invalidateQueries({ queryKey: ['deposits'] });
         queryClient.invalidateQueries({ queryKey: ['member-balance'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     };
@@ -275,6 +281,7 @@ export default function BazaarPage() {
                 setAddOpen(open);
                 if (!open) {
                     setEditingId(null);
+                    setDepositForShopper(false);
                     setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
                     setSummaryItem({ itemName: '', totalCost: 0 });
                 }
@@ -349,6 +356,40 @@ export default function BazaarPage() {
                             </div>
                         </TabsContent>
                     </Tabs>
+
+                    {/* Auto-deposit toggle — only for new expenses */}
+                    {!editingId && (
+                        <div className="mt-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+                            <div className="flex items-center justify-between gap-3">
+                                <Label
+                                    htmlFor="deposit-for-shopper"
+                                    className="text-sm leading-snug cursor-pointer select-none flex-1"
+                                >
+                                    <span className="flex items-center gap-1.5">
+                                        <Wallet className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                        <span>
+                                            বাজারের{' '}
+                                            <span className="font-bold text-emerald-600">
+                                                ৳{addMode === 'detailed'
+                                                    ? items.reduce((s, i) => s + i.quantity * i.unitPrice, 0).toLocaleString()
+                                                    : (summaryItem.totalCost || 0).toLocaleString()}
+                                            </span>
+                                            {' '}টাকা আপনার নামে জমা করুন
+                                        </span>
+                                    </span>
+                                    <span className="text-xs text-muted-foreground block mt-1">
+                                        নিজের পকেট থেকে খরচ করলে ক্লিক করুন
+                                    </span>
+                                </Label>
+                                <Switch
+                                    id="deposit-for-shopper"
+                                    checked={depositForShopper}
+                                    onCheckedChange={setDepositForShopper}
+                                    className="data-[state=checked]:bg-rose-500 shrink-0 scale-110"
+                                />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="border-t pt-4 flex items-center justify-between mt-2">
                         <span className="font-semibold text-lg">

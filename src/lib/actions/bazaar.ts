@@ -9,7 +9,7 @@ import { sendNotificationToMess } from '@/lib/notifications/send';
 // ADD BAZAAR EXPENSE (with items → triggers inventory deduction)
 // ============================================================================
 
-export async function addBazaarExpense(input: unknown) {
+export async function addBazaarExpense(input: unknown, options?: { depositForShopper?: boolean }) {
     const parsed = bazaarExpenseSchema.safeParse(input);
     if (!parsed.success) {
         return { error: 'Invalid input', details: parsed.error.issues };
@@ -66,14 +66,52 @@ export async function addBazaarExpense(input: unknown) {
         return { error: rpcError.message };
     }
 
+    // --- AUTO-DEPOSIT: Credit the shopper's account with the bazaar amount ---
+    if (options?.depositForShopper && totalAmount > 0) {
+        const { error: depositError } = await supabase
+            .from('transactions')
+            .insert({
+                mess_id: messId,
+                cycle_id: cycleId,
+                member_id: shopperId,
+                amount: totalAmount,
+                payment_method: 'cash',
+                reference_no: null,
+                notes: `বাজার খরচ থেকে অটো ডিপোজিট (৳${totalAmount})`,
+                approval_status: isManager ? 'approved' : 'pending',
+                approved_by: isManager ? user.id : null,
+                created_by: user.id,
+            });
+
+        if (depositError) {
+            // Log but don't fail the whole operation — bazaar was already saved
+            console.error('Auto-deposit failed:', depositError.message);
+        } else {
+            // Log the auto-deposit activity
+            await supabase.from('activity_log').insert({
+                mess_id: messId,
+                actor_id: user.id,
+                action: 'deposit_added',
+                details: {
+                    member_id: shopperId,
+                    amount: totalAmount,
+                    payment_method: 'cash',
+                    status: isManager ? 'approved' : 'pending',
+                    source: 'bazaar_auto_deposit',
+                },
+            });
+        }
+    }
+
     // --- PUSH NOTIFICATION ---
     // Try to get the name of the shopper for the notification
     let shopperName = 'Someone';
     const { data: profileData } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
     if (profileData?.full_name) shopperName = profileData.full_name;
 
+    const depositNote = options?.depositForShopper ? ` + ৳${totalAmount} deposited.` : '';
     const notifTitle = isManager ? 'New Bazaar Approved ✅' : 'New Bazaar Added 🛒';
-    const notifBody = `${shopperName} added a bazaar cost of ৳${totalAmount}. ${isManager ? '' : 'Pending approval.'}`;
+    const notifBody = `${shopperName} added a bazaar cost of ৳${totalAmount}.${depositNote} ${isManager ? '' : 'Pending approval.'}`;
 
     // Send push notification asynchronously (don't block the response)
     sendNotificationToMess(messId, user.id, {
