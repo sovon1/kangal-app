@@ -27,6 +27,7 @@
             "id": "software.kangal.twa"
         }
     ],
+    "iarc_rating_id": "e1029384",
     "prefer_related_applications": false,
     "launch_handler": {
         "client_mode": "navigate-existing"
