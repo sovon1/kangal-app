@@ -478,9 +478,6 @@ export default function BazaarPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-
-            {/* Floating Animated Cat Buddy — only visible when dialog is closed */}
-            {mounted && !addOpen && <AnimatedCat />}
         </div>
     );
 }
