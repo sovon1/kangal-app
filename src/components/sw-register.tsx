@@ -23,6 +23,28 @@ export function ServiceWorkerRegister() {
             navigator.serviceWorker
                 .register('/sw.js', { scope: '/' })
                 .then((registration) => {
+                    // Register Background Sync if supported
+                    if ('sync' in registration) {
+                        (registration as any).sync.register('sync-data').catch((err: any) => {
+                            console.log('Background sync registration failed:', err);
+                        });
+                    }
+
+                    // Register Periodic Background Sync if supported
+                    if ('periodicSync' in registration) {
+                        navigator.permissions.query({
+                            name: 'periodic-background-sync' as PermissionName
+                        }).then((status) => {
+                            if (status.state === 'granted') {
+                                (registration as any).periodicSync.register('sync-updates', {
+                                    minInterval: 24 * 60 * 60 * 1000
+                                }).catch((err: any) => {
+                                    console.log('Periodic sync registration failed:', err);
+                                });
+                            }
+                        }).catch(() => {});
+                    }
+
                     registration.addEventListener('updatefound', () => {
                         const newWorker = registration.installing;
                         if (newWorker) {
