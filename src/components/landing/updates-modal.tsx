@@ -39,7 +39,7 @@ const updates = [
         icon: Smartphone,
         title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
         short: "App Install",
-        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেティブ এক্সপেরিয়েন্স।",
+        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেটিভ এক্সপেরিয়েন্স।",
         iconColor: "text-amber-500 dark:text-amber-400",
         iconBg: "bg-amber-500/20 border-amber-500/30",
         glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40 hover:-translate-y-1",
