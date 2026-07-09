@@ -26,6 +26,7 @@ export default function MonthClosePage() {
     const ctx = messCtx ? { cycleId: messCtx.cycleId, cycleName, messId: messCtx.messId } : null;
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (!messCtx) { setLoading(false); return; }
         async function load() {
             // Only fetch cycle name + stats (context provides messId/cycleId)

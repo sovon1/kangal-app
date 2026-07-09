@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "test_db.js",
+    "generate-icons.js",
   ]),
 ]);
 

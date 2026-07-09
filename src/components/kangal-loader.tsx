@@ -19,6 +19,7 @@ export function KangalLoader({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         const iconInterval = setInterval(() => {
             setActiveIndex((i) => (i + 1) % FOOD_ICONS.length);

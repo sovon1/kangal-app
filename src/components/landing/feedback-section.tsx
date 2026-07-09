@@ -56,7 +56,7 @@ export function FeedbackSection() {
                 <Card className="bg-background shadow-lg border-primary/10">
                     <CardHeader>
                         <CardTitle>Send your feedback</CardTitle>
-                        <CardDescription>All messages go straight to the developer's inbox.</CardDescription>
+                        <CardDescription>All messages go straight to the developer&apos;s inbox.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">

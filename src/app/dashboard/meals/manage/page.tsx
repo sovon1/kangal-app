@@ -59,6 +59,7 @@ export default function ManageMealsPage() {
                     dinner: m.dinner + m.guestDinner,
                 };
             });
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setMealData(initial);
             setHasChanges(false);
         }

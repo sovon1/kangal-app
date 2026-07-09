@@ -645,7 +645,7 @@ export default function OptionsPage() {
                             <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-lg border border-red-200 dark:border-red-500/20 text-xs text-red-700 dark:text-red-400 flex items-start gap-2">
                                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                                 <div>
-                                    <strong>You are the Manager!</strong> You cannot leave the mess until you transfer your manager permissions to someone else on the Members page. If you are the only member left, you can use the "Delete Mess" option instead.
+                                    <strong>You are the Manager!</strong> You cannot leave the mess until you transfer your manager permissions to someone else on the Members page. If you are the only member left, you can use the &quot;Delete Mess&quot; option instead.
                                 </div>
                             </div>
                         )}

@@ -1,4 +1,6 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -108,19 +110,16 @@ const WHITE: [number, number, number] = [255, 255, 255];
 const TABLE_HEADER_BG: [number, number, number] = [231, 76, 60];
 const TABLE_ALT_ROW: [number, number, number] = [253, 245, 244];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getFinalY(doc: any, fallback: number): number {
     return doc.lastAutoTable?.finalY ?? fallback;
 }
 
 // ── Draw diagonal watermark ────────────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function drawWatermark(doc: any) {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
     doc.saveGraphicsState();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     doc.setGState(new (doc as any).GState({ opacity: 0.06 }));
     doc.setFontSize(60);
     doc.setFont('helvetica', 'bold');

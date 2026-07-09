@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Smartphone, Check, X } from 'lucide-react';
+import { Download, Smartphone, X } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
     prompt: () => Promise<void>;
@@ -11,14 +11,18 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function InstallAppSection() {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-    const [isInstalled, setIsInstalled] = useState(false);
+    const [isInstalled, setIsInstalled] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.matchMedia('(display-mode: standalone)').matches;
+        }
+        return false;
+    });
     const [isInstalling, setIsInstalling] = useState(false);
     const [shouldRender, setShouldRender] = useState(false);
 
     useEffect(() => {
-        // Check if already installed
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-            setIsInstalled(true);
+        // If already installed, the lazy initializer set it to true and we don't render.
+        if (isInstalled) {
             return;
         }
 
@@ -39,6 +43,7 @@ export function InstallAppSection() {
 
         // We passed the checks, safe to render it. Record the show time.
         localStorage.setItem(SHOW_LIMIT_KEY, Date.now().toString());
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setShouldRender(true);
 
         const handler = (e: Event) => {
@@ -58,7 +63,7 @@ export function InstallAppSection() {
             window.removeEventListener('beforeinstallprompt', handler);
             window.removeEventListener('appinstalled', installedHandler);
         };
-    }, []);
+    }, [isInstalled]);
 
     const handleDismiss = () => {
         setShouldRender(false);

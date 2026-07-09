@@ -57,7 +57,7 @@ export function UpdatesModal({ trigger }: UpdatesModalProps) {
             <DialogTrigger asChild>
                 {trigger || (
                     <Button variant="ghost" className="gap-2 text-sm font-medium text-muted-foreground hover:text-foreground relative hidden sm:flex">
-                        What's New
+                        What&apos;s New
                         <span className="absolute top-1.5 right-1 flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>

@@ -53,6 +53,7 @@ export function SignupCelebration({
                 type: types[Math.floor(Math.random() * types.length)],
             });
         }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setConfetti(pieces);
 
         // Animation phases
