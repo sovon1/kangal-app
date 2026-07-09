@@ -141,25 +141,34 @@ export function InstallAppSection() {
                     </div>
 
                     {deferredPrompt ? (
-                        <Button
-                            onClick={handleInstall}
-                            disabled={isInstalling}
-                            className="w-full h-11 text-sm font-semibold gap-2 shadow-lg shadow-primary/20"
-                        >
-                            {isInstalling ? (
-                                <>
-                                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                    Installing...
-                                </>
-                            ) : (
-                                <>
-                                    <Download className="h-4 w-4" />
-                                    এখনই ইনস্টল করুন
-                                </>
-                            )}
-                        </Button>
-                    ) : showManualInstructions ? (
                         <div className="space-y-2">
+                            <Button
+                                onClick={handleInstall}
+                                disabled={isInstalling}
+                                className="w-full h-11 text-sm font-semibold gap-2 shadow-lg shadow-primary/20"
+                            >
+                                {isInstalling ? (
+                                    <>
+                                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        Installing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="h-4 w-4" />
+                                        এখনই ইনস্টল করুন
+                                    </>
+                                )}
+                            </Button>
+                            <a
+                                href="/kangal.apk"
+                                download="kangal.apk"
+                                className="block text-center text-xs text-muted-foreground hover:text-foreground underline pt-1"
+                            >
+                                সরাসরি Android APK ডাউনলোড করুন (বিকল্প)
+                            </a>
+                        </div>
+                    ) : showManualInstructions ? (
+                        <div className="space-y-3">
                             <p className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
                                 <Smartphone className="h-3.5 w-3.5" />
                                 ম্যানুয়ালি ইনস্টল করুন:
@@ -169,6 +178,16 @@ export function InstallAppSection() {
                                 <p>
                                     Chrome-এ <strong>⋮</strong> মেনু &rarr; <strong>&quot;Add to Home screen&quot;</strong> / <strong>&quot;Install app&quot;</strong> ট্যাপ করুন
                                 </p>
+                            </div>
+                            <div className="text-center pt-1.5">
+                                <span className="text-xs text-muted-foreground">অথবা </span>
+                                <a
+                                    href="/kangal.apk"
+                                    download="kangal.apk"
+                                    className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-bold underline"
+                                >
+                                    সরাসরি Android APK ডাউনলোড করুন
+                                </a>
                             </div>
                         </div>
                     ) : null}
