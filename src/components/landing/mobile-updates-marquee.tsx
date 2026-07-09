@@ -5,21 +5,27 @@ import React from 'react';
 
 const updates = [
     {
-        id: 1,
-        icon: Zap,
-        title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
+        id: 0,
+        icon: Smartphone,
+        title: "অফিশিয়াল KANGAL অ্যান্ড্রোয়েড অ্যাপ রিলিজ! 📱",
         isExclusive: true,
     },
     {
+        id: 1,
+        icon: Sparkles,
+        title: "বাজার খরচ এখন সরাসরি ডিপোজিট! 💰",
+        isExclusive: false,
+    },
+    {
         id: 2,
-        icon: Smartphone,
-        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
+        icon: Zap,
+        title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
         isExclusive: false,
     },
     {
         id: 3,
-        icon: Sparkles,
-        title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
+        icon: Smartphone,
+        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
         isExclusive: false,
     },
 ];
