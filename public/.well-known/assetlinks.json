@@ -5,9 +5,9 @@
     ],
     "target": {
       "namespace": "android_app",
-      "package_name": "software.kangal.twa",
+      "package_name": "software.kangal.www.twa",
       "sha256_cert_fingerprints": [
-        "2E:53:04:2C:4A:C6:27:A7:B1:B1:59:67:3F:52:B5:56:6B:9A:6C:84:0B:EF:51:79:7C:17:DA:47:DD:1A:26:82"
+        "C5:D0:7A:9C:DD:BE:7A:0A:ED:DB:36:B8:14:C4:2F:80:A9:2E:FC:04:ED:AD:38:0E:A1:73:88:94:18:21:3B:D6"
       ]
     }
   }
