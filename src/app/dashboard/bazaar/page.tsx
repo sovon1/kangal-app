@@ -396,7 +396,15 @@ export default function BazaarPage() {
                                                     ? items.reduce((s, i) => s + i.quantity * i.unitPrice, 0).toLocaleString()
                                                     : (summaryItem.totalCost || 0).toLocaleString()}
                                             </span>
-                                            {' '}টাকা{depositMemberId === 'self' ? ' আপনার' : ''} নামে জমা করুন
+                                            {' '}টাকা{' '}
+                                            <span className="font-bold text-emerald-600">
+                                                {depositMemberId === 'self' ? 'আপনার' : (() => {
+                                                    const selected = (membersQuery.data || []).find((m: any) => m.id === depositMemberId);
+                                                    if (!selected) return 'সিলেক্টেড মেম্বারের';
+                                                    return selected.is_manual ? selected.manual_name : (((selected.profile as any)?.full_name) || 'মেম্বারের');
+                                                })()}
+                                            </span>{' '}
+                                            নামে জমা করুন
                                         </span>
                                     </span>
                                     <span className="text-xs text-muted-foreground block mt-1">
