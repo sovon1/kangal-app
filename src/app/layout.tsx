@@ -54,17 +54,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                window.deferredPrompt = e;
-                window.dispatchEvent(new CustomEvent('pwa-install-prompt-received'));
-              });
-            `,
-          }}
-        />
       </head>
       <body
         className={`${plusJakarta.variable} ${geistMono.variable} ${displayFont.variable} font-sans antialiased`}

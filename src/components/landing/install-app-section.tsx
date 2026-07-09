@@ -33,7 +33,7 @@ export function InstallAppSection() {
 
         const SHOW_LIMIT_KEY = 'kangal-banner-last-shown';
         const DISMISS_KEY = 'kangal-banner-dismissed';
-        
+
         // 1. If explicitly dismissed, don't show for 3 days
         const dismissedAt = localStorage.getItem(DISMISS_KEY);
         if (dismissedAt && Date.now() - parseInt(dismissedAt) < 3 * 24 * 60 * 60 * 1000) {
@@ -51,14 +51,6 @@ export function InstallAppSection() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setShouldRender(true);
 
-        const checkPrompt = () => {
-            if ((window as any).deferredPrompt) {
-                setDeferredPrompt((window as any).deferredPrompt as BeforeInstallPromptEvent);
-            }
-        };
-
-        checkPrompt();
-
         const handler = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -70,12 +62,10 @@ export function InstallAppSection() {
         };
 
         window.addEventListener('beforeinstallprompt', handler);
-        window.addEventListener('pwa-install-prompt-received', checkPrompt);
         window.addEventListener('appinstalled', installedHandler);
 
         return () => {
             window.removeEventListener('beforeinstallprompt', handler);
-            window.removeEventListener('pwa-install-prompt-received', checkPrompt);
             window.removeEventListener('appinstalled', installedHandler);
         };
     }, [isInstalled]);
