@@ -209,3 +209,17 @@ self.addEventListener('notificationclick', (event) => {
         })
     );
 });
+
+// --- Background Sync Handlers ---
+self.addEventListener('sync', (event) => {
+    if (event.tag === 'sync-data') {
+        event.waitUntil(Promise.resolve());
+    }
+});
+
+// --- Periodic Background Sync Handlers ---
+self.addEventListener('periodicsync', (event) => {
+    if (event.tag === 'sync-updates') {
+        event.waitUntil(Promise.resolve());
+    }
+});
