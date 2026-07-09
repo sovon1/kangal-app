@@ -14,6 +14,17 @@ import { Sparkles, Smartphone, Bug, TerminalSquare, Zap } from 'lucide-react';
 const updates = [
     {
         id: 0,
+        icon: Sparkles,
+        title: "বাজার খরচ এখন সরাসরি ডিপোজিট! 💰",
+        short: "Bazaar Deposit",
+        desc: "বাজার এন্ট্রি করার সময় নিজের পকেট থেকে খরচ করলে সরাসরি আপনার অথবা অন্য যেকোনো মেম্বারের নামে ডিপোজিট (জমা) হিসেবে যোগ করে নিতে পারবেন এক ক্লিকেই!",
+        iconColor: "text-rose-500 dark:text-rose-400",
+        iconBg: "bg-rose-500/20 border-rose-500/30",
+        glow: "hover:shadow-[0_0_30px_rgba(244,63,94,0.3)] hover:border-rose-500/50 hover:-translate-y-1",
+        isExclusive: true,
+    },
+    {
+        id: 1,
         icon: Zap,
         title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
         short: "Performance",
@@ -21,28 +32,17 @@ const updates = [
         iconColor: "text-blue-500 dark:text-blue-400",
         iconBg: "bg-blue-500/20 border-blue-500/30",
         glow: "hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:border-blue-500/50 hover:-translate-y-1",
-        isExclusive: true,
-    },
-    {
-        id: 1,
-        icon: Smartphone,
-        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
-        short: "App Install",
-        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেটিভ এক্সপেরিয়েন্স।",
-        iconColor: "text-amber-500 dark:text-amber-400",
-        iconBg: "bg-amber-500/20 border-amber-500/30",
-        glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40 hover:-translate-y-1",
         isExclusive: false,
     },
     {
         id: 2,
-        icon: Sparkles,
-        title: "নতুন অফলাইন এক্সপেরিয়েন্স 📡",
-        short: "Offline Mode",
-        desc: "অ্যানিমেটেড অফলাইন মোড যুক্ত করা হয়েছে।",
-        iconColor: "text-emerald-500 dark:text-emerald-400",
-        iconBg: "bg-emerald-500/10 border-emerald-500/20",
-        glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-500/30 hover:-translate-y-1",
+        icon: Smartphone,
+        title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
+        short: "App Install",
+        desc: "ফোন বা কম্পিউটারে KANGAL অ্যাপ হিসেবে ইনস্টল করুন। ওয়েবসাইট থেকে সরাসরি ওয়ান-ক্লিক ইনস্টল, একদম নেティブ এক্সপেরিয়েন্স।",
+        iconColor: "text-amber-500 dark:text-amber-400",
+        iconBg: "bg-amber-500/20 border-amber-500/30",
+        glow: "hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-500/40 hover:-translate-y-1",
         isExclusive: false,
     },
 ];
@@ -72,7 +72,7 @@ export function UpdatesModal({ trigger }: UpdatesModalProps) {
                             <TerminalSquare className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <DialogTitle className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">New Updates (20 April 2026)</DialogTitle>
+                            <DialogTitle className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">New Updates (10 July 2026)</DialogTitle>
                             <DialogDescription className="text-sm font-medium">
                                 what we are doing to make your life easier
                             </DialogDescription>
