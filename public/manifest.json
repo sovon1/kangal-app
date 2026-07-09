@@ -27,8 +27,19 @@
             "id": "software.kangal.twa"
         }
     ],
-    "iarc_rating_id": "e1029384",
+    "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
     "prefer_related_applications": false,
+    "scope_extensions": [
+        {
+            "origin": "*.kangal.software"
+        }
+    ],
+    "protocol_handlers": [
+        {
+            "protocol": "web+kangal",
+            "url": "/dashboard?url=%s"
+        }
+    ],
     "launch_handler": {
         "client_mode": "navigate-existing"
     },
