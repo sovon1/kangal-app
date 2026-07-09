@@ -14,6 +14,18 @@ import { Sparkles, Smartphone, TerminalSquare, Zap } from 'lucide-react';
 const updates = [
     {
         id: 0,
+        icon: Smartphone,
+        title: "অফিশিয়াল অ্যান্ড্রোয়েড অ্যাপ রিলিজ! 📱",
+        date: "10 July 2026",
+        short: "Android App",
+        desc: "অ্যান্ড্রয়েড ইউজারদের জন্য চলে এলো অফিশিয়াল KANGAL অ্যাপ! ব্রাউজার ছাড়াই সরাসরি ফুল-স্ক্রিন, নতুন অফলাইন মোড এবং ব্যাকগ্রাউন্ড নোটিফিকেশন সুবিধা পেতে এখনই ওয়েবসাইট থেকে ডাউনলোড করুন!",
+        iconColor: "text-emerald-500 dark:text-emerald-400",
+        iconBg: "bg-emerald-500/20 border-emerald-500/30",
+        glow: "hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:border-emerald-500/50 hover:-translate-y-1",
+        isExclusive: true,
+    },
+    {
+        id: 1,
         icon: Sparkles,
         title: "বাজার খরচ এখন সরাসরি ডিপোজিট! 💰",
         date: "10 July 2026",
@@ -22,10 +34,10 @@ const updates = [
         iconColor: "text-rose-500 dark:text-rose-400",
         iconBg: "bg-rose-500/20 border-rose-500/30",
         glow: "hover:shadow-[0_0_30px_rgba(244,63,94,0.3)] hover:border-rose-500/50 hover:-translate-y-1",
-        isExclusive: true,
+        isExclusive: false,
     },
     {
-        id: 1,
+        id: 2,
         icon: Zap,
         title: "PWA 400x ফাস্টার ও সুপার স্ট্যাবল! ⚡",
         date: "09 July 2026",
@@ -37,7 +49,7 @@ const updates = [
         isExclusive: false,
     },
     {
-        id: 2,
+        id: 3,
         icon: Smartphone,
         title: "KANGAL অ্যাপ এখন ইনস্টলেবল! 🔥",
         date: "08 July 2026",
