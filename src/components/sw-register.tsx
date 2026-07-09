@@ -2,6 +2,16 @@
 
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { processOfflineQueue } from '@/lib/offline-queue';
+
+interface ServiceWorkerRegistrationWithSync extends ServiceWorkerRegistration {
+    sync?: {
+        register(tag: string): Promise<void>;
+    };
+    periodicSync?: {
+        register(tag: string, options?: { minInterval: number }): Promise<void>;
+    };
+}
 
 export function ServiceWorkerRegister() {
     useEffect(() => {
@@ -23,22 +33,24 @@ export function ServiceWorkerRegister() {
             navigator.serviceWorker
                 .register('/sw.js', { scope: '/' })
                 .then((registration) => {
+                    const reg = registration as ServiceWorkerRegistrationWithSync;
+
                     // Register Background Sync if supported
-                    if ('sync' in registration) {
-                        (registration as any).sync.register('sync-data').catch((err: any) => {
+                    if (reg.sync) {
+                        reg.sync.register('sync-data').catch((err: unknown) => {
                             console.log('Background sync registration failed:', err);
                         });
                     }
 
                     // Register Periodic Background Sync if supported
-                    if ('periodicSync' in registration) {
+                    if (reg.periodicSync) {
                         navigator.permissions.query({
                             name: 'periodic-background-sync' as PermissionName
                         }).then((status) => {
-                            if (status.state === 'granted') {
-                                (registration as any).periodicSync.register('sync-updates', {
+                            if (status.state === 'granted' && reg.periodicSync) {
+                                reg.periodicSync.register('sync-updates', {
                                     minInterval: 24 * 60 * 60 * 1000
-                                }).catch((err: any) => {
+                                }).catch((err: unknown) => {
                                     console.log('Periodic sync registration failed:', err);
                                 });
                             }
@@ -73,6 +85,7 @@ export function ServiceWorkerRegister() {
             // Handle online/offline events
             const handleOnline = () => {
                 toast.success('You are back online! 🟢', { id: 'network-status' });
+                processOfflineQueue();
             };
             const handleOffline = () => {
                 toast.error('You are offline 🔴', {
@@ -84,6 +97,11 @@ export function ServiceWorkerRegister() {
 
             window.addEventListener('online', handleOnline);
             window.addEventListener('offline', handleOffline);
+
+            // Initial check on mount
+            if (navigator.onLine) {
+                processOfflineQueue();
+            }
 
             return () => {
                 window.removeEventListener('online', handleOnline);

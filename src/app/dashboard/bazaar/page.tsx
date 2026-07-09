@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ShoppingCart, Plus, Trash2, Loader2, Calendar, CheckCircle2, XCircle, Clock, Edit2, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
+import { queueOfflineAction } from '@/lib/offline-queue';
 import dynamic from 'next/dynamic';
 
 const AnimatedCat = dynamic(() => import('@/components/bazaar/animated-cat'), {
@@ -34,6 +35,17 @@ export default function BazaarPage() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
+
+    useEffect(() => {
+        const handleSyncSuccess = () => {
+            queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
+            queryClient.invalidateQueries({ queryKey: ['deposits'] });
+            queryClient.invalidateQueries({ queryKey: ['member-balance'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+        };
+        window.addEventListener('bazaar-expense-added', handleSyncSuccess);
+        return () => window.removeEventListener('bazaar-expense-added', handleSyncSuccess);
+    }, [queryClient]);
     const [addOpen, setAddOpen] = useState(false);
     const [addMode, setAddMode] = useState<'detailed' | 'summary'>('summary');
     const [items, setItems] = useState([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
@@ -106,6 +118,30 @@ export default function BazaarPage() {
         }
 
         setSubmitting(true);
+        if (!navigator.onLine) {
+            if (editingId) {
+                toast.error('খরচ এডিট করার জন্য ইন্টারনেট কানেকশন প্রয়োজন');
+                setSubmitting(false);
+                return;
+            }
+
+            queueOfflineAction('ADD_BAZAAR', {
+                cycleId: ctx.cycleId, messId: ctx.messId, shopperId: ctx.memberId,
+                expenseDate: new Date().toISOString().split('T')[0],
+                items: validItems,
+            }, { depositForShopper, depositMemberId: depositMemberId === 'self' ? undefined : depositMemberId });
+
+            toast.success('অফলাইন মোড: আপনার খরচটি সেভ করা হয়েছে এবং ইন্টারনেট ফিরে এলে অটো সিঙ্ক হবে! 💾', { duration: 6000 });
+            setSubmitting(false);
+            setAddOpen(false);
+            setEditingId(null);
+            setDepositForShopper(false);
+            setDepositMemberId('self');
+            setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
+            setSummaryItem({ itemName: '', totalCost: 0 });
+            return;
+        }
+
         if (editingId) {
             const result = await updateBazaarExpense({
                 id: editingId,
