@@ -18,6 +18,15 @@
         "utilities",
         "food"
     ],
+    "lang": "bn",
+    "dir": "ltr",
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=software.kangal.twa",
+            "id": "software.kangal.twa"
+        }
+    ],
     "prefer_related_applications": false,
     "launch_handler": {
         "client_mode": "navigate-existing"
@@ -49,6 +58,13 @@
             "type": "image/png",
             "form_factor": "narrow",
             "label": "KANGAL Mess Management Dashboard"
+        },
+        {
+            "src": "/auth-bg.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "KANGAL Dashboard on Desktop"
         }
     ],
     "shortcuts": [
