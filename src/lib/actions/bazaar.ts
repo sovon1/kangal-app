@@ -9,7 +9,7 @@ import { sendNotificationToMess } from '@/lib/notifications/send';
 // ADD BAZAAR EXPENSE (with items → triggers inventory deduction)
 // ============================================================================
 
-export async function addBazaarExpense(input: unknown, options?: { depositForShopper?: boolean }) {
+export async function addBazaarExpense(input: unknown, options?: { depositForShopper?: boolean; depositMemberId?: string }) {
     const parsed = bazaarExpenseSchema.safeParse(input);
     if (!parsed.success) {
         return { error: 'Invalid input', details: parsed.error.issues };
@@ -66,14 +66,15 @@ export async function addBazaarExpense(input: unknown, options?: { depositForSho
         return { error: rpcError.message };
     }
 
-    // --- AUTO-DEPOSIT: Credit the shopper's account with the bazaar amount ---
+    // --- AUTO-DEPOSIT: Credit the specified member's account with the bazaar amount ---
     if (options?.depositForShopper && totalAmount > 0) {
+        const depositTargetId = options.depositMemberId || shopperId;
         const { error: depositError } = await supabase
             .from('transactions')
             .insert({
                 mess_id: messId,
                 cycle_id: cycleId,
-                member_id: shopperId,
+                member_id: depositTargetId,
                 amount: totalAmount,
                 payment_method: 'cash',
                 reference_no: null,
@@ -93,7 +94,7 @@ export async function addBazaarExpense(input: unknown, options?: { depositForSho
                 actor_id: user.id,
                 action: 'deposit_added',
                 details: {
-                    member_id: shopperId,
+                    member_id: depositTargetId,
                     amount: totalAmount,
                     payment_method: 'cash',
                     status: isManager ? 'approved' : 'pending',

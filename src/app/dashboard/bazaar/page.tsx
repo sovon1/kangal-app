@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { addBazaarExpense, getBazaarExpenses, approveBazaarExpense, updateBazaarExpense, deleteBazaarExpense } from '@/lib/actions/bazaar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +19,7 @@ import { toast } from 'sonner';
 import { useMessContext } from '@/components/mess-context';
 
 export default function BazaarPage() {
+    const supabase = getSupabaseBrowserClient();
     const queryClient = useQueryClient();
     const ctx = useMessContext();
     const [addOpen, setAddOpen] = useState(false);
@@ -28,6 +31,7 @@ export default function BazaarPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [depositForShopper, setDepositForShopper] = useState(false);
+    const [depositMemberId, setDepositMemberId] = useState<string>('self');
 
     const isManager = ctx?.role === 'manager';
 
@@ -40,6 +44,22 @@ export default function BazaarPage() {
             return result.data;
         },
         enabled: !!ctx,
+    });
+
+    // Fetch members for deposit selector (only when switch is on)
+    const membersQuery = useQuery({
+        queryKey: ['bazaar-members', ctx?.messId],
+        queryFn: async () => {
+            if (!ctx) return [];
+            const { data } = await supabase
+                .from('mess_members')
+                .select('id, role, is_manual, manual_name, profile:profiles(full_name)')
+                .eq('mess_id', ctx.messId)
+                .eq('status', 'active')
+                .order('role', { ascending: true });
+            return data || [];
+        },
+        enabled: !!ctx && depositForShopper,
     });
 
     const addItem = () => setItems([...items, { itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
@@ -89,7 +109,7 @@ export default function BazaarPage() {
                 cycleId: ctx.cycleId, messId: ctx.messId, shopperId: ctx.memberId,
                 expenseDate: new Date().toISOString().split('T')[0],
                 items: validItems,
-            }, { depositForShopper });
+            }, { depositForShopper, depositMemberId: depositMemberId === 'self' ? undefined : depositMemberId });
             setSubmitting(false);
             if (result.error) { toast.error(typeof result.error === 'string' ? result.error : 'Failed'); return; }
             const depositMsg = depositForShopper ? ' ডিপোজিটও জমা হয়েছে!' : '';
@@ -99,6 +119,7 @@ export default function BazaarPage() {
         setAddOpen(false);
         setEditingId(null);
         setDepositForShopper(false);
+        setDepositMemberId('self');
         setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
         setSummaryItem({ itemName: '', totalCost: 0 });
         queryClient.invalidateQueries({ queryKey: ['bazaar-expenses'] });
@@ -282,6 +303,7 @@ export default function BazaarPage() {
                 if (!open) {
                     setEditingId(null);
                     setDepositForShopper(false);
+                    setDepositMemberId('self');
                     setItems([{ itemName: '', quantity: 1, unit: 'kg', unitPrice: 0 }]);
                     setSummaryItem({ itemName: '', totalCost: 0 });
                 }
@@ -374,7 +396,7 @@ export default function BazaarPage() {
                                                     ? items.reduce((s, i) => s + i.quantity * i.unitPrice, 0).toLocaleString()
                                                     : (summaryItem.totalCost || 0).toLocaleString()}
                                             </span>
-                                            {' '}টাকা আপনার নামে জমা করুন
+                                            {' '}টাকা{depositMemberId === 'self' ? ' আপনার' : ''} নামে জমা করুন
                                         </span>
                                     </span>
                                     <span className="text-xs text-muted-foreground block mt-1">
@@ -384,10 +406,37 @@ export default function BazaarPage() {
                                 <Switch
                                     id="deposit-for-shopper"
                                     checked={depositForShopper}
-                                    onCheckedChange={setDepositForShopper}
+                                    onCheckedChange={(checked) => {
+                                        setDepositForShopper(checked);
+                                        if (!checked) setDepositMemberId('self');
+                                    }}
                                     className="data-[state=checked]:bg-rose-500 shrink-0 scale-110"
                                 />
                             </div>
+                            {/* Member selector — shown when deposit is toggled on */}
+                            {depositForShopper && (
+                                <div className="mt-2.5 pt-2.5 border-t border-emerald-500/10">
+                                    <Select value={depositMemberId} onValueChange={setDepositMemberId}>
+                                        <SelectTrigger className="h-9 text-xs">
+                                            <SelectValue placeholder="কার নামে জমা হবে?" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="self">
+                                                আমার নামে (নিজে)
+                                            </SelectItem>
+                                            {(membersQuery.data || [])
+                                                .filter((m: Record<string, unknown>) => m.id !== ctx?.memberId)
+                                                .map((m: Record<string, unknown>) => (
+                                                    <SelectItem key={m.id as string} value={m.id as string}>
+                                                        {Boolean(m.is_manual)
+                                                            ? (m.manual_name as string)
+                                                            : ((m.profile as Record<string, unknown>)?.full_name as string || 'Unknown')}
+                                                    </SelectItem>
+                                                ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
                         </div>
                     )}
 
