@@ -19,8 +19,13 @@ export function InstallAppSection() {
     });
     const [isInstalling, setIsInstalling] = useState(false);
     const [shouldRender, setShouldRender] = useState(false);
+    const [isAndroid, setIsAndroid] = useState(false);
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setIsAndroid(/android/i.test(navigator.userAgent));
+        }
+
         // If already installed, the lazy initializer set it to true and we don't render.
         if (isInstalled) {
             return;
@@ -140,7 +145,18 @@ export function InstallAppSection() {
                         ))}
                     </div>
 
-                    {deferredPrompt ? (
+                    {isAndroid ? (
+                        <div className="space-y-2">
+                            <a href="/kangal.apk" download="kangal.apk" className="block w-full">
+                                <Button
+                                    className="w-full h-11 text-sm font-semibold gap-2 shadow-lg shadow-primary/20"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    এখনই ডাউনলোড করুন (APK)
+                                </Button>
+                            </a>
+                        </div>
+                    ) : deferredPrompt ? (
                         <div className="space-y-2">
                             <Button
                                 onClick={handleInstall}
@@ -159,13 +175,6 @@ export function InstallAppSection() {
                                     </>
                                 )}
                             </Button>
-                            <a
-                                href="/kangal.apk"
-                                download="kangal.apk"
-                                className="block text-center text-xs text-muted-foreground hover:text-foreground underline pt-1"
-                            >
-                                সরাসরি Android APK ডাউনলোড করুন (বিকল্প)
-                            </a>
                         </div>
                     ) : showManualInstructions ? (
                         <div className="space-y-3">
@@ -176,18 +185,8 @@ export function InstallAppSection() {
                             <div className="flex items-start gap-2 text-xs text-muted-foreground/80 bg-muted/30 rounded-lg p-3">
                                 <span className="flex-shrink-0 mt-0.5">👉</span>
                                 <p>
-                                    Chrome-এ <strong>⋮</strong> মেনু &rarr; <strong>&quot;Add to Home screen&quot;</strong> / <strong>&quot;Install app&quot;</strong> ট্যাপ করুন
+                                    Safari-তে <strong>Share</strong> মেনু &rarr; <strong>&quot;Add to Home Screen&quot;</strong> ট্যাপ করুন
                                 </p>
-                            </div>
-                            <div className="text-center pt-1.5">
-                                <span className="text-xs text-muted-foreground">অথবা </span>
-                                <a
-                                    href="/kangal.apk"
-                                    download="kangal.apk"
-                                    className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-bold underline"
-                                >
-                                    সরাসরি Android APK ডাউনলোড করুন
-                                </a>
                             </div>
                         </div>
                     ) : null}

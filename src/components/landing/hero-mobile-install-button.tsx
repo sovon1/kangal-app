@@ -12,6 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function HeroMobileInstallButton() {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+    const [isAndroid, setIsAndroid] = useState(false);
     const [isInstalled, setIsInstalled] = useState(() => {
         if (typeof window !== 'undefined') {
             return window.matchMedia('(display-mode: standalone)').matches;
@@ -21,6 +22,10 @@ export function HeroMobileInstallButton() {
     const [isInstalling, setIsInstalling] = useState(false);
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setIsAndroid(/android/i.test(navigator.userAgent));
+        }
+
         const handler = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -59,8 +64,33 @@ export function HeroMobileInstallButton() {
         setDeferredPrompt(null);
     };
 
-    // Only render on mobile when the prompt is available and app is not installed
-    if (isInstalled || !deferredPrompt) return null;
+    // Only render on mobile when the app is not installed
+    if (isInstalled) return null;
+
+    // For Android, we show the direct APK download link immediately
+    if (isAndroid) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full sm:hidden mt-2"
+            >
+                <a href="/kangal.apk" download="kangal.apk" className="block w-full">
+                    <Button
+                        variant="secondary"
+                        size="lg"
+                        className="w-full h-12 px-8 text-lg gap-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 border border-emerald-500/20"
+                    >
+                        <Download className="h-5 w-5" />
+                        Download KANGAL App (APK)
+                    </Button>
+                </a>
+            </motion.div>
+        );
+    }
+
+    // Fallback to PWA prompt for other mobile OS (if supported)
+    if (!deferredPrompt) return null;
 
     return (
         <motion.div
